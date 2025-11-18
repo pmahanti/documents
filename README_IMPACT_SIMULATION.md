@@ -299,10 +299,65 @@ Results are consistent with:
 
 5. **Ballistic Ejecta Only**: No vapor plume, no secondary cratering, no seismic effects.
 
+## Crater Reverse Modeling (NEW!)
+
+**Inverse problem solver**: Given observed crater GeoTIFF data, estimate impact parameters and create formation animations!
+
+### Features
+
+- **GeoTIFF Support**: Load real lunar crater topography and images
+- **Morphometry Extraction**: Automatically measure diameter, depth, rim height
+- **Scaling Law Inversion**: Estimate projectile size and velocity from crater
+- **Formation Animation**: Generate impact sequence matching observed crater
+- **Context Movies**: Show crater appearing in wider landscape
+- **Scientific Validation**: Forward model verification (typically <1% error)
+
+### Usage
+
+```bash
+# With GeoTIFF files
+python crater_reverse_modeling.py \
+    --crater-topo crater_elevation.tif \
+    --crater-image crater_optical.tif \
+    --context-image region_context.tif \
+    --velocity 20
+
+# Synthetic demonstration mode
+python crater_reverse_modeling.py \
+    --diameter 300 \
+    --velocity 18 \
+    --frames 80 \
+    --fps 15 \
+    --output-prefix my_crater
+```
+
+### Outputs
+
+1. **Formation Animation** (`*_formation.gif`):
+   - Left: Crater profile evolution (simulated vs observed)
+   - Right: Map view showing crater appearance
+   - Matches final observed morphology
+
+2. **Context Movie** (`*_context.gif`):
+   - Crater fading into wider landscape
+   - Shows spatial context and scale
+   - Red circle marks crater location
+
+### Example Results
+
+```
+Observed crater: D = 265m, d = 52m
+↓ [Scaling law inversion]
+Estimated impact: 2.0m projectile @ 20 km/s
+↓ [Forward verification]
+Predicted crater: D = 264.6m (0.15% error) ✓
+```
+
 ## Future Enhancements
 
 Potential additions:
 - [ ] MoviePy integration for advanced video editing and compositing
+- [x] Crater reverse modeling from GeoTIFF data
 - [ ] Secondary crater field generation from ejecta
 - [ ] Layered target properties (regolith depth variation)
 - [ ] Thermal effects and melt volume estimation
