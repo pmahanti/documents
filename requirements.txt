@@ -5,3 +5,4 @@ geopandas>=0.10.0
 shapely>=1.8.0
 pyproj>=3.0.0
 matplotlib>=3.5.0
+reportlab>=3.6.0
