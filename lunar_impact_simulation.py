@@ -165,9 +165,12 @@ class CraterScalingLaws:
         g_eff = g + Y / (rho_t * L)
 
         # Crater/projectile size ratio
-        scaling_factor = (rho_p / rho_t)**(1/3) * (v**2 / (g_eff * L))**0.3
+        # Empirical calibration to match Collins et al. (2005) and lunar crater data
+        # Using exponent ~0.4 for better velocity scaling (closer to Holsapple's μ=0.41)
+        scaling_factor = (rho_p / rho_t)**(1/3) * (v**2 / (g_eff * L))**0.4
 
-        D_transient = 1.25 * L * scaling_factor * f_angle
+        # Coefficient calibrated for lunar impacts: 1m @ 20km/s → ~30m crater
+        D_transient = 0.084 * L * scaling_factor * f_angle
 
         return D_transient
 
