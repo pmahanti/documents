@@ -1,0 +1,26 @@
+import numpy as np
+from numpy.polynomial import chebyshev
+
+def create_synthetic_crater_profile(x_normalized):
+    """Generates a simple, synthetic 1D crater profile (e.g., a downward curve)."""
+    # A simple parabolic-like shape for demonstration
+    return -x_normalized**2 + 0.1 * np.random.randn(len(x_normalized))
+
+# 1. Define the normalized domain [-1, 1]
+# Use Chebyshev points for optimal interpolation (optional but recommended for real data)
+num_points = 50
+x_data = np.cos(np.linspace(0, np.pi, num_points))
+
+# 2. Generate the elevation data
+y_data = create_synthetic_crater_profile(x_data)
+
+# 3. Fit the data to a Chebyshev series (e.g., up to degree 10)
+# The 'domain' parameter ensures correct normalization if x_data wasn't already normalized
+degree = 10
+cheb_fit = chebyshev.Chebyshev.fit(x_data, y_data, degree, domain=[-1, 1])
+
+# The 'c' attribute of the resulting object contains the standardized coefficients
+coefficients = cheb_fit.coef
+
+print(f"Chebyshev coefficients: {coefficients}")
+print(f"Type of coefficients: {type(coefficients)}")
