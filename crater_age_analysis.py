@@ -43,6 +43,17 @@ except ImportError:
     print("Warning: topography_degradation_age module not found.")
     TOPO_DEGRADATION_AVAILABLE = False
 
+# Import Chebyshev coefficient extraction
+try:
+    from chebyshev_coefficients import (
+        ChebyshevProfileAnalyzer,
+        extract_chebyshev_coefficients
+    )
+    CHEBYSHEV_AVAILABLE = True
+except ImportError:
+    print("Warning: chebyshev_coefficients module not found.")
+    CHEBYSHEV_AVAILABLE = False
+
 
 class CraterAgeAnalyzer:
     """Main class for crater age analysis using diffusion-based degradation."""
@@ -94,9 +105,16 @@ class CraterAgeAnalyzer:
         else:
             self.topo_deg_estimator = None
 
+        # Initialize Chebyshev coefficient analyzer
+        if CHEBYSHEV_AVAILABLE:
+            self.chebyshev_analyzer = ChebyshevProfileAnalyzer(num_coefficients=17)
+        else:
+            self.chebyshev_analyzer = None
+
         print(f"Loaded {len(self.craters_gdf)} craters")
         print(f"Pixel size: {self.pixel_size} meters")
         print(f"Age method: {age_method}")
+        print(f"Chebyshev analysis: {'enabled' if CHEBYSHEV_AVAILABLE else 'disabled'}")
 
     def refine_rim_position(self, geometry, topo_array, image_array, transform, search_radius=10):
         """
@@ -570,6 +588,22 @@ class CraterAgeAnalyzer:
                     topo_corrected, center_row, center_col, diameter_pixels, num_profiles=8
                 )
 
+                # Extract Chebyshev coefficients from profiles
+                # Profiles are normalized by diameter: -D to +D maps to -1 to +1
+                chebyshev_matrix = None
+                chebyshev_analysis = None
+                if self.chebyshev_analyzer is not None and len(profiles) > 0:
+                    try:
+                        chebyshev_matrix, chebyshev_analysis, cheb_metadata = \
+                            extract_chebyshev_coefficients(
+                                profiles,
+                                diameter=diameter_pixels,  # Normalize by crater diameter
+                                num_coefficients=17
+                            )
+                        print(f"  Chebyshev: {chebyshev_matrix.shape[0]}×{chebyshev_matrix.shape[1]} coefficient matrix")
+                    except Exception as e:
+                        print(f"  Warning: Chebyshev extraction failed: {e}")
+
                 # Estimate age
                 age, depth, degradation = self.estimate_age_from_profiles(
                     profiles, diameter_meters, self.pixel_size
@@ -585,8 +619,24 @@ class CraterAgeAnalyzer:
                     'depth_m': depth,
                     'age': age,
                     'degradation': degradation,
-                    'num_profiles': len(profiles)
+                    'num_profiles': len(profiles),
+                    'chebyshev_matrix': chebyshev_matrix,
+                    'chebyshev_analysis': chebyshev_analysis
                 }
+
+                # Add individual Chebyshev coefficient columns for shapefile
+                if chebyshev_matrix is not None and chebyshev_analysis is not None:
+                    # Add mean coefficients (easier to store in shapefile)
+                    mean_coeffs = chebyshev_analysis['mean_coefficients']
+                    for i in range(min(17, len(mean_coeffs))):
+                        result[f'C{i}_mean'] = float(mean_coeffs[i])
+
+                    # Add key crater characteristics
+                    crater_chars = chebyshev_analysis.get('crater_characteristics', {})
+                    result['depth_indicator'] = float(crater_chars.get('mean_depth_indicator', 0))
+                    result['central_peak_idx'] = float(crater_chars.get('central_peak_indicator', 0))
+                    result['asymmetry_idx'] = float(crater_chars.get('asymmetry_index', 0))
+                    result['profile_consistency'] = float(crater_chars.get('profile_consistency', 0))
 
                 # Copy original attributes
                 for col in self.craters_gdf.columns:
@@ -673,9 +723,58 @@ class CraterAgeAnalyzer:
 
         print(f"\nVisualization saved to: {output_path}")
 
-    def save_results(self, results_gdf, output_shapefile='crater_ages.shp'):
+    def save_chebyshev_matrices(self, results_gdf, output_dir='output'):
         """
-        Save results to shapefile.
+        Save Chebyshev coefficient matrices to separate files.
+
+        Parameters:
+        -----------
+        results_gdf : GeoDataFrame
+            Results containing Chebyshev matrices
+        output_dir : str
+            Output directory for matrix files
+        """
+        import os
+        import json
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Save individual matrices as numpy files
+        matrices_saved = 0
+        for idx, row in results_gdf.iterrows():
+            if 'chebyshev_matrix' in row and row['chebyshev_matrix'] is not None:
+                matrix = row['chebyshev_matrix']
+
+                # Save as numpy file
+                matrix_file = os.path.join(output_dir, f'crater_{idx}_chebyshev_17x8.npy')
+                np.save(matrix_file, matrix)
+
+                # Also save as CSV for easier viewing
+                csv_file = os.path.join(output_dir, f'crater_{idx}_chebyshev_17x8.csv')
+                np.savetxt(csv_file, matrix, delimiter=',',
+                          header='Profile angles: 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°\n' +
+                                 'Rows: C0-C16, Columns: 8 profiles',
+                          fmt='%.6f')
+
+                matrices_saved += 1
+
+        # Save summary with all matrices in one file
+        if matrices_saved > 0:
+            summary_file = os.path.join(output_dir, 'all_craters_chebyshev.npz')
+            matrices_dict = {}
+            for idx, row in results_gdf.iterrows():
+                if 'chebyshev_matrix' in row and row['chebyshev_matrix'] is not None:
+                    matrices_dict[f'crater_{idx}'] = row['chebyshev_matrix']
+
+            np.savez(summary_file, **matrices_dict)
+            print(f"  Chebyshev matrices saved: {matrices_saved} craters")
+            print(f"  Summary file: {summary_file}")
+            print(f"  Individual files: {output_dir}/crater_*_chebyshev_17x8.*")
+
+    def save_results(self, results_gdf, output_shapefile='crater_ages.shp', save_chebyshev=True):
+        """
+        Save results to shapefile and Chebyshev matrices to separate files.
 
         Parameters:
         -----------
@@ -683,14 +782,31 @@ class CraterAgeAnalyzer:
             Results to save
         output_shapefile : str
             Output shapefile path
+        save_chebyshev : bool
+            Whether to save Chebyshev matrices to separate files (default True)
         """
-        # Ensure all columns are serializable
-        for col in results_gdf.columns:
-            if results_gdf[col].dtype == 'object':
-                results_gdf[col] = results_gdf[col].astype(str)
+        # Create a copy for shapefile (remove non-serializable columns)
+        gdf_copy = results_gdf.copy()
 
-        results_gdf.to_file(output_shapefile)
+        # Remove matrix columns (they'll be saved separately)
+        cols_to_remove = ['chebyshev_matrix', 'chebyshev_analysis']
+        for col in cols_to_remove:
+            if col in gdf_copy.columns:
+                gdf_copy = gdf_copy.drop(columns=[col])
+
+        # Ensure all remaining columns are serializable
+        for col in gdf_copy.columns:
+            if gdf_copy[col].dtype == 'object':
+                gdf_copy[col] = gdf_copy[col].astype(str)
+
+        gdf_copy.to_file(output_shapefile)
         print(f"\nResults saved to: {output_shapefile}")
+
+        # Save Chebyshev matrices separately
+        if save_chebyshev:
+            import os
+            output_dir = os.path.join(os.path.dirname(output_shapefile) or '.', 'chebyshev_coefficients')
+            self.save_chebyshev_matrices(results_gdf, output_dir)
 
     def close(self):
         """Close raster datasets."""

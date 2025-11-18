@@ -27,11 +27,12 @@ python crater_age_analysis.py \
 - **Precise center and diameter calculation** via circle fitting
 - **First-order tilt correction** for accurate morphology
 - **8 radial elevation profiles** at 45° intervals
+- **Chebyshev coefficient extraction**: 17×8 matrix for morphological analysis
 - **Multiple age estimation methods**:
   - Topography degradation model (Luo et al. 2025)
   - Cratermaker diffusion models
   - Depth-diameter ratio fallback
-- **Shapefile output** with age labels and statistics
+- **Shapefile output** with age labels, statistics, and Chebyshev coefficients
 - **Visualization** with labeled crater map
 
 ### Documentation
@@ -42,6 +43,7 @@ See [README_CRATER_ANALYSIS.md](README_CRATER_ANALYSIS.md) for detailed document
 
 - `crater_age_analysis.py` - Main analysis script
 - `topography_degradation_age.py` - Topography degradation model (Luo et al. 2025)
+- `chebyshev_coefficients.py` - Chebyshev polynomial coefficient extraction
 - `example_usage.py` - Example usage and API demonstrations
 - `validate_code.py` - Code validation script
 - `requirements.txt` - Python dependencies

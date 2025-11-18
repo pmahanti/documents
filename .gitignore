@@ -39,6 +39,7 @@ Thumbs.db
 
 # Output files
 output/
+chebyshev_coefficients/
 *.shp
 *.shx
 *.dbf
@@ -46,6 +47,8 @@ output/
 *.cpg
 *.tif
 *.png
+*.npy
+*.npz
 !example*.png
 
 # Jupyter

@@ -8,11 +8,16 @@ This toolkit provides comprehensive analysis of lunar impact craters using diffu
 - **Center & Diameter Calculation**: Fits circles to refined rim points for accurate center and diameter determination
 - **Tilt Correction**: Removes first-order planar tilt from topography data
 - **Radial Profile Extraction**: Extracts 8 elevation profiles at 45° intervals from -1.5D to +1.5D
+- **Chebyshev Coefficient Extraction**: Computes 17×8 matrix of Chebyshev coefficients (C0-C16) from radial profiles
+  - Standardized morphological descriptors
+  - Depth-to-diameter ratio inference (C2)
+  - Central peak detection (C4, C8)
+  - Asymmetry analysis (odd coefficients)
 - **Multiple Age Estimation Methods**:
   - **Topography Degradation Model** (Luo et al. 2025) - Primary method
   - **Cratermaker Diffusion Model** - Alternative method
   - **Depth-Diameter Ratio** - Fallback method
-- **Output Generation**: Creates labeled shapefiles and visualizations
+- **Output Generation**: Creates labeled shapefiles, visualizations, and Chebyshev coefficient matrices
 
 ## Installation
 
@@ -144,6 +149,31 @@ The algorithm refines crater rim positions using:
 - Each profile extends from -1.5D to +1.5D
 - Samples 300 points per profile
 
+### 4.5. Chebyshev Coefficient Extraction
+Chebyshev polynomials provide a standardized mathematical framework for quantitative crater characterization:
+
+- **Polynomial Fitting**: Fits 17 Chebyshev polynomials (C0-C16) to each radial profile
+- **Normalization**:
+  - Radial distances normalized by crater diameter D: positions from -D to +D map to -1 to +1
+  - Elevations centered at 0 (mean subtracted) and divided by diameter D
+  - This ensures size-independent comparison across different crater diameters
+- **Output**: 17×8 coefficient matrix (17 coefficients × 8 profiles)
+- **Physical Interpretation**:
+  - **C0**: Normalized mean elevation offset (dimensionless)
+  - **C2**: Depth-to-diameter ratio indicator (curvature)
+  - **C4, C8**: Central peak presence indicators
+  - **Odd coefficients (C1, C3, C5, ...)**: Asymmetry indicators
+  - **Even coefficients (C0, C2, C4, ...)**: Symmetric morphological features
+
+**Research Basis**: Most crater elevation profiles can be well represented using 17 Chebyshev coefficients, as demonstrated by LROC team analysis of 765 craters ranging from 100m to 145km in diameter.
+
+**Standardization**: By normalizing distances and elevations by diameter, coefficients become directly comparable across craters of different sizes, enabling:
+- Standardized comparison between craters
+- Degradation state quantification independent of size
+- Central peak detection in complex craters
+- Profile asymmetry assessment
+- Automated crater classification
+
 ### 5. Age Estimation
 
 The toolkit provides multiple age estimation methods:
@@ -190,10 +220,40 @@ Contains all original attributes plus:
 - `diameter_m`: Corrected diameter in meters
 - `depth_m`: Crater depth in meters
 - `age`: Estimated age (numerical or categorical)
-- `degradation`: Degradation parameter from cratermaker
+- `degradation`: Degradation parameter from age estimation
 - `num_profiles`: Number of successfully extracted profiles
+- `C0_mean` through `C16_mean`: Mean Chebyshev coefficients across 8 profiles
+- `depth_indicator`: C2-based depth-to-diameter indicator
+- `central_peak_idx`: Combined C4+C8 central peak indicator
+- `asymmetry_idx`: Sum of odd coefficient magnitudes
+- `profile_consistency`: Standard deviation of coefficients (lower = more symmetric)
 
-### 2. Visualization Image (crater_ages_visualization.png)
+### 2. Chebyshev Coefficient Matrices (chebyshev_coefficients/ directory)
+Full 17×8 coefficient matrices for detailed morphological analysis:
+
+- **Individual crater files**:
+  - `crater_N_chebyshev_17x8.npy`: NumPy binary format (for Python analysis)
+  - `crater_N_chebyshev_17x8.csv`: CSV format (for spreadsheet viewing)
+  - Rows: C0-C16 coefficients
+  - Columns: 8 profiles at 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°
+
+- **Summary file**:
+  - `all_craters_chebyshev.npz`: All crater matrices in compressed NumPy archive
+
+**Loading Chebyshev matrices in Python**:
+```python
+import numpy as np
+
+# Load single crater matrix
+matrix = np.load('chebyshev_coefficients/crater_0_chebyshev_17x8.npy')
+print(f"Shape: {matrix.shape}")  # (17, 8)
+
+# Load all craters
+all_data = np.load('chebyshev_coefficients/all_craters_chebyshev.npz')
+crater_0 = all_data['crater_0']
+```
+
+### 3. Visualization Image (crater_ages_visualization.png)
 - Lunar image background
 - Red circles showing refined crater positions
 - Yellow text labels with age estimates
@@ -271,9 +331,13 @@ gdf.to_file('craters_reprojected.shp')
 
 3. **Pike, R. J. (1977).** Size-dependence in the shape of fresh impact craters on the moon. *Impact and Explosion Cratering*, 489-509.
 
-4. **cratermaker Documentation**: https://cratermaker.readthedocs.io/en/latest/api/morphology.html
+4. **LROC Team.** Chebyshev polynomial analysis of lunar crater morphology. *Lunar Reconnaissance Orbiter Camera*. http://lroc.sese.asu.edu/posts/864
+   - Standardized approach for quantitative crater topography characterization
+   - Analysis of 765 craters (100m to 145km diameter) using 17 Chebyshev coefficients
 
-5. **Howard, A. D. (2007).** Simulating the development of Martian highland landscapes through the interaction of impact cratering, fluvial erosion, and variable hydrologic forcing. *Geomorphology*, 91(3-4), 332-363.
+5. **cratermaker Documentation**: https://cratermaker.readthedocs.io/en/latest/api/morphology.html
+
+6. **Howard, A. D. (2007).** Simulating the development of Martian highland landscapes through the interaction of impact cratering, fluvial erosion, and variable hydrologic forcing. *Geomorphology*, 91(3-4), 332-363.
 
 ## Citation
 
