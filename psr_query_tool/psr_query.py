@@ -274,6 +274,171 @@ class PSRQuery:
 
         print(f"Results exported to: {output_path}")
 
+    def create_map_png(
+        self,
+        results: gpd.GeoDataFrame,
+        query_lat: float,
+        query_lon: float,
+        radius_km: float,
+        output_path: str,
+        dpi: int = 150
+    ):
+        """
+        Create a PNG map visualization of PSRs and query location.
+
+        Args:
+            results: GeoDataFrame with query results
+            query_lat: Query latitude
+            query_lon: Query longitude
+            radius_km: Search radius in kilometers
+            output_path: Output PNG file path
+            dpi: Resolution in dots per inch (default: 150)
+        """
+        try:
+            import matplotlib.pyplot as plt
+            import matplotlib.patches as mpatches
+            from matplotlib.patches import Circle
+            import numpy as np
+        except ImportError:
+            raise ImportError(
+                "Visualization requires matplotlib. Install with: pip install matplotlib"
+            )
+
+        output_path = Path(output_path)
+
+        # Create figure and axis
+        fig, ax = plt.subplots(figsize=(12, 10), dpi=dpi)
+
+        # Set background color to dark (space-like)
+        ax.set_facecolor('#0a0a0a')
+        fig.patch.set_facecolor('#1a1a1a')
+
+        # Plot all PSRs in the dataset (in gray)
+        self.gdf.plot(
+            ax=ax,
+            color='#404040',
+            edgecolor='#606060',
+            linewidth=0.5,
+            alpha=0.3,
+            label='Other PSRs'
+        )
+
+        # Plot PSRs within radius (highlighted)
+        if len(results) > 0:
+            results.plot(
+                ax=ax,
+                color='#4a90e2',
+                edgecolor='#ffffff',
+                linewidth=1.5,
+                alpha=0.7,
+                label=f'PSRs within {radius_km}km'
+            )
+
+        # Plot query location
+        ax.plot(
+            query_lon,
+            query_lat,
+            marker='*',
+            markersize=20,
+            color='#ff6b6b',
+            markeredgecolor='white',
+            markeredgewidth=1.5,
+            label='Query Location',
+            zorder=10
+        )
+
+        # Draw search radius circle (approximate)
+        # Convert radius from km to degrees (rough approximation)
+        radius_deg = radius_km / (self.LUNAR_RADIUS_KM * np.pi / 180)
+
+        # Adjust for latitude distortion
+        lat_factor = np.cos(np.radians(query_lat))
+        if abs(lat_factor) > 0.01:  # Avoid division by zero at poles
+            radius_lon = radius_deg / lat_factor
+        else:
+            radius_lon = radius_deg
+
+        circle = Circle(
+            (query_lon, query_lat),
+            radius_deg,
+            fill=False,
+            edgecolor='#ff6b6b',
+            linewidth=2,
+            linestyle='--',
+            alpha=0.6,
+            label=f'{radius_km}km radius'
+        )
+        ax.add_patch(circle)
+
+        # Set plot limits to focus on area of interest
+        margin_factor = 2.5
+        lat_margin = radius_deg * margin_factor
+        lon_margin = radius_lon * margin_factor if abs(lat_factor) > 0.01 else radius_deg * margin_factor
+
+        ax.set_xlim(query_lon - lon_margin, query_lon + lon_margin)
+        ax.set_ylim(query_lat - lat_margin, query_lat + lat_margin)
+
+        # Labels and title
+        ax.set_xlabel('Longitude (degrees)', fontsize=12, color='white')
+        ax.set_ylabel('Latitude (degrees)', fontsize=12, color='white')
+
+        title = f'Lunar Permanently Shadowed Regions\n'
+        title += f'Query: ({query_lat:.2f}°, {query_lon:.2f}°) | '
+        title += f'Radius: {radius_km}km | '
+        title += f'PSRs Found: {len(results)}'
+
+        ax.set_title(title, fontsize=14, fontweight='bold', color='white', pad=20)
+
+        # Style the grid
+        ax.grid(True, alpha=0.2, color='white', linestyle=':')
+        ax.tick_params(colors='white')
+
+        # Legend
+        legend = ax.legend(
+            loc='upper right',
+            framealpha=0.9,
+            facecolor='#2a2a2a',
+            edgecolor='white',
+            fontsize=10
+        )
+        plt.setp(legend.get_texts(), color='white')
+
+        # Add statistics box
+        if len(results) > 0:
+            stats_text = f"Statistics:\n"
+            stats_text += f"Total PSRs: {len(results)}\n"
+            stats_text += f"Nearest: {results.iloc[0]['distance_km']:.2f} km\n"
+            stats_text += f"Farthest: {results.iloc[-1]['distance_km']:.2f} km"
+
+            props = dict(boxstyle='round', facecolor='#2a2a2a', alpha=0.9, edgecolor='white')
+            ax.text(
+                0.02, 0.02,
+                stats_text,
+                transform=ax.transAxes,
+                fontsize=9,
+                verticalalignment='bottom',
+                bbox=props,
+                color='white',
+                family='monospace'
+            )
+
+        # Tight layout
+        plt.tight_layout()
+
+        # Save
+        plt.savefig(
+            output_path,
+            dpi=dpi,
+            bbox_inches='tight',
+            facecolor=fig.get_facecolor(),
+            edgecolor='none'
+        )
+        plt.close()
+
+        print(f"Map saved to: {output_path}")
+
+        return output_path
+
 
 def main():
     """Main entry point."""
@@ -293,6 +458,9 @@ Examples:
 
   # Export results
   %(prog)s --lat -89.5 --lon 45.0 --radius 50 --output results.geojson
+
+  # Create PNG map visualization
+  %(prog)s --lat -89.5 --lon 45.0 --radius 50 --map-png map.png
         """
     )
 
@@ -337,6 +505,16 @@ Examples:
         default='geojson',
         help='Output format (default: geojson)'
     )
+    parser.add_argument(
+        '--map-png',
+        help='Create PNG map visualization at specified path'
+    )
+    parser.add_argument(
+        '--dpi',
+        type=int,
+        default=150,
+        help='DPI for PNG output (default: 150)'
+    )
 
     args = parser.parse_args()
 
@@ -363,6 +541,17 @@ Examples:
             # Export if requested
             if args.output and len(results) > 0:
                 psr.export_results(results, args.output, args.format)
+
+            # Create PNG map if requested
+            if args.map_png:
+                psr.create_map_png(
+                    results,
+                    args.lat,
+                    args.lon,
+                    args.radius,
+                    args.map_png,
+                    args.dpi
+                )
         else:
             parser.error("--lat and --lon are required for queries (or use --convert)")
 

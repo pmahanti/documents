@@ -31,3 +31,10 @@ results/
 *.geojson
 *.json
 output/
+
+# Examples (generated)
+examples/*.png
+!examples/example_wide_area.png  # Keep one example for documentation
+
+# Synthetic data
+data/synthetic/
