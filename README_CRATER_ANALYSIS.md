@@ -8,7 +8,10 @@ This toolkit provides comprehensive analysis of lunar impact craters using diffu
 - **Center & Diameter Calculation**: Fits circles to refined rim points for accurate center and diameter determination
 - **Tilt Correction**: Removes first-order planar tilt from topography data
 - **Radial Profile Extraction**: Extracts 8 elevation profiles at 45° intervals from -1.5D to +1.5D
-- **Age Estimation**: Uses diffusion-based degradation models via cratermaker library
+- **Multiple Age Estimation Methods**:
+  - **Topography Degradation Model** (Luo et al. 2025) - Primary method
+  - **Cratermaker Diffusion Model** - Alternative method
+  - **Depth-Diameter Ratio** - Fallback method
 - **Output Generation**: Creates labeled shapefiles and visualizations
 
 ## Installation
@@ -55,12 +58,14 @@ python crater_age_analysis.py \
 ```python
 from crater_age_analysis import CraterAgeAnalyzer
 
-# Initialize analyzer
+# Initialize analyzer with default (auto) age estimation method
 analyzer = CraterAgeAnalyzer(
     topo_path='topography.tif',
     image_path='lunar_image.tif',
     shapefile_path='crater_rims.shp',
-    pixel_size_meters=5.0  # Optional
+    pixel_size_meters=5.0,  # Optional
+    age_method='auto',  # Options: 'auto', 'topography_degradation', 'cratermaker', 'both'
+    diffusivity=5.0  # Diffusivity coefficient in m²/Myr (for topography_degradation)
 )
 
 # Process all craters
@@ -75,6 +80,27 @@ analyzer.visualize_results(results, 'crater_ages_visualization.png')
 # Clean up
 analyzer.close()
 ```
+
+### Age Estimation Methods
+
+The toolkit supports multiple age estimation methods:
+
+1. **`age_method='auto'`** (default): Automatically selects the best available method
+   - Prefers topography_degradation if available
+   - Falls back to cratermaker, then depth-diameter ratio
+
+2. **`age_method='topography_degradation'`**: Uses Luo et al. (2025) model
+   - Best for craters > 400m diameter
+   - Uncertainty < 165 Ma for large craters
+   - Based on diffusive degradation modeling
+
+3. **`age_method='cratermaker'`**: Uses cratermaker library
+   - Requires cratermaker installation
+   - General diffusion-based approach
+
+4. **`age_method='both'`**: Runs both methods for comparison
+   - Returns ages from all available methods
+   - Useful for validation and uncertainty quantification
 
 ## Input Data Requirements
 
@@ -119,12 +145,35 @@ The algorithm refines crater rim positions using:
 - Samples 300 points per profile
 
 ### 5. Age Estimation
+
+The toolkit provides multiple age estimation methods:
+
+#### Method A: Topography Degradation Model (Luo et al. 2025) - **Primary Method**
+Based on DOI: 10.5281/zenodo.15168130
+
+This method uses diffusive degradation modeling:
+- Generates pristine (fresh) crater profile based on empirical morphology
+  - Parabolic bowl interior for simple craters
+  - Exponential rim decay
+  - d/D ≈ 0.196 for fresh lunar simple craters
+- Models degradation through diffusion equation
+  - Smoothing length scale: σ = √(2κt) where κ is diffusivity, t is time
+  - Default diffusivity: 5 m²/Myr (typical lunar value: 3-10 m²/Myr)
+- Fits observed profiles to degraded model to estimate age
+- Calculates age from 8 radial profiles and returns mean ± std
+- **Best for craters > 400m diameter**
+- **Typical uncertainty: < 165 Ma for large craters**
+- Validates against isotopic ages from lunar samples
+
+#### Method B: Cratermaker Diffusion Model
 Uses the cratermaker library's diffusion-based model:
 - Analyzes crater depth and rim degradation
 - Compares to theoretical diffusion profiles
 - Estimates age in billions of years (Ga)
+- Requires cratermaker package installation
 
-Fallback method (if cratermaker unavailable):
+#### Method C: Depth-Diameter Ratio (Fallback)
+Quick classification based on degradation state:
 - Calculates depth-to-diameter (d/D) ratio
 - Classifies based on degradation state:
   - Fresh: d/D > 0.18 (<0.1 Ga)
@@ -215,15 +264,34 @@ gdf.to_file('craters_reprojected.shp')
 
 ## References
 
-1. **cratermaker Documentation**: https://cratermaker.readthedocs.io/en/latest/api/morphology.html
-2. Fassett, C. I., & Thomson, B. J. (2014). Crater degradation on the lunar maria: Topographic diffusion and the rate of erosion on the Moon. JGR Planets.
-3. Howard, A. D. (2007). Simulating the development of Martian highland landscapes through the interaction of impact cratering, fluvial erosion, and variable hydrologic forcing. Geomorphology.
+1. **Luo, F., Xiao, Z., Xie, M., Wang, Y., & Ma, Y. (2025).** Age Estimation of Individual Lunar Simple Craters Using the Topography Degradation Model. *Journal of Geophysical Research: Planets*. DOI: 10.1029/2025JE008937
+   - Software/Data: https://doi.org/10.5281/zenodo.15168130
+
+2. **Fassett, C. I., & Thomson, B. J. (2014).** Crater degradation on the lunar maria: Topographic diffusion and the rate of erosion on the Moon. *JGR Planets*, 119(10), 2255-2271.
+
+3. **Pike, R. J. (1977).** Size-dependence in the shape of fresh impact craters on the moon. *Impact and Explosion Cratering*, 489-509.
+
+4. **cratermaker Documentation**: https://cratermaker.readthedocs.io/en/latest/api/morphology.html
+
+5. **Howard, A. D. (2007).** Simulating the development of Martian highland landscapes through the interaction of impact cratering, fluvial erosion, and variable hydrologic forcing. *Geomorphology*, 91(3-4), 332-363.
 
 ## Citation
 
 If you use this code in your research, please cite:
-- The cratermaker library: https://github.com/profminton/cratermaker
-- Relevant scientific papers on crater degradation modeling
+
+- **For the topography degradation method:**
+  ```
+  Luo, F., Xiao, Z., Xie, M., Wang, Y., & Ma, Y. (2025). Age Estimation of
+  Individual Lunar Simple Craters Using the Topography Degradation Model.
+  Journal of Geophysical Research: Planets. https://doi.org/10.1029/2025JE008937
+  ```
+
+- **For the cratermaker method:**
+  - The cratermaker library: https://github.com/profminton/cratermaker
+
+- **General crater degradation modeling:**
+  - Fassett & Thomson (2014) for diffusion-based approaches
+  - Pike (1977) for pristine crater morphology relationships
 
 ## License
 

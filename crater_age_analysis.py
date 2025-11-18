@@ -32,11 +32,23 @@ except ImportError:
     print("Warning: cratermaker not installed. Age estimation will use placeholder.")
     diffusion_age = None
 
+# Import alternate topography degradation model
+try:
+    from topography_degradation_age import (
+        TopographyDegradationAgeEstimator,
+        estimate_age_topography_degradation
+    )
+    TOPO_DEGRADATION_AVAILABLE = True
+except ImportError:
+    print("Warning: topography_degradation_age module not found.")
+    TOPO_DEGRADATION_AVAILABLE = False
+
 
 class CraterAgeAnalyzer:
     """Main class for crater age analysis using diffusion-based degradation."""
 
-    def __init__(self, topo_path, image_path, shapefile_path, pixel_size_meters=None):
+    def __init__(self, topo_path, image_path, shapefile_path, pixel_size_meters=None,
+                 age_method='auto', diffusivity=5.0):
         """
         Initialize the crater age analyzer.
 
@@ -50,10 +62,18 @@ class CraterAgeAnalyzer:
             Path to shapefile with approximate crater rims
         pixel_size_meters : float, optional
             Pixel size in meters (if None, extracted from raster)
+        age_method : str, optional
+            Age estimation method: 'auto', 'cratermaker', 'topography_degradation', or 'both'
+            Default: 'auto' (uses topography_degradation if available, else cratermaker, else fallback)
+        diffusivity : float, optional
+            Topographic diffusivity coefficient in m²/Myr (default 5.0)
+            Used for topography_degradation method
         """
         self.topo_path = topo_path
         self.image_path = image_path
         self.shapefile_path = shapefile_path
+        self.age_method = age_method
+        self.diffusivity = diffusivity
 
         # Load data
         self.topo_src = rasterio.open(topo_path)
@@ -66,8 +86,17 @@ class CraterAgeAnalyzer:
         else:
             self.pixel_size = pixel_size_meters
 
+        # Initialize topography degradation estimator if requested
+        if age_method in ['topography_degradation', 'both', 'auto'] and TOPO_DEGRADATION_AVAILABLE:
+            self.topo_deg_estimator = TopographyDegradationAgeEstimator(
+                diffusivity=diffusivity
+            )
+        else:
+            self.topo_deg_estimator = None
+
         print(f"Loaded {len(self.craters_gdf)} craters")
         print(f"Pixel size: {self.pixel_size} meters")
+        print(f"Age method: {age_method}")
 
     def refine_rim_position(self, geometry, topo_array, image_array, transform, search_radius=10):
         """
@@ -330,12 +359,12 @@ class CraterAgeAnalyzer:
 
         Returns:
         --------
-        age : float
-            Estimated age in years (Ga if applicable)
+        age : float or dict
+            Estimated age in years (Ga if applicable), or dict with multiple estimates
         depth : float
             Current depth in meters
-        degradation_param : float
-            Degradation parameter
+        degradation_param : float or dict
+            Degradation parameter(s)
         """
         if len(profiles) == 0:
             return None, None, None
@@ -367,12 +396,42 @@ class CraterAgeAnalyzer:
             rim_heights.append(rim_elev)
 
         avg_depth = np.median(depths) * pixel_size  # Convert to meters
+        avg_rim_height = np.median(rim_heights) * pixel_size if rim_heights else None
 
-        # Use cratermaker if available
-        if diffusion_age is not None:
+        # Determine which method(s) to use
+        use_topo_deg = False
+        use_cratermaker = False
+
+        if self.age_method == 'auto':
+            # Prefer topography degradation, fall back to others
+            use_topo_deg = TOPO_DEGRADATION_AVAILABLE and self.topo_deg_estimator is not None
+            use_cratermaker = (not use_topo_deg) and (diffusion_age is not None)
+        elif self.age_method == 'topography_degradation':
+            use_topo_deg = TOPO_DEGRADATION_AVAILABLE and self.topo_deg_estimator is not None
+        elif self.age_method == 'cratermaker':
+            use_cratermaker = diffusion_age is not None
+        elif self.age_method == 'both':
+            use_topo_deg = TOPO_DEGRADATION_AVAILABLE and self.topo_deg_estimator is not None
+            use_cratermaker = diffusion_age is not None
+
+        results = {}
+
+        # Try topography degradation method
+        if use_topo_deg:
             try:
-                # Call cratermaker diffusion age estimation
-                # Note: This is a simplified call - adjust parameters based on actual API
+                topo_result = self.topo_deg_estimator.estimate_age_from_profiles(
+                    profiles, diameter_meters, pixel_size,
+                    observed_depth=avg_depth,
+                    observed_rim_height=avg_rim_height
+                )
+                if topo_result is not None:
+                    results['topography_degradation'] = topo_result
+            except Exception as e:
+                print(f"Warning: Topography degradation estimation failed: {e}")
+
+        # Try cratermaker method
+        if use_cratermaker:
+            try:
                 age_result = diffusion_age(
                     diameter=diameter_meters,
                     depth=avg_depth,
@@ -386,16 +445,37 @@ class CraterAgeAnalyzer:
                     age = age_result
                     degradation = None
 
+                results['cratermaker'] = {
+                    'age_ga': age,
+                    'degradation': degradation,
+                    'method': 'cratermaker'
+                }
             except Exception as e:
                 print(f"Warning: cratermaker estimation failed: {e}")
-                age = self._simple_age_estimate(diameter_meters, avg_depth)
-                degradation = None
-        else:
-            # Fallback: simple depth-diameter ratio method
-            age = self._simple_age_estimate(diameter_meters, avg_depth)
-            degradation = None
 
-        return age, avg_depth, degradation
+        # Fallback: simple depth-diameter ratio method
+        if len(results) == 0:
+            age = self._simple_age_estimate(diameter_meters, avg_depth)
+            return age, avg_depth, None
+
+        # Return results based on what was requested
+        if self.age_method == 'both' and len(results) > 1:
+            # Return both methods
+            return results, avg_depth, results
+        elif len(results) > 0:
+            # Return the first available result
+            method_name = list(results.keys())[0]
+            result = results[method_name]
+
+            if 'age_ga' in result:
+                age = f"{result['age_ga']:.2f} Ga ({method_name})"
+            else:
+                age = f"{result.get('degradation_state', 'Unknown')} ({method_name})"
+
+            return age, avg_depth, result
+        else:
+            age = self._simple_age_estimate(diameter_meters, avg_depth)
+            return age, avg_depth, None
 
     def _simple_age_estimate(self, diameter, depth):
         """
