@@ -32,8 +32,9 @@ python crater_age_analysis.py \
   - Topography degradation model (Luo et al. 2025)
   - Cratermaker diffusion models
   - Depth-diameter ratio fallback
+- **Degradation Animation**: Quadchart visualization of crater evolution (3D topography, profiles, d/D, Chebyshev)
 - **Shapefile output** with age labels, statistics, and Chebyshev coefficients
-- **Visualization** with labeled crater map
+- **Visualization** with labeled crater map and animations
 
 ### Documentation
 
@@ -45,8 +46,25 @@ See [README_CRATER_ANALYSIS.md](README_CRATER_ANALYSIS.md) for detailed document
 - `topography_degradation_age.py` - Topography degradation model (Luo et al. 2025)
 - `chebyshev_coefficients.py` - Chebyshev polynomial coefficient extraction
 - `crater_synthesis_degradation_test.py` - Synthesis and degradation test suite
+- `crater_degradation_animation.py` - Animated quadchart degradation visualization
 - `example_usage.py` - Example usage and API demonstrations
 - `validate_code.py` - Code validation script
 - `test_chebyshev.py` - Chebyshev coefficient unit tests
 - `requirements.txt` - Python dependencies
 - `README_CRATER_ANALYSIS.md` - Comprehensive documentation
+
+### Quick Animation
+
+```bash
+# Generate degradation animation for a 2km crater
+python crater_degradation_animation.py --diameter 2000 --output crater_2km.mp4
+
+# Custom parameters
+python crater_degradation_animation.py \
+    --diameter 5000 \
+    --age-min 0.1 \
+    --age-max 3.9 \
+    --frames 150 \
+    --fps 15 \
+    --output crater_5km_degradation.mp4
+```

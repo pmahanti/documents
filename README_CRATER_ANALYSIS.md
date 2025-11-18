@@ -333,6 +333,120 @@ The test demonstrates:
 3. **Size Dependence**: Larger craters show slower relative degradation
 4. **Time Scales**: Significant morphological changes within first 1 Ga
 
+## Degradation Animation
+
+Generate animated quadchart visualizations showing crater evolution over time.
+
+### Usage
+
+```bash
+# Basic usage - 2km crater
+python crater_degradation_animation.py --diameter 2000 --output crater_2km.mp4
+
+# Full parameter control
+python crater_degradation_animation.py \
+    --diameter 5000 \
+    --age-min 0.1 \
+    --age-max 3.9 \
+    --frames 150 \
+    --fps 15 \
+    --output crater_degradation.mp4
+
+# Generate GIF instead of MP4
+python crater_degradation_animation.py --diameter 3000 --output crater.gif
+```
+
+### Animation Layout
+
+The animation shows a quadchart with 4 panels evolving over time:
+
+**Quadrant 1 (Top Left): 3D Topography**
+- 3D surface plot of crater morphology
+- Generated from radial profile using axisymmetric assumption
+- Shows visual degradation of rim and floor
+- Consistent viewing angle (30° elevation, 45° azimuth)
+
+**Quadrant 2 (Top Right): 2D Elevation Profile**
+- Normalized radial elevation profile (h/D vs r/D)
+- Black dashed line: pristine crater (reference)
+- Blue solid line: current degraded state
+- Shows smoothing of rim and filling of crater floor
+
+**Quadrant 3 (Bottom Left): d/D Ratio Evolution**
+- Tracks depth-to-diameter ratio over time
+- Horizontal dashed line: pristine value (0.196)
+- Red curve: degradation trajectory
+- Large red dot: current state
+- Demonstrates exponential-like decay
+
+**Quadrant 4 (Bottom Right): Chebyshev Coefficient Evolution**
+- Tracks normalized values of key coefficients:
+  - C0 (mean elevation) - Blue
+  - C2 (depth indicator) - Red
+  - C4 (central peak) - Green
+  - C8 (central peak) - Orange
+- Shows which morphological features change fastest
+- All coefficients normalized to [-1, 1] range
+
+### Parameters
+
+- `--diameter FLOAT`: Crater diameter in meters (required)
+- `--output STR`: Output filename (.mp4 or .gif)
+- `--age-min FLOAT`: Minimum age in Ga (default: 0.1)
+- `--age-max FLOAT`: Maximum age in Ga (default: 3.9)
+- `--frames INT`: Number of frames (default: 100)
+- `--fps INT`: Frames per second (default: 10)
+
+### Output Formats
+
+**MP4 (recommended)**:
+- Requires ffmpeg
+- Smaller file size
+- Better quality
+- Suitable for presentations
+
+**GIF**:
+- No external dependencies
+- Larger file size
+- Compatible with all platforms
+- Good for web/email
+
+### Technical Details
+
+- **Degradation model**: Diffusion-based (κ = 5 m²/Myr)
+- **Frame generation**: Pre-computed for smooth playback
+- **3D surface**: 72 angular points × radial profile length
+- **Coefficient normalization**: Per-coefficient global max
+- **Resolution**: 1600×1200 pixels at 150 DPI
+
+### Example Output Characteristics
+
+For a 2km crater over 0.1-3.9 Ga:
+- Initial d/D: ~0.196 (fresh)
+- Final d/D: ~0.05 (heavily degraded)
+- C2 coefficient: Decreases ~80%
+- Higher-order coefficients: Approach zero faster
+- Visual: Rim height reduces from ~80m to ~20m
+
+### Python API Usage
+
+```python
+from crater_degradation_animation import generate_crater_animation
+
+# Generate animation
+animator = generate_crater_animation(
+    diameter_m=2000,
+    output_file='crater_2km.mp4',
+    age_range=(0.1, 3.9),
+    num_frames=100,
+    fps=10
+)
+
+# Access computed data
+print(f"Final d/D ratio: {animator.d_D_ratios[-1]:.4f}")
+print(f"Coefficient matrix shape: {animator.chebyshev_matrices.shape}")
+```
+
 ## Example Workflow
 
 ```python

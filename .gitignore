@@ -52,6 +52,9 @@ synthesis_test_results/
 *.npz
 *.mat
 *.pdf
+*.mp4
+*.gif
+*.avi
 !example*.png
 !example*.pdf
 
