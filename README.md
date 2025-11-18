@@ -41,10 +41,12 @@ See [README_CRATER_ANALYSIS.md](README_CRATER_ANALYSIS.md) for detailed document
 
 ### Files
 
-- `crater_age_analysis.py` - Main analysis script
+- `crater_age_analysis.py` - Main analysis script with MATLAB export
 - `topography_degradation_age.py` - Topography degradation model (Luo et al. 2025)
 - `chebyshev_coefficients.py` - Chebyshev polynomial coefficient extraction
+- `crater_synthesis_degradation_test.py` - Synthesis and degradation test suite
 - `example_usage.py` - Example usage and API demonstrations
 - `validate_code.py` - Code validation script
+- `test_chebyshev.py` - Chebyshev coefficient unit tests
 - `requirements.txt` - Python dependencies
 - `README_CRATER_ANALYSIS.md` - Comprehensive documentation

@@ -772,9 +772,74 @@ class CraterAgeAnalyzer:
             print(f"  Summary file: {summary_file}")
             print(f"  Individual files: {output_dir}/crater_*_chebyshev_17x8.*")
 
-    def save_results(self, results_gdf, output_shapefile='crater_ages.shp', save_chebyshev=True):
+    def export_to_matlab(self, results_gdf, output_file='crater_analysis.mat'):
         """
-        Save results to shapefile and Chebyshev matrices to separate files.
+        Export profiles and Chebyshev coefficients to MATLAB .mat file.
+
+        Parameters:
+        -----------
+        results_gdf : GeoDataFrame
+            Results containing profiles and Chebyshev matrices
+        output_file : str
+            Output .mat file path
+        """
+        try:
+            from scipy.io import savemat
+        except ImportError:
+            print("Warning: scipy.io not available. Cannot export to MATLAB format.")
+            return
+
+        # Prepare data structure for MATLAB
+        matlab_data = {
+            'num_craters': len(results_gdf),
+            'crater_info': []
+        }
+
+        # Arrays for all craters
+        all_chebyshev = []
+        all_diameters = []
+        all_depths = []
+        all_ages = []
+
+        for idx, row in results_gdf.iterrows():
+            crater_data = {
+                'crater_id': idx,
+                'center_x': row.get('center_x', np.nan),
+                'center_y': row.get('center_y', np.nan),
+                'diameter_m': row.get('diameter_m', np.nan),
+                'depth_m': row.get('depth_m', np.nan),
+                'age': str(row.get('age', 'Unknown'))
+            }
+
+            # Add Chebyshev matrix if available
+            if 'chebyshev_matrix' in row and row['chebyshev_matrix'] is not None:
+                all_chebyshev.append(row['chebyshev_matrix'])
+                crater_data['has_chebyshev'] = True
+            else:
+                all_chebyshev.append(np.zeros((17, 8)))
+                crater_data['has_chebyshev'] = False
+
+            all_diameters.append(row.get('diameter_m', np.nan))
+            all_depths.append(row.get('depth_m', np.nan))
+
+            matlab_data['crater_info'].append(crater_data)
+
+        # Stack all Chebyshev matrices into a 3D array
+        if all_chebyshev:
+            matlab_data['chebyshev_coefficients'] = np.stack(all_chebyshev, axis=2)  # 17 x 8 x N
+
+        matlab_data['diameters'] = np.array(all_diameters)
+        matlab_data['depths'] = np.array(all_depths)
+
+        # Save to .mat file
+        savemat(output_file, matlab_data, do_compression=True)
+        print(f"\nMATLAB export saved to: {output_file}")
+        print(f"  Chebyshev matrix shape: {matlab_data['chebyshev_coefficients'].shape if 'chebyshev_coefficients' in matlab_data else 'N/A'}")
+
+    def save_results(self, results_gdf, output_shapefile='crater_ages.shp',
+                    save_chebyshev=True, save_matlab=False):
+        """
+        Save results to shapefile, Chebyshev matrices, and optionally MATLAB format.
 
         Parameters:
         -----------
@@ -784,6 +849,8 @@ class CraterAgeAnalyzer:
             Output shapefile path
         save_chebyshev : bool
             Whether to save Chebyshev matrices to separate files (default True)
+        save_matlab : bool
+            Whether to export to MATLAB .mat format (default False)
         """
         # Create a copy for shapefile (remove non-serializable columns)
         gdf_copy = results_gdf.copy()
@@ -807,6 +874,12 @@ class CraterAgeAnalyzer:
             import os
             output_dir = os.path.join(os.path.dirname(output_shapefile) or '.', 'chebyshev_coefficients')
             self.save_chebyshev_matrices(results_gdf, output_dir)
+
+        # Export to MATLAB if requested
+        if save_matlab:
+            import os
+            matlab_file = os.path.join(os.path.dirname(output_shapefile) or '.', 'crater_analysis.mat')
+            self.export_to_matlab(results_gdf, matlab_file)
 
     def close(self):
         """Close raster datasets."""

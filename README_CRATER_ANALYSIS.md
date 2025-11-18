@@ -253,11 +253,85 @@ all_data = np.load('chebyshev_coefficients/all_craters_chebyshev.npz')
 crater_0 = all_data['crater_0']
 ```
 
-### 3. Visualization Image (crater_ages_visualization.png)
+### 3. MATLAB Export (crater_analysis.mat)
+Optional export format for MATLAB users:
+
+```python
+# Enable MATLAB export
+analyzer.save_results(results, 'crater_ages.shp', save_matlab=True)
+```
+
+**MATLAB file contents**:
+- `num_craters`: Number of craters analyzed
+- `chebyshev_coefficients`: 3D array (17 × 8 × N) - all Chebyshev matrices
+- `diameters`: Array of crater diameters (meters)
+- `depths`: Array of crater depths (meters)
+- `crater_info`: Struct array with detailed information
+
+**Loading in MATLAB**:
+```matlab
+% Load data
+data = load('crater_analysis.mat');
+
+% Access Chebyshev coefficients for crater 1
+cheb_crater1 = data.chebyshev_coefficients(:,:,1);  % 17x8 matrix
+
+% Plot all crater diameters
+histogram(data.diameters);
+xlabel('Diameter (m)');
+ylabel('Count');
+```
+
+### 4. Visualization Image (crater_ages_visualization.png)
 - Lunar image background
 - Red circles showing refined crater positions
 - Yellow text labels with age estimates
 - High-resolution output (300 DPI default)
+
+## Synthesis and Degradation Testing
+
+A comprehensive test suite is provided to validate the degradation models and Chebyshev analysis:
+
+### Running the Synthesis Test
+
+```bash
+python crater_synthesis_degradation_test.py
+```
+
+This generates:
+- 10 synthetic craters (800m to 5km diameter)
+- Degraded profiles from 0.1 to 3.5 Ga at 0.1 Ga intervals
+- Chebyshev coefficient evolution analysis
+- Depth-to-diameter ratio tracking
+
+### Test Outputs
+
+**CSV File** (`degradation_chebyshev_results.csv`):
+- Complete tabular data for all craters and ages
+- Columns: crater_id, diameter, age, d/D ratio, 17 Chebyshev coefficients, derived indices
+
+**MATLAB File** (`degradation_analysis.mat`):
+- All pristine and degraded profiles
+- Chebyshev coefficient matrices
+- d/D ratio evolution arrays
+
+**PDF Report** (`degradation_analysis_report.pdf`):
+- Page 1: Methodology summary
+- Pages 2-3: Elevation profile evolution
+- Page 4: d/D ratio evolution plots
+- Pages 5-6: Chebyshev coefficient evolution
+- Page 7: Absolute coefficient magnitude trends
+
+### Key Findings from Synthesis Test
+
+The test demonstrates:
+1. **d/D Degradation**: Exponential-like decrease from ~0.196 (fresh) to ~0.05 (ancient)
+2. **Coefficient Evolution**:
+   - C2 (depth indicator) decreases monotonically
+   - Higher-order coefficients decay faster
+   - C0 remains relatively stable (baseline)
+3. **Size Dependence**: Larger craters show slower relative degradation
+4. **Time Scales**: Significant morphological changes within first 1 Ga
 
 ## Example Workflow
 

@@ -40,6 +40,7 @@ Thumbs.db
 # Output files
 output/
 chebyshev_coefficients/
+synthesis_test_results/
 *.shp
 *.shx
 *.dbf
@@ -49,7 +50,10 @@ chebyshev_coefficients/
 *.png
 *.npy
 *.npz
+*.mat
+*.pdf
 !example*.png
+!example*.pdf
 
 # Jupyter
 .ipynb_checkpoints/
