@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from typing import Tuple, Optional, Dict
 import argparse
 import warnings
+from datetime import datetime
 warnings.filterwarnings('ignore')
 
 # Import our validated physics
@@ -341,6 +342,11 @@ class EnhancedReportGenerator:
                 ha='center', fontsize=20, fontweight='bold')
         fig.text(0.5, 0.76, 'Bayesian Inverse Modeling with Uncertainty Quantification',
                 ha='center', fontsize=12, style='italic')
+
+        # Add simulation datetime
+        simulation_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+        fig.text(0.5, 0.73, f'Simulation Date: {simulation_datetime}',
+                ha='center', fontsize=10, style='italic', color='gray')
 
         L, v, theta, rho = self.params_ml
         sigma_L, sigma_v, sigma_theta, sigma_rho = self.uncertainties
