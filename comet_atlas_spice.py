@@ -240,6 +240,61 @@ def calculate_distances(comet_pos, earth_pos, moon_pos):
     return earth_distances, moon_distances
 
 
+def calculate_comet_magnitude(observer_distance_km, sun_distance_km, H=11.5, K=10.0):
+    """
+    Calculate apparent magnitude of the comet using standard comet magnitude formula.
+
+    Parameters:
+    - observer_distance_km: Distance from observer to comet (km)
+    - sun_distance_km: Distance from Sun to comet (km)
+    - H: Absolute magnitude (default 11.5 for C/2025 N1)
+    - K: Slope parameter (default 10.0 for C/2025 N1)
+
+    Returns:
+    - Apparent magnitude as seen from observer
+
+    Formula: m = H + 5*log10(Δ) + K*log10(r)
+    where Δ = distance to observer (AU), r = distance to Sun (AU)
+    """
+    # Convert to AU
+    delta_au = observer_distance_km / AU  # Observer distance in AU
+    r_au = sun_distance_km / AU  # Heliocentric distance in AU
+
+    # Standard comet magnitude equation
+    magnitude = H + 5 * np.log10(delta_au) + K * np.log10(r_au)
+
+    return magnitude
+
+
+def calculate_brightness_data(times, comet_pos, earth_pos, moon_pos):
+    """
+    Calculate brightness (magnitude) of comet as seen from Earth and Moon.
+
+    Returns:
+    - earth_magnitudes: Array of magnitudes from Earth
+    - moon_magnitudes: Array of magnitudes from Moon
+    - sun_distances: Array of heliocentric distances (km)
+    """
+    earth_magnitudes = []
+    moon_magnitudes = []
+    sun_distances = np.linalg.norm(comet_pos, axis=1)  # Distance from Sun to comet
+
+    for i in range(len(times)):
+        # Distance from observer to comet
+        earth_dist = np.linalg.norm(comet_pos[i] - earth_pos[i])
+        moon_dist = np.linalg.norm(comet_pos[i] - moon_pos[i])
+        sun_dist = sun_distances[i]
+
+        # Calculate magnitudes
+        mag_earth = calculate_comet_magnitude(earth_dist, sun_dist)
+        mag_moon = calculate_comet_magnitude(moon_dist, sun_dist)
+
+        earth_magnitudes.append(mag_earth)
+        moon_magnitudes.append(mag_moon)
+
+    return np.array(earth_magnitudes), np.array(moon_magnitudes), sun_distances
+
+
 def plot_3d_trajectory(times, comet_pos, earth_pos, moon_pos):
     """Create 3D plot of trajectories."""
     # Convert to AU for better visualization
@@ -413,6 +468,11 @@ def print_summary(times, comet_pos, earth_pos, moon_pos, start_date, end_date):
     """Print summary statistics of the encounter."""
     earth_distances, moon_distances = calculate_distances(comet_pos, earth_pos, moon_pos)
 
+    # Calculate brightness
+    earth_magnitudes, moon_magnitudes, sun_distances = calculate_brightness_data(
+        times, comet_pos, earth_pos, moon_pos
+    )
+
     closest_earth_idx = np.argmin(earth_distances)
     closest_moon_idx = np.argmin(moon_distances)
 
@@ -422,12 +482,21 @@ def print_summary(times, comet_pos, earth_pos, moon_pos, start_date, end_date):
     closest_earth_date = et_to_datetime_string(closest_earth_et)
     closest_moon_date = et_to_datetime_string(closest_moon_et)
 
+    # Find brightest magnitude (minimum value since lower mag = brighter)
+    brightest_earth_idx = np.argmin(earth_magnitudes)
+    brightest_moon_idx = np.argmin(moon_magnitudes)
+
     print("\n" + "="*70)
-    print("COMET C/2025 N1 (ATLAS) TRAJECTORY SUMMARY")
+    print("COMET C/2025 N1 (ATLAS) - 3I/ATLAS")
+    print("Third Confirmed Interstellar Object")
     print("="*70)
     print(f"\nData Source: NAIF SPICE Kernel")
     print(f"Kernel File: {COMET_KERNEL}")
     print(f"Time Range: {start_date} to {end_date}")
+    print(f"\nComet Parameters:")
+    print(f"  Absolute Magnitude (H): 11.5")
+    print(f"  Slope Parameter (K): 10.0")
+    print(f"  Eccentricity: ~6.15 (highly hyperbolic - interstellar!)")
 
     print(f"\nClosest Approach to Earth:")
     print(f"  Date/Time: {closest_earth_date}")
@@ -442,10 +511,33 @@ def print_summary(times, comet_pos, earth_pos, moon_pos, start_date, end_date):
     print(f"  Distance: {moon_distances[closest_moon_idx] / 1e6:.3f} Million km")
     print(f"  Distance: {moon_distances[closest_moon_idx] / EARTH_MOON_DISTANCE:.2f} Lunar Distances")
 
-    # Minimum and maximum distances
-    print(f"\nDistance Range to Earth:")
-    print(f"  Minimum: {earth_distances.min() / 1e6:.3f} Million km ({earth_distances.min() / AU:.4f} AU)")
-    print(f"  Maximum: {earth_distances.max() / 1e6:.3f} Million km ({earth_distances.max() / AU:.4f} AU)")
+    print(f"\nBrightness from Earth:")
+    print(f"  At Closest Approach: magnitude {earth_magnitudes[closest_earth_idx]:.2f}")
+    print(f"  Brightest: magnitude {earth_magnitudes[brightest_earth_idx]:.2f} on {et_to_datetime_string(times[brightest_earth_idx])}")
+    print(f"  Faintest: magnitude {earth_magnitudes.max():.2f}")
+
+    print(f"\nBrightness from Moon:")
+    print(f"  At Closest Approach: magnitude {moon_magnitudes[closest_moon_idx]:.2f}")
+    print(f"  Brightest: magnitude {moon_magnitudes[brightest_moon_idx]:.2f} on {et_to_datetime_string(times[brightest_moon_idx])}")
+    print(f"  Difference from Earth: Δm = {abs(moon_magnitudes[brightest_moon_idx] - earth_magnitudes[brightest_earth_idx]):.4f} mag")
+
+    if abs(moon_magnitudes[brightest_moon_idx] - earth_magnitudes[brightest_earth_idx]) < 0.01:
+        print(f"  → Virtually IDENTICAL brightness as seen from Earth!")
+
+    print(f"\nVisibility:")
+    if earth_magnitudes.min() < 10:
+        print(f"  Visible with medium-sized amateur telescope (8-10 inch)")
+    elif earth_magnitudes.min() < 12:
+        print(f"  Visible with small telescope (4-6 inch) under dark skies")
+    elif earth_magnitudes.min() < 14:
+        print(f"  Requires medium telescope (8-10 inch) under dark skies")
+    else:
+        print(f"  Requires large telescope (12+ inch) or CCD imaging")
+
+    # Heliocentric distance range
+    print(f"\nHeliocentric Distance (Sun to Comet):")
+    print(f"  Minimum: {sun_distances.min() / AU:.4f} AU")
+    print(f"  Maximum: {sun_distances.max() / AU:.4f} AU")
 
     print("="*70 + "\n")
 
