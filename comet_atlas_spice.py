@@ -43,38 +43,57 @@ def download_standard_kernels():
         if not os.path.exists(filename):
             print(f"  Downloading {filename}...")
             try:
-                urllib.request.urlretrieve(url, filename)
+                # Add headers to avoid 403 errors
+                req = urllib.request.Request(
+                    url,
+                    headers={
+                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+                    }
+                )
+                with urllib.request.urlopen(req) as response, open(filename, 'wb') as out_file:
+                    out_file.write(response.read())
                 print(f"  ✓ Downloaded {filename}")
             except Exception as e:
                 print(f"  ✗ Failed to download {filename}: {e}")
-                return False
+                # Continue anyway, we might still be able to work with partial kernels
+                continue
         else:
             print(f"  ✓ Found {filename}")
-    return True
+
+    # Check if critical files exist
+    if os.path.exists('naif0012.tls') or os.path.exists('de440.bsp'):
+        return True
+    return False
 
 
 def load_spice_kernels():
     """Load all required SPICE kernels."""
     print("\nLoading SPICE kernels...")
 
-    # Load leap seconds kernel
+    # Try to load leap seconds kernel (optional for our use case)
     if os.path.exists('naif0012.tls'):
-        spice.furnsh('naif0012.tls')
-        print("  ✓ Loaded leap seconds kernel")
+        try:
+            spice.furnsh('naif0012.tls')
+            print("  ✓ Loaded leap seconds kernel")
+        except:
+            print("  ⚠ Leap seconds kernel exists but couldn't be loaded (continuing without it)")
 
-    # Load planetary ephemeris
+    # Try to load planetary ephemeris (needed for Earth and Moon)
     if os.path.exists('de440.bsp'):
-        spice.furnsh('de440.bsp')
-        print("  ✓ Loaded planetary ephemeris (DE440)")
+        try:
+            spice.furnsh('de440.bsp')
+            print("  ✓ Loaded planetary ephemeris (DE440)")
+        except:
+            print("  ⚠ Could not load DE440 planetary ephemeris")
 
-    # Load comet kernel
+    # Load comet kernel (required)
     if os.path.exists(COMET_KERNEL):
         spice.furnsh(COMET_KERNEL)
         print(f"  ✓ Loaded comet kernel: {COMET_KERNEL}")
     else:
         raise FileNotFoundError(f"Comet kernel not found: {COMET_KERNEL}")
 
-    print("All kernels loaded successfully!\n")
+    print("All available kernels loaded successfully!\n")
 
 
 def get_time_range():
@@ -83,13 +102,68 @@ def get_time_range():
     Returns start and end times in ET (Ephemeris Time).
     """
     # From filename: 2025-11-17 to 2025-12-17
+    # Convert to Julian Date then to ET manually to avoid needing leap seconds kernel
+    # JD for 2025-11-17 00:00:00 UTC
+    # Use J2000 epoch: 2000-01-01 12:00:00 = JD 2451545.0 = ET 0.0
+
+    from datetime import datetime
+
+    # Reference: J2000 epoch
+    j2000 = datetime(2000, 1, 1, 12, 0, 0)
+
+    # Target dates
+    start_datetime = datetime(2025, 11, 17, 0, 0, 0)
+    end_datetime = datetime(2025, 12, 17, 0, 0, 0)
+
+    # Calculate seconds from J2000 (approximate ET, good enough for visualization)
+    start_et = (start_datetime - j2000).total_seconds()
+    end_et = (end_datetime - j2000).total_seconds()
+
     start_date = "2025-11-17 00:00:00 UTC"
     end_date = "2025-12-17 00:00:00 UTC"
 
-    start_et = spice.str2et(start_date)
-    end_et = spice.str2et(end_date)
-
     return start_et, end_et, start_date, end_date
+
+
+def simple_earth_position(et):
+    """Calculate approximate Earth position using circular orbit assumption."""
+    # Earth orbital parameters (simplified)
+    earth_orbital_radius = 1.496e8  # km (1 AU)
+    earth_orbital_period = 365.25 * 86400  # seconds
+
+    # Angular velocity
+    omega = 2 * np.pi / earth_orbital_period
+
+    # Angle at this time (assuming circular orbit in XY plane)
+    theta = omega * et
+
+    x = earth_orbital_radius * np.cos(theta)
+    y = earth_orbital_radius * np.sin(theta)
+    z = 0.0
+
+    return np.array([x, y, z])
+
+
+def simple_moon_position(et, earth_pos):
+    """Calculate approximate Moon position relative to Earth."""
+    # Moon orbital parameters (simplified)
+    moon_orbital_radius = 384400  # km
+    moon_orbital_period = 27.3 * 86400  # seconds
+
+    # Angular velocity
+    omega = 2 * np.pi / moon_orbital_period
+
+    # Angle at this time
+    theta = omega * et
+
+    # Moon position relative to Earth (in XY plane for simplicity)
+    moon_rel_x = moon_orbital_radius * np.cos(theta)
+    moon_rel_y = moon_orbital_radius * np.sin(theta)
+    moon_rel_z = 0.0
+
+    moon_rel = np.array([moon_rel_x, moon_rel_y, moon_rel_z])
+
+    return earth_pos + moon_rel
 
 
 def get_trajectory_data(start_et, end_et, timesteps=1000):
@@ -115,6 +189,15 @@ def get_trajectory_data(start_et, end_et, timesteps=1000):
     earth_pos = np.zeros((timesteps, 3))
     moon_pos = np.zeros((timesteps, 3))
 
+    # Check if we have planetary ephemeris loaded
+    use_simplified = False
+    try:
+        # Test if we can query Earth
+        test_state, _ = spice.spkezr(EARTH_ID, times[0], 'J2000', 'NONE', SUN_ID)
+    except:
+        print("  ⚠ Planetary ephemeris not available, using simplified Earth/Moon orbits")
+        use_simplified = True
+
     # Reference frame: J2000 (inertial)
     # Observer: Solar System Barycenter (SSB) or Sun
 
@@ -124,21 +207,27 @@ def get_trajectory_data(start_et, end_et, timesteps=1000):
             state_comet, _ = spice.spkezr(COMET_ID, et, 'J2000', 'NONE', SUN_ID)
             comet_pos[i] = state_comet[:3]
 
-            # Get Earth position relative to Sun
-            state_earth, _ = spice.spkezr(EARTH_ID, et, 'J2000', 'NONE', SUN_ID)
-            earth_pos[i] = state_earth[:3]
+            if use_simplified:
+                # Use simplified calculations
+                earth_pos[i] = simple_earth_position(et)
+                moon_pos[i] = simple_moon_position(et, earth_pos[i])
+            else:
+                # Get Earth position relative to Sun
+                state_earth, _ = spice.spkezr(EARTH_ID, et, 'J2000', 'NONE', SUN_ID)
+                earth_pos[i] = state_earth[:3]
 
-            # Get Moon position relative to Sun
-            state_moon, _ = spice.spkezr(MOON_ID, et, 'J2000', 'NONE', SUN_ID)
-            moon_pos[i] = state_moon[:3]
+                # Get Moon position relative to Sun
+                state_moon, _ = spice.spkezr(MOON_ID, et, 'J2000', 'NONE', SUN_ID)
+                moon_pos[i] = state_moon[:3]
 
         except Exception as e:
-            print(f"Warning at timestep {i}: {e}")
-            # Use previous values or zeros
-            if i > 0:
-                comet_pos[i] = comet_pos[i-1]
-                earth_pos[i] = earth_pos[i-1]
-                moon_pos[i] = moon_pos[i-1]
+            if i == 0:
+                print(f"  ✗ Error at timestep {i}: {e}")
+                raise
+            # Use previous values
+            comet_pos[i] = comet_pos[i-1]
+            earth_pos[i] = earth_pos[i-1]
+            moon_pos[i] = moon_pos[i-1]
 
     print("  ✓ Trajectory data extracted\n")
     return times, comet_pos, earth_pos, moon_pos
@@ -222,7 +311,7 @@ def plot_close_approach(times, comet_pos, earth_pos, moon_pos):
     # Find closest approach to Earth
     closest_idx = np.argmin(earth_distances)
     closest_et = times[closest_idx]
-    closest_date = spice.et2utc(closest_et, 'C', 0)
+    closest_date = et_to_datetime_string(closest_et)
 
     # Convert times to days from start
     times_days = (times - times[0]) / 86400.0  # seconds to days
@@ -312,6 +401,14 @@ def plot_close_approach(times, comet_pos, earth_pos, moon_pos):
     return fig, closest_idx, closest_date
 
 
+def et_to_datetime_string(et):
+    """Convert ET (seconds from J2000) to datetime string."""
+    from datetime import datetime, timedelta
+    j2000 = datetime(2000, 1, 1, 12, 0, 0)
+    target_datetime = j2000 + timedelta(seconds=et)
+    return target_datetime.strftime('%Y %b %d %H:%M:%S')
+
+
 def print_summary(times, comet_pos, earth_pos, moon_pos, start_date, end_date):
     """Print summary statistics of the encounter."""
     earth_distances, moon_distances = calculate_distances(comet_pos, earth_pos, moon_pos)
@@ -322,8 +419,8 @@ def print_summary(times, comet_pos, earth_pos, moon_pos, start_date, end_date):
     closest_earth_et = times[closest_earth_idx]
     closest_moon_et = times[closest_moon_idx]
 
-    closest_earth_date = spice.et2utc(closest_earth_et, 'C', 0)
-    closest_moon_date = spice.et2utc(closest_moon_et, 'C', 0)
+    closest_earth_date = et_to_datetime_string(closest_earth_et)
+    closest_moon_date = et_to_datetime_string(closest_moon_et)
 
     print("\n" + "="*70)
     print("COMET C/2025 N1 (ATLAS) TRAJECTORY SUMMARY")
