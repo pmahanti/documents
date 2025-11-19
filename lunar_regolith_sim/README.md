@@ -1,38 +1,107 @@
-# Lunar Regolith Flow Simulator
+# Lunar Regolith Flow Simulator v0.2
 
-A physics-based simulation of regolith flow on lunar slopes, modeling the formation of distinctive "elephant hide" textures observed on the Moon.
+A physics-based simulation of regolith flow on lunar slopes, modeling the formation of distinctive "elephant hide" textures through **thermal cycling** and **seismic perturbations** over **geological timescales**.
 
 ## Overview
 
-This package provides a comprehensive simulation framework for studying granular flow dynamics of lunar regolith on slopes. The simulator accounts for:
+This package provides a comprehensive simulation framework for studying how elephant hide textures form on the Moon through slow, cumulative downslope creep over millions of years. The simulator accounts for:
 
-- **Lunar gravity conditions** (1/6 of Earth's gravity)
-- **Granular flow mechanics** (angle of repose, friction, cohesion)
-- **Cellular automata avalanching** for discrete flow events
-- **Continuum mechanics** for smooth flow processes
-- **Texture formation** through cumulative deformation
+- **Realistic regolith properties** (40-50% porosity, 40-800 μm grain sizes, low cohesion)
+- **Lunar thermal cycling** (100-400 K day/night temperature swings, 29.5-day cycle)
+- **Seismic perturbations** (moonquakes M 2-5, impact-induced ground motion)
+- **Slope-dependent formation** (threshold >8°, optimal 15-25°)
+- **Geological timescales** (millions of years of cumulative creep)
 
 ## What are Elephant Hide Textures?
 
-Elephant hide textures are distinctive surface patterns observed on steep lunar slopes, particularly on crater walls. They appear as:
+Elephant hide textures are distinctive wrinkled surface patterns observed on steep lunar slopes, particularly on crater walls. They form through:
 
-- Wrinkled, anastomosing (branching and rejoining) patterns
-- Oriented downslope
-- Alternating ridges and troughs
-- Result from repeated granular flow and avalanching
+### Formation Mechanism
 
-These textures provide valuable information about:
-- Regolith properties and behavior
-- Slope stability and dynamics
-- Lunar surface processes and evolution
+The texture develops via **two primary forces**:
+
+1. **Thermal Cycling** - Temperature variations from lunar day/night cycles cause slow downslope creep:
+   - Daytime: ~400 K (127°C)
+   - Nighttime: ~100 K (-173°C)
+   - Thermal expansion/contraction drives gradual material movement
+
+2. **Seismic Shaking** - Mass movement involves ground shaking from:
+   - Impact events (meteorite strikes)
+   - Moonquakes (M 2-5 typical, rare M >5 events)
+   - Triggers regolith landslides on steep slopes
+
+### Characteristics
+
+- **Appearance**: Wrinkled, anastomosing (branching and rejoining) patterns
+- **Orientation**: Aligned downslope
+- **Slope dependence**:
+  - Threshold: >8° for any texture formation
+  - Optimal: 15-25° for maximum development
+  - Too steep (>35°): Fresh avalanches dominate
+- **Timescale**: Forms over millions of years
+- **Location**: Common on crater walls, terrace slopes
 
 ## Features
 
-- **Physics Engine**: Realistic regolith mechanics under lunar gravity
-- **Flexible Geometry**: Support for linear slopes, crater walls, and terraced slopes
-- **Flow Simulation**: Hybrid cellular automata + continuum mechanics approach
-- **Visualization**: Comprehensive plotting tools for analysis
-- **Extensible**: Modular design for easy customization
+### Physics Engine
+
+- **Enhanced regolith properties**:
+  - Porosity: 40-50% (loose, unconsolidated particles)
+  - Internal friction angle: 35-40°
+  - Cohesion: 0.1-1 kPa (very low)
+  - Grain sizes: 40-800 μm median
+  - Bulk density consistent with porosity
+
+- **Slope-dependent texture formation**:
+  - Automatic intensity calculation based on slope angle
+  - Threshold detection (8°)
+  - Optimal range identification (15-25°)
+
+### Thermal Cycling Module
+
+- **Lunar day/night cycle simulation**:
+  - 29.5 Earth day period
+  - Temperature range: 100-400 K
+  - Latitude-dependent variations
+  - Subsurface thermal diffusion
+
+- **Thermal creep calculation**:
+  - Temperature-dependent deformation
+  - Cumulative displacement over cycles
+  - Thermal stress computation
+
+### Seismic Perturbation Module
+
+- **Moonquake simulation**:
+  - Deep moonquakes (~700 km depth, M 2-3.5)
+  - Shallow moonquakes (~50 km depth, M 3-5, rare)
+  - Thermal moonquakes (~20 km depth, M 1.5-2.5)
+  - Impact-induced quakes (variable depth, M 2-4)
+
+- **Ground motion calculation**:
+  - Peak ground acceleration
+  - Distance attenuation
+  - Regolith mobilization thresholds
+
+### Geological Timescale Simulation
+
+- **GeologicalRegolithSimulation**: Full geological evolution
+  - Simulate millions to billions of years
+  - Tracks thermal cycles and seismic events
+  - Fresh vs. aged crater comparison
+
+- **AcceleratedSimulation**: Time-compressed demonstration
+  - Time acceleration factors (e.g., 10^6x)
+  - Preserves essential physics
+  - Faster testing and parameter exploration
+
+### Visualization Tools
+
+- Comprehensive plotting functions
+- Fresh vs. aged crater comparisons
+- Slope-texture relationship analysis
+- Temporal evolution tracking
+- Publication-quality figures
 
 ## Installation
 
@@ -48,63 +117,80 @@ cd lunar_regolith_sim
 pip install -e .
 ```
 
-This will install the package and all dependencies.
-
 ### Dependencies
 
 - numpy >= 1.21.0
 - scipy >= 1.7.0
 - matplotlib >= 3.4.0
 - pillow >= 8.3.0
-- numba >= 0.54.0 (for performance optimization)
+- numba >= 0.54.0
 
 ## Quick Start
 
-### Basic Example
+### Geological Timescale Simulation
 
 ```python
 from lunar_regolith_sim import (
     RegolithPhysics,
     SlopeGeometry,
-    RegolithFlowSimulation,
-    SimulationVisualizer
+    LunarThermalCycle,
+    MoonquakeSimulator,
+    GeologicalRegolithSimulation
 )
 
-# Create a slope
-slope = SlopeGeometry(width=100, height=100, resolution=1.0)
-slope.create_linear_slope(angle=35, direction='y')
-slope.add_roughness(amplitude=0.2, wavelength=5.0)
+# Create crater wall geometry
+slope = SlopeGeometry(width=200, height=200, resolution=1.0)
+slope.create_crater_wall(
+    crater_x=100, crater_y=100,
+    inner_radius=40, outer_radius=85,
+    rim_height=20, floor_depth=10
+)
 
-# Set up physics (lunar conditions)
-physics = RegolithPhysics()
+# Initialize physics with realistic parameters
+physics = RegolithPhysics(
+    porosity=0.45,                # 45% porosity
+    cohesion=0.5,                 # 0.5 kPa
+    internal_friction_angle=37.5, # 35-40° range
+    grain_size=60e-6              # 60 μm
+)
 
-# Create simulation
-sim = RegolithFlowSimulation(
+# Thermal cycle (100-400 K)
+thermal = LunarThermalCycle(temp_max=400, temp_min=100)
+
+# Moonquakes
+moonquakes = MoonquakeSimulator()
+
+# Create geological simulation
+geo_sim = GeologicalRegolithSimulation(
     slope_geometry=slope,
     physics=physics,
-    initial_thickness=1.5
+    thermal_cycle=thermal,
+    moonquake_sim=moonquakes,
+    initial_thickness=2.0
 )
 
-# Run simulation
-sim.run(duration=1000)
+# Simulate fresh crater (smooth regolith)
+fresh_state = geo_sim.simulate_fresh_crater()
 
-# Visualize results
-viz = SimulationVisualizer(sim)
-viz.create_summary_figure()
+# Evolve over 3 million years
+final_state = geo_sim.advance_geological_time(duration_years=3e6)
+
+# Get elephant hide texture
+texture = geo_sim.get_elephant_hide_texture()
 ```
 
 ### Run Example Scripts
 
-The package includes several example scripts:
-
 ```bash
-# Simple linear slope
+# Geological timescale simulation (millions of years)
+python examples/geological_timescale.py
+
+# Realistic parameter study
+python examples/realistic_parameters.py
+
+# Original fast-flow examples
 python examples/simple_slope.py
-
-# Crater wall (most realistic for elephant hide)
 python examples/crater_wall.py
-
-# Parameter study
 python examples/interactive_demo.py
 ```
 
@@ -112,202 +198,193 @@ python examples/interactive_demo.py
 
 ### Physics Module
 
-The `RegolithPhysics` class handles physical properties and mechanics:
+Enhanced with realistic lunar regolith parameters:
 
 ```python
 physics = RegolithPhysics(
-    gravity=1.62,              # m/s² (lunar gravity)
-    particle_density=1800,     # kg/m³
-    angle_of_repose=35.0,      # degrees
-    cohesion=0.1               # kPa
+    porosity=0.45,                # 40-50% typical
+    cohesion=0.5,                 # 0.1-1 kPa range
+    internal_friction_angle=37.5, # 35-40° range
+    grain_size=60e-6,            # 40-800 μm median
+    gravity=1.62                  # Lunar gravity
 )
 
-# Check stability
-is_stable = physics.is_stable(slope_angle=30, thickness=1.0)
+# Check texture formation potential
+intensity = physics.get_texture_formation_intensity(slope_angle=20)
 
-# Calculate flow velocity
-velocity = physics.calculate_flow_velocity(slope_angle=35, thickness=1.5)
+# Calculate creep rate
+creep_rate = physics.calculate_creep_rate(
+    slope_angle=20,
+    temperature_variation=150,  # K
+    seismic_activity=0.1       # 0-1 scale
+)
 ```
 
-### Slope Geometry Module
-
-The `SlopeGeometry` class creates terrain configurations:
+### Thermal Cycling Module
 
 ```python
-slope = SlopeGeometry(width=100, height=100, resolution=1.0)
+from lunar_regolith_sim import LunarThermalCycle, ThermalCreepSimulator
 
-# Linear slope
-slope.create_linear_slope(angle=35, direction='y')
-
-# Crater wall
-slope.create_crater_wall(
-    crater_x=50, crater_y=50,
-    inner_radius=20, outer_radius=40,
-    rim_height=10, floor_depth=5
+# Create thermal cycle
+thermal = LunarThermalCycle(
+    temp_max=400,   # Daytime temperature (K)
+    temp_min=100,   # Nighttime temperature (K)
+    latitude=0.0    # Equatorial (max variation)
 )
 
-# Terraced slope
-slope.create_terrace(
-    terrace_y=50, terrace_height=5,
-    slope_angle_upper=30, slope_angle_lower=35
-)
+# Get temperature at time
+temp = thermal.get_surface_temperature(time_seconds)
 
-# Add surface features
-slope.add_roughness(amplitude=0.2, wavelength=5.0)
-slope.add_perturbation(x=50, y=50, radius=5, amplitude=2)
+# Get temperature at depth
+temp_subsurface = thermal.get_temperature_at_depth(time_seconds, depth=0.5)
+
+# Thermal creep simulator
+creep_sim = ThermalCreepSimulator(thermal, physics)
+result = creep_sim.simulate_texture_development(slope_angles, duration_years)
 ```
 
-### Simulation Module
-
-The `RegolithFlowSimulation` class runs the simulation:
+### Seismic Perturbation Module
 
 ```python
-sim = RegolithFlowSimulation(
+from lunar_regolith_sim import MoonquakeSimulator, SeismicPerturbation
+
+# Create moonquake simulator
+moonquakes = MoonquakeSimulator(
+    quake_rate_multiplier=1.0,  # 1.0 = typical rate
+    seed=42                      # Reproducible
+)
+
+# Generate quake sequence
+quakes = moonquakes.generate_quake_sequence(duration_years=1e6)
+
+# Calculate ground motion
+pga = moonquakes.calculate_ground_motion(
+    magnitude=3.5,      # Moonquake magnitude
+    distance_km=50,     # Distance from epicenter
+    depth_km=700        # Depth of quake
+)
+
+# Seismic perturbation
+seismic = SeismicPerturbation(moonquakes)
+perturbation = seismic.apply_to_grid(
+    slope_angles, epicenter_x, epicenter_y,
+    magnitude, depth_km, grid_resolution
+)
+```
+
+### Geological Simulation Module
+
+```python
+from lunar_regolith_sim import GeologicalRegolithSimulation
+
+geo_sim = GeologicalRegolithSimulation(
     slope_geometry=slope,
     physics=physics,
-    initial_thickness=1.5
+    thermal_cycle=thermal,
+    moonquake_sim=moonquakes
 )
 
-# Single time step
-state = sim.step(dt=0.1)
+# Fresh crater (t=0)
+fresh_state = geo_sim.simulate_fresh_crater()
 
-# Run for duration
-history = sim.run(duration=1000, progress_interval=100)
+# Advance geological time
+final_state = geo_sim.advance_geological_time(duration_years=3e6)
 
-# Extract elephant hide texture
-texture = sim.get_elephant_hide_texture()
+# Compare fresh vs aged
+comparison = geo_sim.compare_fresh_vs_aged()
 
-# Reset simulation
-sim.reset(initial_thickness=2.0)
+# Get texture
+texture = geo_sim.get_elephant_hide_texture()
 ```
 
-### Visualization Module
+## Scientific Background
 
-The `SimulationVisualizer` class provides comprehensive plotting:
+### Formation Timescales
 
-```python
-viz = SimulationVisualizer(sim)
+Elephant hide textures form through **slow, cumulative downslope creep** over millions of years. Fresh impact craters have smooth regolith that gradually develops texture over time:
 
-# Individual plots
-viz.plot_elevation(include_regolith=True)
-viz.plot_slope_angle()
-viz.plot_elephant_hide(enhance=True)
-viz.plot_flow_velocity()
-viz.plot_3d_surface()
+- **0-100 kyr**: Minimal texture, fresh appearance
+- **100 kyr - 1 Myr**: Initial texture nucleation
+- **1-10 Myr**: Well-developed texture patterns
+- **>10 Myr**: Mature, complex textures
 
-# Comprehensive summary
-viz.create_summary_figure(save_path='summary.png')
+### Physical Parameters
 
-# Save all figures
-viz.save_all_figures(output_dir='output/')
-```
+Based on Apollo samples and remote sensing:
 
-## Physical Background
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Porosity | 40-50% | Loose, unconsolidated |
+| Bulk density | 1700-1900 kg/m³ | Depends on porosity |
+| Grain density | ~3100 kg/m³ | Solid particles |
+| Median grain size | 40-800 μm | Size distribution |
+| Internal friction | 35-40° | Angle of internal friction |
+| Cohesion | 0.1-1 kPa | Very low |
+| Angle of repose | ~35° | Critical for avalanching |
 
-### Granular Flow on the Moon
+### Thermal Cycling
 
-Regolith flow on lunar slopes is governed by several factors:
+| Parameter | Value |
+|-----------|-------|
+| Daytime temp | ~400 K (127°C) |
+| Nighttime temp | ~100 K (-173°C) |
+| Temperature swing | ~300 K |
+| Cycle period | 29.5 Earth days |
+| Thermal skin depth | ~0.5 m |
 
-1. **Low Gravity**: 1.62 m/s² vs 9.81 m/s² on Earth
-   - Affects flow velocity and runout distance
-   - Influences particle interactions
+### Seismic Activity
 
-2. **No Atmosphere**: No air resistance or moisture
-   - Purely mechanical interactions
-   - Low cohesion between particles
+| Type | Depth | Magnitude | Rate |
+|------|-------|-----------|------|
+| Deep moonquakes | ~700 km | M 2-3.5 | ~600/yr |
+| Shallow moonquakes | ~50 km | M 3-5 | ~2/yr |
+| Thermal moonquakes | ~20 km | M 1.5-2.5 | ~100/yr |
+| Impact quakes | <10 km | M 2-4 | ~50/yr |
 
-3. **Angle of Repose**: Critical angle (~35° for lunar regolith)
-   - Below: stable, no flow
-   - At/above: unstable, avalanching occurs
+## Applications
 
-4. **Savage-Hutter Flow Model**: Describes granular avalanches
-   - Velocity depends on thickness and slope
-   - Energy dissipation through friction
-
-### Elephant Hide Formation
-
-The distinctive texture forms through:
-
-1. **Initial Perturbation**: Small-scale roughness or irregularities
-2. **Flow Nucleation**: Flow begins at steepest/most unstable points
-3. **Channelization**: Flow concentrates in channels
-4. **Deposition**: Material deposits in patterns
-5. **Repetition**: Multiple flow events create texture
-
-## Scientific Applications
-
-This simulator can be used for:
-
-- **Planetary Science**: Understanding lunar surface processes
-- **Mission Planning**: Assessing slope stability for rovers/landers
-- **Regolith Characterization**: Inferring properties from textures
-- **Comparative Planetology**: Studying flow on other airless bodies
-- **Education**: Teaching granular mechanics and planetary processes
-
-## Performance Notes
-
-- **Grid Resolution**: Use 0.5-1.0 m for good balance of speed/accuracy
-- **Time Steps**: Default 0.1 s is generally appropriate
-- **JIT Compilation**: First run may be slow (Numba compilation)
-- **Large Domains**: Consider coarser resolution or smaller area
-
-## Output
-
-The simulation generates:
-
-1. **Elevation maps**: Topography with hillshading
-2. **Slope angle maps**: Distribution and stability analysis
-3. **Elephant hide textures**: Enhanced texture patterns
-4. **Flow velocity fields**: Magnitude and direction
-5. **3D surface views**: Perspective visualization
-6. **Cross-sections**: Profile views
-7. **Statistics**: Flow events, deformation, etc.
+- **Planetary Science**: Understanding lunar surface evolution
+- **Mission Planning**: Slope stability assessment for rovers/landers
+- **Age Dating**: Using texture development to estimate crater ages
+- **Regolith Properties**: Inferring properties from texture patterns
+- **Comparative Planetology**: Studying similar processes on other airless bodies
+- **Education**: Teaching geological timescales and planetary processes
 
 ## Limitations and Assumptions
 
-- **2D Simulation**: Vertical dimension simplified
-- **Simplified Physics**: Real regolith behavior is more complex
-- **No Temperature Effects**: Assumes isothermal conditions
-- **Homogeneous Regolith**: Uniform properties
-- **Steady Gravity**: No tidal or rotational effects
+- 2D surface simulation (vertical dimension simplified)
+- Homogeneous regolith properties
+- Simplified thermal and seismic models
+- No impact gardening effects
+- No space weathering effects
+- Statistical representation of long-term processes
 
 ## Contributing
 
-Contributions are welcome! Areas for improvement:
+Contributions welcome! Areas for enhancement:
 
-- More sophisticated flow models
 - 3D particle-based simulation
-- Temperature-dependent properties
 - Heterogeneous regolith layers
-- Validation against real lunar data
+- Impact gardening integration
+- Validation against LRO/Kaguya data
+- Machine learning texture recognition
 
 ## References
 
-1. Bart, G. D. (2007). "Comparison of small lunar landslides and martian gullies"
-2. Senthil Kumar, P., et al. (2013). "Lunar regolith mass movement on crater wall"
+1. Kumar, P.S., et al. (2016). "Gullies and landslides on the Moon"
+2. Senthil Kumar, P., et al. (2013). "Recent shallow moonquake and impact-triggered boulder falls"
 3. Xiao, Z., et al. (2013). "Mass wasting features on the Moon"
-4. Savage, S. B., & Hutter, K. (1989). "The motion of a finite mass of granular material"
+4. Apollo Lunar Surface Experiments Package (ALSEP) seismic data
+5. Lunar Reconnaissance Orbiter Camera (LROC) observations
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT License - See LICENSE file
 
 ## Authors
 
 Lunar Regolith Research Team
 
-## Acknowledgments
-
-- Based on observations from Apollo missions, Lunar Reconnaissance Orbiter, and other lunar missions
-- Physics models adapted from terrestrial granular flow research
-- Inspired by planetary surface processes research
-
-## Support
-
-For issues, questions, or suggestions:
-- Open an issue on the GitHub repository
-- Contact the development team
-
 ---
 
-**Happy Simulating!** 🌙
+**Version 0.2.0** - Enhanced with thermal cycling, seismic perturbations, and geological timescale simulation
