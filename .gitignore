@@ -1,0 +1,30 @@
+# Generated visualization outputs
+*.png
+
+# SPICE kernels (downloaded at runtime)
+naif0012.tls
+de440.bsp
+de440s.bsp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
