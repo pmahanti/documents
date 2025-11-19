@@ -299,83 +299,156 @@ Results are consistent with:
 
 5. **Ballistic Ejecta Only**: No vapor plume, no secondary cratering, no seismic effects.
 
-## Crater Reverse Modeling (NEW!)
+## Impact Parameter Back-Calculator (NEW!)
 
-**Inverse problem solver**: Given observed crater GeoTIFF data, estimate impact parameters and create formation animations!
+**Bayesian inverse problem solver**: Given observed crater characteristics, rigorously estimate impact parameters with full uncertainty quantification!
 
 ### Features
 
-- **GeoTIFF Support**: Load real lunar crater topography and images
-- **Morphometry Extraction**: Automatically measure diameter, depth, rim height
-- **Scaling Law Inversion**: Estimate projectile size and velocity from crater
-- **Formation Animation**: Generate impact sequence matching observed crater
-- **Context Movies**: Show crater appearing in wider landscape
-- **Scientific Validation**: Forward model verification (typically <1% error)
+- **Bayesian Inference**: Maximum likelihood estimation with proper error bars
+- **Monte Carlo Uncertainty**: Propagates all parameter uncertainties (typically 500-1000 samples)
+- **Highland/Mare Properties**: Terrain-specific target parameters (Carrier et al. 1991)
+- **Location-Aware**: Latitude/longitude for context
+- **Comprehensive PDF Report**: 7-page scientific document with theory, calculations, validation, and references
+- **Formation Animation**: Quadchart showing crater evolution from best-fit parameters
+- **Scientific Rigor**: Citations, equations, confidence intervals
 
 ### Usage
 
 ```bash
-# With GeoTIFF files
-python crater_reverse_modeling.py \
-    --crater-topo crater_elevation.tif \
-    --crater-image crater_optical.tif \
-    --context-image region_context.tif \
-    --velocity 20
+# Basic usage - crater diameter and location required
+python impact_backcalculator.py \
+    --diameter 350 \
+    --latitude 25.5 \
+    --longitude 45.2 \
+    --terrain mare
 
-# Synthetic demonstration mode
-python crater_reverse_modeling.py \
-    --diameter 300 \
-    --velocity 18 \
-    --frames 80 \
-    --fps 15 \
-    --output-prefix my_crater
+# Full analysis with ejecta constraint
+python impact_backcalculator.py \
+    --diameter 350 \
+    --latitude 25.5 \
+    --longitude 45.2 \
+    --terrain highland \
+    --ejecta-range 25000 \
+    --depth 68.6 \
+    --velocity-guess 20 \
+    --n-samples 1000 \
+    --output-prefix highland_crater
 ```
+
+### Inputs
+
+| Parameter | Required | Description | Units |
+|-----------|----------|-------------|-------|
+| `--diameter` | Yes | Observed crater diameter | meters |
+| `--latitude` | Yes | Crater latitude | degrees N |
+| `--longitude` | Yes | Crater longitude | degrees E |
+| `--terrain` | Yes | `highland` or `mare` | - |
+| `--ejecta-range` | No | Maximum ejecta distance | meters |
+| `--depth` | No | Crater depth (default: 0.196×D) | meters |
+| `--velocity-guess` | No | Initial velocity guess (default: 20) | km/s |
+| `--n-samples` | No | Monte Carlo samples (default: 1000) | - |
 
 ### Outputs
 
-1. **Formation Animation** (`*_formation.gif`):
-   - Left: Crater profile evolution (simulated vs observed)
-   - Right: Map view showing crater appearance
-   - Matches final observed morphology
+1. **7-Page PDF Scientific Report** (`*_report.pdf`):
+   - **Page 1**: Executive summary with best-fit parameters
+   - **Page 2**: Observed data, location, target properties
+   - **Page 3**: Complete theory (Holsapple scaling laws, equations, references)
+   - **Page 4**: Back-calculation results with histograms
+   - **Page 5**: Uncertainty analysis (correlations, confidence intervals)
+   - **Page 6**: Forward model validation (predicted vs observed)
+   - **Page 7**: Full references (Holsapple, Pike, Melosh, Collins, etc.)
 
-2. **Context Movie** (`*_context.gif`):
-   - Crater fading into wider landscape
-   - Shows spatial context and scale
-   - Red circle marks crater location
+2. **Quadchart Animation** (`*_quadchart.gif`):
+   - Q1: 3D crater formation
+   - Q2: 2D profile evolution
+   - Q3: Ejecta ballistics
+   - Q4: Ejecta plan view
 
 ### Example Results
 
+**Input**: 350m diameter mare crater at 25.5°N, 45.2°E with 25km ejecta range
+
+**Output**:
 ```
-Observed crater: D = 265m, d = 52m
-↓ [Scaling law inversion]
-Estimated impact: 2.0m projectile @ 20 km/s
-↓ [Forward verification]
-Predicted crater: D = 264.6m (0.15% error) ✓
+Maximum Likelihood Parameters:
+  Projectile diameter: 3.34 ± 0.19 m
+  Impact velocity: 20.0 ± 1.1 km/s
+  Impact angle: 45.0° ± 6.7°
+  Projectile density: 2800 ± 297 kg/m³
+
+95% Credible Intervals:
+  Projectile: [2.98, 3.74] m
+  Velocity: [18.0, 22.0] km/s
+  Angle: [31.6, 59.7]°
+  Density: [2241, 3399] kg/m³
+
+Validation:
+  Predicted diameter: 354.3 m
+  Observed diameter: 350.0 m
+  Error: 1.2% ✓
 ```
+
+### Scientific Approach
+
+The back-calculator uses **Bayesian inverse modeling**:
+
+1. **Prior Distributions**:
+   - Velocity: N(20 km/s, 5 km/s) - typical asteroid
+   - Angle: N(45°, 15°) - most probable (sin²θ weighted)
+   - Density: N(2800 kg/m³, 500 kg/m³) - rocky projectile
+
+2. **Likelihood Function**:
+   - Primary: Crater diameter match
+   - Secondary: Ejecta range (if provided)
+   - Tertiary: Depth measurement (if provided)
+
+3. **Optimization**:
+   - Nelder-Mead minimization of negative log-posterior
+   - Hessian-based uncertainty estimates
+
+4. **Monte Carlo Sampling**:
+   - 500-1000 samples from posterior
+   - Forward propagation to crater predictions
+   - Percentile-based confidence intervals (68% and 95%)
+
+### Validation
+
+All physics validated against:
+- **Holsapple (1993)**: Scaling law theory
+- **Pike (1977)**: Lunar crater morphometry (d/D = 0.196)
+- **Melosh (1989)**: Ejecta dynamics
+- **Collins et al. (2005)**: Impact effects program
+
+Typical accuracy: **<2% error** in diameter prediction
 
 ## Future Enhancements
 
 Potential additions:
 - [ ] MoviePy integration for advanced video editing and compositing
-- [x] Crater reverse modeling from GeoTIFF data
+- [x] **Bayesian impact parameter back-calculator with uncertainty quantification**
 - [ ] Secondary crater field generation from ejecta
 - [ ] Layered target properties (regolith depth variation)
 - [ ] Thermal effects and melt volume estimation
 - [ ] Oblique impact asymmetry (uprange/downrange ejecta)
 - [ ] Complex crater morphology (central peaks, terraces)
 - [ ] Export to VTK/ParaView for advanced 3D visualization
+- [ ] MCMC sampling for full posterior distribution exploration
 
 ## File Structure
 
 ```
 documents/
-├── lunar_impact_simulation.py      # Core simulation engine
-├── impact_animation.py              # Animation generation
+├── lunar_impact_simulation.py      # Core simulation engine (21 KB)
+├── impact_animation.py              # Animation generation (20 KB)
+├── impact_backcalculator.py        # Bayesian inverse solver (48 KB) ⭐NEW
+├── validate_physics.py             # Physics validation suite (28 KB)
 ├── test_crater_sizes.py            # Projectile size finder
 ├── README_IMPACT_SIMULATION.md     # This file
 ├── crater_simulation_2d.png        # Example output
 ├── impact_150m_quadchart.gif       # Example animation
-└── lunar_impact_200m_quadchart.gif # Example animation
+└── mare_crater_350m_report.pdf     # Example PDF report ⭐NEW
 ```
 
 ## License
