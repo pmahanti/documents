@@ -17,6 +17,12 @@ matplotlib>=3.7.0
 # Progress bars
 tqdm>=4.65.0
 
+# SPICE toolkit for spacecraft navigation
+spiceypy>=6.0.0
+
+# Timezone handling
+pytz>=2023.3
+
 # Optional: For better performance
 pyproj>=3.6.0
 rtree>=1.1.0
