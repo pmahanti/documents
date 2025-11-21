@@ -1,10 +1,11 @@
 # Generated geodatabases
 *.gpkg
 
-# Generated visualizations
+# Generated visualizations (but keep examples)
 *_on_psr.png
 *_cog_overlap.png
 psr_*_cog_overlap.png
+!example*.png
 
 # Python cache
 __pycache__/
