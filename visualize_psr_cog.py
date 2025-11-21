@@ -661,7 +661,7 @@ class PSRCOGVisualizer:
 
         plt.close()
 
-        # Create zoomed-in version showing full extent of overlapping COGs
+        # Create zoomed-in version (crop of main image showing COG extent)
         print(f"\nGenerating zoomed-in view...")
 
         # Calculate combined extent of target PSR and all overlapping COGs
@@ -681,23 +681,19 @@ class PSRCOGVisualizer:
             maxy + buffer_size
         ]
 
-        # Create zoomed figure
+        # Create zoomed figure with SAME background PSRs as main view
         fig_zoom, ax_zoom = plt.subplots(figsize=(14, 14), dpi=150, facecolor='black')
         ax_zoom.set_facecolor('black')
 
-        # Find PSRs in zoomed extent
-        zoom_box = box(zoom_extent[0], zoom_extent[2], zoom_extent[1], zoom_extent[3])
-        psr_zoom = psr_data[psr_data.intersects(zoom_box)]
-
-        # Plot context PSRs in zoomed view
-        if len(psr_zoom) > 0:
-            psr_zoom.plot(
-                ax=ax_zoom,
-                facecolor='#0a0a0a',
-                edgecolor='#303030',
-                linewidth=0.2,
-                alpha=0.5
-            )
+        # Plot ALL context PSRs (same as main view - all PSRs in polar region)
+        psr_context.plot(
+            ax=ax_zoom,
+            facecolor='#0a0a0a',  # Very dark gray
+            edgecolor='#303030',  # Dark gray
+            linewidth=0.2,  # Very thin outline
+            alpha=0.5,
+            label='Other PSRs'
+        )
 
         # Plot target PSR with bright outline
         gpd.GeoSeries([psr_geom], crs=psr_data.crs).plot(
@@ -718,18 +714,14 @@ class PSRCOGVisualizer:
                 alpha=0.4
             )
 
-        # Add lat/lon grid for zoomed view
-        lat_gdf_zoom, lon_gdf_zoom, _, _ = self._create_lat_lon_grid(
-            is_north, psr_data.crs, zoom_extent
-        )
+        # Add lat/lon grid (same as main view)
+        if lat_gdf is not None and len(lat_gdf) > 0:
+            lat_gdf.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
 
-        if lat_gdf_zoom is not None and len(lat_gdf_zoom) > 0:
-            lat_gdf_zoom.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+        if lon_gdf is not None and len(lon_gdf) > 0:
+            lon_gdf.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
 
-        if lon_gdf_zoom is not None and len(lon_gdf_zoom) > 0:
-            lon_gdf_zoom.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
-
-        # Set zoomed extent
+        # Set zoomed extent (this crops the view)
         ax_zoom.set_xlim(zoom_extent[0], zoom_extent[1])
         ax_zoom.set_ylim(zoom_extent[2], zoom_extent[3])
 
