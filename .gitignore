@@ -3,9 +3,13 @@
 
 # Generated visualizations (but keep examples)
 *_on_psr.png
+*_on_psr.tif
 *_cog_overlap.png
+*_cog_overlap.tif
 psr_*_cog_overlap.png
+psr_*_cog_overlap.tif
 !example*.png
+!example*.tif
 
 # Python cache
 __pycache__/
