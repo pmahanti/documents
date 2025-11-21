@@ -336,13 +336,13 @@ class PSRCOGVisualizer:
                 label='PSR Regions'
             )
 
-        # Plot COG footprint with thin outline
+        # Plot COG footprint with continuous thin outline
         gpd.GeoSeries([cog_geom], crs=psr_data.crs).plot(
             ax=ax,
             facecolor='none',
             edgecolor='#ff6b6b',  # Bright coral red
             linewidth=1.5,  # Thin outline
-            linestyle='--',
+            linestyle='-',  # Continuous line (not dashed)
             label='COG Footprint'
         )
 
@@ -364,10 +364,14 @@ class PSRCOGVisualizer:
         # Add grid (night mode)
         ax.grid(True, linestyle=':', alpha=0.2, color='#606060')
 
-        # Labels and title (night mode colors)
-        ax.set_xlabel('Easting (m)', fontsize=12, fontweight='bold', color='white')
-        ax.set_ylabel('Northing (m)', fontsize=12, fontweight='bold', color='white')
+        # Labels and title (night mode colors) - in km
+        ax.set_xlabel('Easting (km)', fontsize=12, fontweight='bold', color='white')
+        ax.set_ylabel('Northing (km)', fontsize=12, fontweight='bold', color='white')
         ax.tick_params(colors='white', which='both')
+
+        # Format tick labels to show km instead of m
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x/1000:.0f}'))
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, p: f'{y/1000:.0f}'))
 
         pole_str = "North Pole" if is_north else "South Pole"
         ax.set_title(
@@ -541,12 +545,12 @@ class PSRCOGVisualizer:
             label='Other PSRs'
         )
 
-        # Plot the target PSR (night mode with thin outline)
+        # Plot the target PSR (night mode with bright outline)
         gpd.GeoSeries([psr_geom], crs=psr_data.crs).plot(
             ax=ax,
             facecolor='#1a3a4a',  # Dark blue-gray
-            edgecolor='#4a90c0',  # Light blue
-            linewidth=1.0,  # Thin outline
+            edgecolor='#00ffff',  # Bright cyan for visibility
+            linewidth=2.0,  # Thicker bright outline
             alpha=0.8,
             label=f'Target PSR (ID: {psr_id})'
         )
@@ -581,10 +585,14 @@ class PSRCOGVisualizer:
         # Add grid (night mode)
         ax.grid(True, linestyle=':', alpha=0.2, color='#606060')
 
-        # Labels and title (night mode)
-        ax.set_xlabel('Easting (m)', fontsize=12, fontweight='bold', color='white')
-        ax.set_ylabel('Northing (m)', fontsize=12, fontweight='bold', color='white')
+        # Labels and title (night mode) - in km
+        ax.set_xlabel('Easting (km)', fontsize=12, fontweight='bold', color='white')
+        ax.set_ylabel('Northing (km)', fontsize=12, fontweight='bold', color='white')
         ax.tick_params(colors='white', which='both')
+
+        # Format tick labels to show km instead of m
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x/1000:.0f}'))
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, p: f'{y/1000:.0f}'))
 
         pole_str = "North Pole" if is_north else "South Pole"
         ax.set_title(
@@ -603,7 +611,7 @@ class PSRCOGVisualizer:
         else:
             # Create custom legend with summary (night mode colors)
             legend_elements = [
-                Patch(facecolor='#1a3a4a', edgecolor='#4a90c0', label=f'Target PSR (ID: {psr_id})'),
+                Patch(facecolor='#1a3a4a', edgecolor='#00ffff', linewidth=2, label=f'Target PSR (ID: {psr_id})'),
                 Patch(facecolor='#0a0a0a', edgecolor='#303030', label='Other PSRs'),
                 Patch(facecolor='#ff6b6b', alpha=0.5, label=f'{len(overlapping_cogs)} Overlapping COGs')
             ]
@@ -650,6 +658,128 @@ class PSRCOGVisualizer:
         # Save as GeoTIFF
         self._save_as_geotiff(fig, ax, extent, psr_data.crs, tif_file)
         print(f"Saved GeoTIFF to: {os.path.abspath(tif_file)}")
+
+        plt.close()
+
+        # Create zoomed-in version showing full extent of overlapping COGs
+        print(f"\nGenerating zoomed-in view...")
+
+        # Calculate combined extent of target PSR and all overlapping COGs
+        all_geoms = [psr_geom] + [cog_row.geometry for _, cog_row in overlapping_cogs.iterrows()]
+        from shapely.ops import unary_union
+        combined_geom = unary_union(all_geoms)
+
+        minx, miny, maxx, maxy = combined_geom.bounds
+        width = maxx - minx
+        height = maxy - miny
+        buffer_size = max(width, height) * 0.1  # 10% buffer
+
+        zoom_extent = [
+            minx - buffer_size,
+            maxx + buffer_size,
+            miny - buffer_size,
+            maxy + buffer_size
+        ]
+
+        # Create zoomed figure
+        fig_zoom, ax_zoom = plt.subplots(figsize=(14, 14), dpi=150, facecolor='black')
+        ax_zoom.set_facecolor('black')
+
+        # Find PSRs in zoomed extent
+        zoom_box = box(zoom_extent[0], zoom_extent[2], zoom_extent[1], zoom_extent[3])
+        psr_zoom = psr_data[psr_data.intersects(zoom_box)]
+
+        # Plot context PSRs in zoomed view
+        if len(psr_zoom) > 0:
+            psr_zoom.plot(
+                ax=ax_zoom,
+                facecolor='#0a0a0a',
+                edgecolor='#303030',
+                linewidth=0.2,
+                alpha=0.5
+            )
+
+        # Plot target PSR with bright outline
+        gpd.GeoSeries([psr_geom], crs=psr_data.crs).plot(
+            ax=ax_zoom,
+            facecolor='#1a3a4a',
+            edgecolor='#00ffff',  # Bright cyan
+            linewidth=2.0,
+            alpha=0.8
+        )
+
+        # Plot overlapping COGs
+        for idx, (_, cog_row) in enumerate(overlapping_cogs.iterrows()):
+            gpd.GeoSeries([cog_row.geometry], crs=cog_data_reprojected.crs).plot(
+                ax=ax_zoom,
+                facecolor=colors[idx],
+                edgecolor='#ff6b6b',
+                linewidth=0.8,
+                alpha=0.4
+            )
+
+        # Add lat/lon grid for zoomed view
+        lat_gdf_zoom, lon_gdf_zoom, _, _ = self._create_lat_lon_grid(
+            is_north, psr_data.crs, zoom_extent
+        )
+
+        if lat_gdf_zoom is not None and len(lat_gdf_zoom) > 0:
+            lat_gdf_zoom.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+
+        if lon_gdf_zoom is not None and len(lon_gdf_zoom) > 0:
+            lon_gdf_zoom.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+
+        # Set zoomed extent
+        ax_zoom.set_xlim(zoom_extent[0], zoom_extent[1])
+        ax_zoom.set_ylim(zoom_extent[2], zoom_extent[3])
+
+        # Grid and labels
+        ax_zoom.grid(True, linestyle=':', alpha=0.2, color='#606060')
+        ax_zoom.set_xlabel('Easting (km)', fontsize=12, fontweight='bold', color='white')
+        ax_zoom.set_ylabel('Northing (km)', fontsize=12, fontweight='bold', color='white')
+        ax_zoom.tick_params(colors='white', which='both')
+        ax_zoom.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x/1000:.0f}'))
+        ax_zoom.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, p: f'{y/1000:.0f}'))
+
+        # Title
+        ax_zoom.set_title(
+            f'{pole_str} - Zoomed View: PSR ID {psr_id}\n'
+            f'{len(overlapping_cogs)} Overlapping COG Images',
+            fontsize=14,
+            fontweight='bold',
+            pad=20,
+            color='white'
+        )
+
+        # Legend for zoomed view
+        legend_zoom_elements = [
+            Patch(facecolor='#1a3a4a', edgecolor='#00ffff', linewidth=2, label=f'Target PSR (ID: {psr_id})'),
+            Patch(facecolor='#0a0a0a', edgecolor='#303030', label='Other PSRs'),
+        ]
+        for idx, fname in enumerate(cog_filenames):
+            legend_zoom_elements.append(
+                Patch(facecolor=colors[idx], edgecolor='#ff6b6b', alpha=0.4, label=f'COG: {fname[:15]}...')
+            )
+
+        legend_zoom = ax_zoom.legend(handles=legend_zoom_elements, loc='upper left',
+                                     fontsize=9, framealpha=0.9, bbox_to_anchor=(1.02, 1))
+        legend_zoom.get_frame().set_facecolor('#1a1a1a')
+        legend_zoom.get_frame().set_edgecolor('#404040')
+        for text in legend_zoom.get_texts():
+            text.set_color('white')
+
+        ax_zoom.set_aspect('equal')
+        plt.tight_layout()
+
+        # Save zoomed version
+        png_zoom_file = f"{output_base}_zoom.png"
+        tif_zoom_file = f"{output_base}_zoom.tif"
+
+        plt.savefig(png_zoom_file, dpi=150, bbox_inches='tight')
+        print(f"Saved zoomed PNG to: {os.path.abspath(png_zoom_file)}")
+
+        self._save_as_geotiff(fig_zoom, ax_zoom, zoom_extent, psr_data.crs, tif_zoom_file)
+        print(f"Saved zoomed GeoTIFF to: {os.path.abspath(tif_zoom_file)}")
 
         plt.close()
 

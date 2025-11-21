@@ -26,8 +26,9 @@ python visualize_psr_cog.py --cog M012728826S.60m.COG.tif --output example1_sout
 - Latitude gridlines: 75°, 80°, 85°, 90° (5° spacing)
 - Longitude gridlines: 0°, 30°, 60°, 90°, 120°, 150°, 180°, 210°, 240°, 270°, 300°, 330° (30° spacing)
 - **Night mode theme:** Dark background with light elements
-- **Thin outlines:** Coral red dashed line (1.5px) for COG footprint
+- **Thin outlines:** Coral red continuous line (1.5px) for COG footprint
 - Dark blue-gray filled PSR polygons with light blue thin outlines (0.3px)
+- **Axes in kilometers:** X/Y axes show distance in km from pole center
 
 ---
 
@@ -55,16 +56,19 @@ python visualize_psr_cog.py --cog M013049982S.60m.COG.tif --output example2_nort
 - Latitude gridlines: 75°, 80°, 85°, 90° (5° spacing)
 - Longitude gridlines: 0°, 30°, 60°, 90°, 120°, 150°, 180°, 210°, 240°, 270°, 300°, 330° (30° spacing)
 - **Night mode theme:** Dark background with light elements
-- **Thin outlines:** Coral red dashed line (1.5px) for COG footprint
+- **Thin outlines:** Coral red continuous line (1.5px) for COG footprint
 - Dark blue-gray filled PSR polygons with light blue thin outlines (0.3px)
+- **Axes in kilometers:** X/Y axes show distance in km from pole center
 
 ---
 
 ## Example 3: South Pole - PSR Overlap Query
 
 **Files:**
-- `example3_psr_overlap.png` (472 KB)
-- `example3_psr_overlap.tif` (614 KB) - Georeferenced GeoTIFF
+- `example3_psr_overlap.png` (463 KB) - Full polar view
+- `example3_psr_overlap.tif` (606 KB) - Georeferenced GeoTIFF (full view)
+- `example3_psr_overlap_zoom.png` (288 KB) - Zoomed view of overlap region
+- `example3_psr_overlap_zoom.tif` (592 KB) - Georeferenced GeoTIFF (zoomed)
 
 **Command:**
 ```bash
@@ -83,10 +87,12 @@ python visualize_psr_cog.py --psr-id SP_816480_0652210 --output example3_psr_ove
 **Features:**
 - South pole view (75-90°S) - 15 degrees from pole
 - **Night mode theme:** Dark background with light elements
-- Target PSR highlighted in dark blue-gray with light blue outline (1.0px)
+- **Bright cyan target PSR:** Target PSR highlighted in dark blue-gray fill with bright cyan outline (2.0px, #00ffff)
 - Context PSRs shown in very dark gray with dark outlines (0.2px)
-- Two overlapping COG footprints in different colors with thin coral red outlines (0.8px)
+- Two overlapping COG footprints in different colors with thin coral red continuous outlines (0.8px)
 - Complete lat/lon grid overlay
+- **Axes in kilometers:** X/Y axes show distance in km from pole center
+- **Zoomed view included:** Additional visualization focused on overlap region with 10% buffer
 
 ---
 
@@ -122,36 +128,39 @@ Maps show **15 degrees from each pole** (75-90° latitude range):
 
 **COG Footprint Visualizations (Examples 1, 2):**
 - **Black background:** Night mode theme for reduced eye strain
-- **Coral red dashed line (1.5px):** COG image footprint boundary (#ff6b6b)
+- **Coral red continuous line (1.5px):** COG image footprint boundary (#ff6b6b)
 - **Dark blue-gray filled (#1a3a4a):** PSR polygons in polar region
 - **Light blue thin outlines (0.3px):** PSR polygon boundaries (#4a90c0)
 - **Gray dotted lines (0.3px):** Lat/lon grid (#808080)
 - **White text:** Labels, title, axis text
+- **Axes in kilometers:** Distance from pole center in km
 
 **PSR Overlap Visualizations (Example 3):**
 - **Black background:** Night mode theme
 - **Dark blue-gray filled (#1a3a4a):** Target PSR polygon
-- **Light blue outline (1.0px):** Target PSR boundary (#4a90c0)
+- **Bright cyan outline (2.0px):** Target PSR boundary for high visibility (#00ffff)
 - **Very dark gray filled (#0a0a0a):** Other PSRs in the region (context)
 - **Dark gray outlines (0.2px):** Context PSR boundaries (#303030)
 - **Set3 colormap:** Overlapping COG footprints (various colors)
-- **Coral red outlines (0.8px):** COG footprint boundaries (#ff6b6b)
+- **Coral red continuous outlines (0.8px):** COG footprint boundaries (#ff6b6b)
 - **Gray dotted lines (0.3px):** Lat/lon grid (#808080)
 - **White text:** Labels, title, axis text
+- **Axes in kilometers:** Distance from pole center in km
+- **Dual views:** Full polar view (15° extent) + zoomed view (overlap region with 10% buffer)
 
 ### Output Formats
 
-Each visualization produces two files:
+Each visualization produces two files (or four for PSR overlap queries):
 
 1. **PNG (Portable Network Graphics)**
    - Resolution: 150 DPI
-   - Size: ~500-550 KB
+   - Size: ~500-550 KB (full view), ~290 KB (zoomed view)
    - Use: Display, presentations, documentation
    - Non-georeferenced raster image
 
 2. **GeoTIFF (Georeferenced TIFF)**
    - Resolution: Matches PNG (150 DPI)
-   - Size: ~630-690 KB
+   - Size: ~590-690 KB
    - Use: GIS applications, spatial analysis
    - Includes:
      - Coordinate Reference System (CRS)
@@ -159,6 +168,12 @@ Each visualization produces two files:
      - Proper georeferencing for pole
    - Compression: LZW
    - Compatible with: QGIS, ArcGIS, ENVI, GDAL
+
+3. **PSR Overlap Queries Only: Zoomed View Files**
+   - Additional `_zoom.png` and `_zoom.tif` files
+   - Focused on overlap region with 10% buffer
+   - Shows target PSR and all overlapping COG footprints in detail
+   - Same format and quality as full view files
 
 ---
 
@@ -248,9 +263,9 @@ python visualize_psr_cog.py --cog FILENAME.tif \
 ## Performance Notes
 
 - **COG footprint visualizations:** ~10-15 seconds
-- **PSR overlap visualizations:** ~10-20 seconds (depends on number of COGs)
-- **PNG file size:** ~500-550 KB (150 dpi)
-- **GeoTIFF file size:** ~630-690 KB (LZW compressed)
+- **PSR overlap visualizations:** ~15-25 seconds (includes zoomed view generation)
+- **PNG file size:** ~500-550 KB (full view, 150 dpi), ~290 KB (zoomed view)
+- **GeoTIFF file size:** ~590-690 KB (LZW compressed)
 
 ---
 
@@ -335,12 +350,16 @@ If you use these visualizations in publications, please cite:
 
 ## Version
 
-- **Version:** 3.0
+- **Version:** 4.0
 - **Date:** 2025-11-21
 - **Features:**
   - Polar stereographic projection (15° from pole)
   - Lat/lon grids (5° latitude, 30° longitude)
   - Dual PNG/GeoTIFF output
   - **Night mode theme** with dark backgrounds
-  - **Thin outlines** for clean visualization (0.2-1.5px)
+  - **Thin continuous outlines** for clean visualization (0.2-2.0px)
+  - **Bright cyan target PSR outline** (#00ffff) for high visibility in overlap queries
+  - **Axes in kilometers** for easier distance interpretation
+  - **Zoomed views** for PSR overlap queries showing detailed overlap regions
+  - All visualizations show all PSRs in polar region for complete context
   - Optimized for PSR-dense polar regions

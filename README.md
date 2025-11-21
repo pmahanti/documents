@@ -273,6 +273,24 @@ If you use this software in your research, please cite:
 
 ## Version History
 
+- **v4.0** (2025-11-21): Enhanced visualizations
+  - Continuous (not dashed) COG footprint outlines
+  - Bright cyan target PSR outline (#00ffff) for high visibility
+  - Axes in kilometers for easier distance interpretation
+  - Zoomed views for PSR overlap queries (overlap region with 10% buffer)
+  - All visualizations show complete PSR context in polar region
+
+- **v3.0** (2025-11-21): Polar projection and grids
+  - 15° polar view (75-90° latitude)
+  - Lat/lon grids (5° latitude, 30° longitude)
+  - Night mode theme with dark backgrounds
+  - Thin outlines (0.2-2.0px) for clean visualization
+  - Dual PNG/GeoTIFF output with proper georeferencing
+
+- **v2.0** (2025-11-21): Polar stereographic projection
+  - Native polar stereographic projections (north/south)
+  - Separate CRS handling for hemispheres
+
 - **v1.0** (2025-11-21): Initial release
   - PSR geodatabase creation
   - COG footprint extraction
