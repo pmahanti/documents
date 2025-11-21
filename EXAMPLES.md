@@ -5,20 +5,20 @@ This document shows example outputs from the PSR-SDC1 visualization tools with p
 ## Example 1: South Pole - COG Footprint on PSRs
 
 **Files:**
-- `example1_south_pole.png` (503 KB)
-- `example1_south_pole.tif` (651 KB) - Georeferenced GeoTIFF
+- `example1_south_pole.png` (491 KB)
+- `example1_south_pole.tif` (642 KB) - Georeferenced GeoTIFF
 
 **Command:**
 ```bash
-python visualize_psr_cog.py --cog M012728826S.60m.COG.tif --output example1_south_pole
+python visualize_psr_cog.py --cog M013067672S.60m.COG.tif --output example1_south_pole
 ```
 
 **Description:**
-- COG file: M012728826S.60m.COG.tif
+- COG file: M013067672S.60m.COG.tif
 - Hemisphere: Southern
-- Footprint area: 850.41 km²
-- Valid data fraction: 6.8%
-- Image dimensions: 1992 x 1731 pixels
+- Footprint area: 1,049.46 km²
+- Valid data fraction: 15.9%
+- Image dimensions: 2811 x 642 pixels
 - PSRs in region: 2,362 (within 15° of south pole)
 
 **Features:**
@@ -35,20 +35,20 @@ python visualize_psr_cog.py --cog M012728826S.60m.COG.tif --output example1_sout
 ## Example 2: North Pole - COG Footprint on PSRs
 
 **Files:**
-- `example2_north_pole.png` (535 KB)
-- `example2_north_pole.tif` (667 KB) - Georeferenced GeoTIFF
+- `example2_north_pole.png` (524 KB)
+- `example2_north_pole.tif` (658 KB) - Georeferenced GeoTIFF
 
 **Command:**
 ```bash
-python visualize_psr_cog.py --cog M013049982S.60m.COG.tif --output example2_north_pole
+python visualize_psr_cog.py --cog M013057217S.60m.COG.tif --output example2_north_pole
 ```
 
 **Description:**
-- COG file: M013049982S.60m.COG.tif
+- COG file: M013057217S.60m.COG.tif
 - Hemisphere: Northern
-- Footprint area: 870.45 km²
-- Valid data fraction: 20.2%
-- Image dimensions: 2569 x 462 pixels
+- Footprint area: 858.75 km²
+- Valid data fraction: 18.0%
+- Image dimensions: 2564 x 509 pixels
 - PSRs in region: 5,625 (within 15° of north pole)
 
 **Features:**
@@ -65,24 +65,24 @@ python visualize_psr_cog.py --cog M013049982S.60m.COG.tif --output example2_nort
 ## Example 3: South Pole - PSR Overlap Query
 
 **Files:**
-- `example3_psr_overlap.png` (463 KB) - Full polar view
-- `example3_psr_overlap.tif` (606 KB) - Georeferenced GeoTIFF (full view)
-- `example3_psr_overlap_zoom.png` (288 KB) - Zoomed view of overlap region
-- `example3_psr_overlap_zoom.tif` (592 KB) - Georeferenced GeoTIFF (zoomed)
+- `example3_psr_overlap.png` (464 KB) - Full polar view
+- `example3_psr_overlap.tif` (607 KB) - Georeferenced GeoTIFF (full view)
+- `example3_psr_overlap_zoom.png` (227 KB) - Zoomed view of overlap region
+- `example3_psr_overlap_zoom.tif` (498 KB) - Georeferenced GeoTIFF (zoomed)
 
 **Command:**
 ```bash
-python visualize_psr_cog.py --psr-id SP_816480_0652210 --output example3_psr_overlap
+python visualize_psr_cog.py --psr-id SP_845460_0695020 --output example3_psr_overlap
 ```
 
 **Description:**
-- PSR ID: SP_816480_0652210
+- PSR ID: SP_845460_0695020
 - Hemisphere: Southern
-- PSR area: 79.788 km²
-- Location: 81.648°S, 65.222°E
+- PSR area: 6.484 km²
+- Location: 84.546°S, 69.502°E
 - Overlapping COG images: 2
-  - M013121460S.60m.COG.tif
-  - M013128596S.60m.COG.tif
+  - M013078591S.60m.COG.tif
+  - M013085783S.60m.COG.tif
 
 **Features:**
 - South pole view (75-90°S) - 15 degrees from pole
