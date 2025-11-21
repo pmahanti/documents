@@ -144,9 +144,9 @@ class PSRCOGVisualizer:
             for lon in lons:
                 points = []
                 if is_north:
-                    lat_range = np.linspace(70, 90, 50)
+                    lat_range = np.linspace(75, 90, 50)
                 else:
-                    lat_range = np.linspace(-90, -70, 50)
+                    lat_range = np.linspace(-90, -75, 50)
 
                 for lat in lat_range:
                     try:
@@ -170,7 +170,7 @@ class PSRCOGVisualizer:
 
     def _get_polar_extent(self, is_north, crs):
         """
-        Get the extent for showing 20 degrees from pole.
+        Get the extent for showing 15 degrees from pole.
 
         Parameters
         ----------
@@ -187,16 +187,16 @@ class PSRCOGVisualizer:
         # Moon radius in meters
         moon_radius = 1737400
 
-        # For 20 degrees from pole, we want to show from 70° to 90° latitude
+        # For 15 degrees from pole, we want to show from 75° to 90° latitude
         # In polar stereographic, this creates a circular extent
-        # The radius at 70° latitude in polar stereographic
+        # The radius at 75° latitude in polar stereographic
 
         # Approximate extent (will be refined based on actual projection)
         # This creates a square extent that should encompass the polar region
         if is_north:
-            extent_size = 600000  # ~600 km from center
+            extent_size = 450000  # ~450 km from center
         else:
-            extent_size = 600000
+            extent_size = 450000
 
         return (-extent_size, extent_size, -extent_size, extent_size)
 
@@ -321,65 +321,72 @@ class PSRCOGVisualizer:
 
         print(f"\nPSRs in polar region: {len(psr_subset)}")
 
-        # Create the visualization
-        fig, ax = plt.subplots(figsize=(14, 14), dpi=150)
+        # Create the visualization with dark background (night mode)
+        fig, ax = plt.subplots(figsize=(14, 14), dpi=150, facecolor='black')
+        ax.set_facecolor('black')
 
-        # Plot PSRs
+        # Plot PSRs with thin outlines (night mode colors)
         if len(psr_subset) > 0:
             psr_subset.plot(
                 ax=ax,
-                facecolor='lightblue',
-                edgecolor='darkblue',
-                linewidth=0.8,
-                alpha=0.6,
+                facecolor='#1a3a4a',  # Dark blue-gray
+                edgecolor='#4a90c0',  # Light blue
+                linewidth=0.3,  # Thin outline
+                alpha=0.7,
                 label='PSR Regions'
             )
 
-        # Plot COG footprint
+        # Plot COG footprint with thin outline
         gpd.GeoSeries([cog_geom], crs=psr_data.crs).plot(
             ax=ax,
             facecolor='none',
-            edgecolor='red',
-            linewidth=3,
+            edgecolor='#ff6b6b',  # Bright coral red
+            linewidth=1.5,  # Thin outline
             linestyle='--',
             label='COG Footprint'
         )
 
-        # Add latitude/longitude grid
+        # Add latitude/longitude grid (night mode)
         lat_gdf, lon_gdf, lat_labels, lon_labels = self._create_lat_lon_grid(
             is_north, psr_data.crs, extent
         )
 
         if lat_gdf is not None and len(lat_gdf) > 0:
-            lat_gdf.plot(ax=ax, color='gray', linewidth=0.5, linestyle=':', alpha=0.7)
+            lat_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
 
         if lon_gdf is not None and len(lon_gdf) > 0:
-            lon_gdf.plot(ax=ax, color='gray', linewidth=0.5, linestyle=':', alpha=0.7)
+            lon_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
 
-        # Set extent to show 20 degrees from pole
+        # Set extent to show 15 degrees from pole
         ax.set_xlim(extent[0], extent[1])
         ax.set_ylim(extent[2], extent[3])
 
-        # Add grid
-        ax.grid(True, linestyle=':', alpha=0.3, color='black')
+        # Add grid (night mode)
+        ax.grid(True, linestyle=':', alpha=0.2, color='#606060')
 
-        # Labels and title
-        ax.set_xlabel('Easting (m)', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Northing (m)', fontsize=12, fontweight='bold')
+        # Labels and title (night mode colors)
+        ax.set_xlabel('Easting (m)', fontsize=12, fontweight='bold', color='white')
+        ax.set_ylabel('Northing (m)', fontsize=12, fontweight='bold', color='white')
+        ax.tick_params(colors='white', which='both')
 
         pole_str = "North Pole" if is_north else "South Pole"
         ax.set_title(
             f'{pole_str} - COG Footprint on PSR Outlines\n{cog_filename}\n'
-            f'Polar Stereographic (70-90° latitude)',
+            f'Polar Stereographic (75-90° latitude)',
             fontsize=14,
             fontweight='bold',
-            pad=20
+            pad=20,
+            color='white'
         )
 
-        # Add legend
-        ax.legend(loc='upper right', fontsize=11, framealpha=0.9)
+        # Add legend (night mode)
+        legend = ax.legend(loc='upper right', fontsize=11, framealpha=0.9)
+        legend.get_frame().set_facecolor('#1a1a1a')
+        legend.get_frame().set_edgecolor('#404040')
+        for text in legend.get_texts():
+            text.set_color('white')
 
-        # Add text box with statistics
+        # Add text box with statistics (night mode)
         stats_text = (
             f"COG Area: {cog_info['area_km2']:.2f} km²\n"
             f"Valid Data: {cog_info['valid_fraction']:.1%}\n"
@@ -391,7 +398,8 @@ class PSRCOGVisualizer:
             transform=ax.transAxes,
             fontsize=10,
             verticalalignment='top',
-            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8)
+            color='white',
+            bbox=dict(boxstyle='round', facecolor='#2a2a2a', edgecolor='#404040', alpha=0.9)
         )
 
         # Equal aspect ratio
@@ -511,10 +519,11 @@ class PSRCOGVisualizer:
             print(f"\nNo COG images overlap with PSR ID {psr_id}")
             return [], None, None
 
-        # Create visualization
-        fig, ax = plt.subplots(figsize=(14, 14), dpi=150)
+        # Create visualization (night mode)
+        fig, ax = plt.subplots(figsize=(14, 14), dpi=150, facecolor='black')
+        ax.set_facecolor('black')
 
-        # Get polar extent (20 degrees from pole)
+        # Get polar extent (15 degrees from pole)
         extent = self._get_polar_extent(is_north, psr_data.crs)
 
         # Find all PSRs in the polar region for context
@@ -522,83 +531,91 @@ class PSRCOGVisualizer:
         extent_box = box(extent[0], extent[2], extent[1], extent[3])
         psr_context = psr_data[psr_data.intersects(extent_box)]
 
-        # Plot context PSRs
+        # Plot context PSRs (night mode with thin outlines)
         psr_context.plot(
             ax=ax,
-            facecolor='lightgray',
-            edgecolor='gray',
-            linewidth=0.5,
-            alpha=0.3,
+            facecolor='#0a0a0a',  # Very dark gray
+            edgecolor='#303030',  # Dark gray
+            linewidth=0.2,  # Very thin outline
+            alpha=0.5,
             label='Other PSRs'
         )
 
-        # Plot the target PSR
+        # Plot the target PSR (night mode with thin outline)
         gpd.GeoSeries([psr_geom], crs=psr_data.crs).plot(
             ax=ax,
-            facecolor='lightblue',
-            edgecolor='darkblue',
-            linewidth=2.5,
-            alpha=0.7,
+            facecolor='#1a3a4a',  # Dark blue-gray
+            edgecolor='#4a90c0',  # Light blue
+            linewidth=1.0,  # Thin outline
+            alpha=0.8,
             label=f'Target PSR (ID: {psr_id})'
         )
 
-        # Plot overlapping COG footprints with different colors
+        # Plot overlapping COG footprints with different colors (night mode)
         colors = plt.cm.Set3(np.linspace(0, 1, len(overlapping_cogs)))
         for idx, (_, cog_row) in enumerate(overlapping_cogs.iterrows()):
             gpd.GeoSeries([cog_row.geometry], crs=cog_data_reprojected.crs).plot(
                 ax=ax,
                 facecolor=colors[idx],
-                edgecolor='red',
-                linewidth=1.5,
-                alpha=0.5,
+                edgecolor='#ff6b6b',  # Bright coral red
+                linewidth=0.8,  # Thin outline
+                alpha=0.4,
                 label=f"COG: {cog_row['filename'][:15]}..."
             )
 
-        # Add latitude/longitude grid
+        # Add latitude/longitude grid (night mode)
         lat_gdf, lon_gdf, lat_labels, lon_labels = self._create_lat_lon_grid(
             is_north, psr_data.crs, extent
         )
 
         if lat_gdf is not None and len(lat_gdf) > 0:
-            lat_gdf.plot(ax=ax, color='gray', linewidth=0.5, linestyle=':', alpha=0.7)
+            lat_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
 
         if lon_gdf is not None and len(lon_gdf) > 0:
-            lon_gdf.plot(ax=ax, color='gray', linewidth=0.5, linestyle=':', alpha=0.7)
+            lon_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
 
         # Set extent
         ax.set_xlim(extent[0], extent[1])
         ax.set_ylim(extent[2], extent[3])
 
-        # Add grid
-        ax.grid(True, linestyle=':', alpha=0.3, color='black')
+        # Add grid (night mode)
+        ax.grid(True, linestyle=':', alpha=0.2, color='#606060')
 
-        # Labels and title
-        ax.set_xlabel('Easting (m)', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Northing (m)', fontsize=12, fontweight='bold')
+        # Labels and title (night mode)
+        ax.set_xlabel('Easting (m)', fontsize=12, fontweight='bold', color='white')
+        ax.set_ylabel('Northing (m)', fontsize=12, fontweight='bold', color='white')
+        ax.tick_params(colors='white', which='both')
 
         pole_str = "North Pole" if is_north else "South Pole"
         ax.set_title(
             f'{pole_str} - COG Images Overlapping PSR ID: {psr_id}\n'
             f'{len(overlapping_cogs)} COG images found\n'
-            f'Polar Stereographic (70-90° latitude)',
+            f'Polar Stereographic (75-90° latitude)',
             fontsize=14,
             fontweight='bold',
-            pad=20
+            pad=20,
+            color='white'
         )
 
-        # Add legend (limit entries if too many)
+        # Add legend (limit entries if too many) - night mode
         if len(overlapping_cogs) <= 8:
-            ax.legend(loc='upper left', fontsize=9, framealpha=0.9, bbox_to_anchor=(1.02, 1))
+            legend = ax.legend(loc='upper left', fontsize=9, framealpha=0.9, bbox_to_anchor=(1.02, 1))
         else:
-            # Create custom legend with summary
+            # Create custom legend with summary (night mode colors)
             legend_elements = [
-                Patch(facecolor='lightblue', edgecolor='darkblue', label=f'Target PSR (ID: {psr_id})'),
-                Patch(facecolor='lightgray', edgecolor='gray', label='Other PSRs'),
-                Patch(facecolor='red', alpha=0.5, label=f'{len(overlapping_cogs)} Overlapping COGs')
+                Patch(facecolor='#1a3a4a', edgecolor='#4a90c0', label=f'Target PSR (ID: {psr_id})'),
+                Patch(facecolor='#0a0a0a', edgecolor='#303030', label='Other PSRs'),
+                Patch(facecolor='#ff6b6b', alpha=0.5, label=f'{len(overlapping_cogs)} Overlapping COGs')
             ]
-            ax.legend(handles=legend_elements, loc='upper right', fontsize=11, framealpha=0.9)
+            legend = ax.legend(handles=legend_elements, loc='upper right', fontsize=11, framealpha=0.9)
 
-        # Add text box with COG list (if not too many)
+        # Apply night mode styling to legend
+        legend.get_frame().set_facecolor('#1a1a1a')
+        legend.get_frame().set_edgecolor('#404040')
+        for text in legend.get_texts():
+            text.set_color('white')
+
+        # Add text box with COG list (if not too many) - night mode
         if len(cog_filenames) <= 10:
             cog_list_text = "Overlapping COGs:\n" + "\n".join([f"{i}. {fn[:20]}" for i, fn in enumerate(cog_filenames, 1)])
             ax.text(
@@ -606,7 +623,8 @@ class PSRCOGVisualizer:
                 transform=ax.transAxes,
                 fontsize=8,
                 verticalalignment='bottom',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8),
+                color='white',
+                bbox=dict(boxstyle='round', facecolor='#2a2a2a', edgecolor='#404040', alpha=0.9),
                 family='monospace'
             )
 

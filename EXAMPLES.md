@@ -1,12 +1,12 @@
 # Visualization Examples
 
-This document shows example outputs from the PSR-SDC1 visualization tools with polar stereographic projection and lat/lon grids.
+This document shows example outputs from the PSR-SDC1 visualization tools with polar stereographic projection, lat/lon grids, and night mode theme.
 
 ## Example 1: South Pole - COG Footprint on PSRs
 
 **Files:**
-- `example1_south_pole.png` (554 KB)
-- `example1_south_pole.tif` (674 KB) - Georeferenced GeoTIFF
+- `example1_south_pole.png` (503 KB)
+- `example1_south_pole.tif` (651 KB) - Georeferenced GeoTIFF
 
 **Command:**
 ```bash
@@ -19,26 +19,56 @@ python visualize_psr_cog.py --cog M012728826S.60m.COG.tif --output example1_sout
 - Footprint area: 850.41 km²
 - Valid data fraction: 6.8%
 - Image dimensions: 1992 x 1731 pixels
-- PSRs in region: 2,384 (all south pole PSRs)
+- PSRs in region: 2,362 (within 15° of south pole)
 
 **Features:**
-- Full south pole view (70-90°S)
+- South pole view (75-90°S) - 15 degrees from pole
 - Latitude gridlines: 75°, 80°, 85°, 90° (5° spacing)
 - Longitude gridlines: 0°, 30°, 60°, 90°, 120°, 150°, 180°, 210°, 240°, 270°, 300°, 330° (30° spacing)
-- Red dashed line shows COG footprint
-- Blue filled polygons show all PSRs in the south polar region
+- **Night mode theme:** Dark background with light elements
+- **Thin outlines:** Coral red dashed line (1.5px) for COG footprint
+- Dark blue-gray filled PSR polygons with light blue thin outlines (0.3px)
 
 ---
 
-## Example 2: South Pole - PSR Overlap Query
+## Example 2: North Pole - COG Footprint on PSRs
 
 **Files:**
-- `example2_psr_overlap.png` (517 KB)
-- `example2_psr_overlap.tif` (633 KB) - Georeferenced GeoTIFF
+- `example2_north_pole.png` (535 KB)
+- `example2_north_pole.tif` (667 KB) - Georeferenced GeoTIFF
 
 **Command:**
 ```bash
-python visualize_psr_cog.py --psr-id SP_816480_0652210 --output example2_psr_overlap
+python visualize_psr_cog.py --cog M013049982S.60m.COG.tif --output example2_north_pole
+```
+
+**Description:**
+- COG file: M013049982S.60m.COG.tif
+- Hemisphere: Northern
+- Footprint area: 870.45 km²
+- Valid data fraction: 20.2%
+- Image dimensions: 2569 x 462 pixels
+- PSRs in region: 5,625 (within 15° of north pole)
+
+**Features:**
+- North pole view (75-90°N) - 15 degrees from pole
+- Latitude gridlines: 75°, 80°, 85°, 90° (5° spacing)
+- Longitude gridlines: 0°, 30°, 60°, 90°, 120°, 150°, 180°, 210°, 240°, 270°, 300°, 330° (30° spacing)
+- **Night mode theme:** Dark background with light elements
+- **Thin outlines:** Coral red dashed line (1.5px) for COG footprint
+- Dark blue-gray filled PSR polygons with light blue thin outlines (0.3px)
+
+---
+
+## Example 3: South Pole - PSR Overlap Query
+
+**Files:**
+- `example3_psr_overlap.png` (472 KB)
+- `example3_psr_overlap.tif` (614 KB) - Georeferenced GeoTIFF
+
+**Command:**
+```bash
+python visualize_psr_cog.py --psr-id SP_816480_0652210 --output example3_psr_overlap
 ```
 
 **Description:**
@@ -51,39 +81,12 @@ python visualize_psr_cog.py --psr-id SP_816480_0652210 --output example2_psr_ove
   - M013128596S.60m.COG.tif
 
 **Features:**
-- Full south pole view (70-90°S)
-- Target PSR highlighted in blue
-- Context PSRs shown in gray
-- Two overlapping COG footprints in different colors
+- South pole view (75-90°S) - 15 degrees from pole
+- **Night mode theme:** Dark background with light elements
+- Target PSR highlighted in dark blue-gray with light blue outline (1.0px)
+- Context PSRs shown in very dark gray with dark outlines (0.2px)
+- Two overlapping COG footprints in different colors with thin coral red outlines (0.8px)
 - Complete lat/lon grid overlay
-
----
-
-## Example 3: North Pole - COG Footprint on PSRs
-
-**Files:**
-- `example3_north_pole.png` (554 KB)
-- `example3_north_pole.tif` (687 KB) - Georeferenced GeoTIFF
-
-**Command:**
-```bash
-python visualize_psr_cog.py --cog M013049982S.60m.COG.tif --output example3_north_pole
-```
-
-**Description:**
-- COG file: M013049982S.60m.COG.tif
-- Hemisphere: Northern
-- Footprint area: 870.45 km²
-- Valid data fraction: 20.2%
-- Image dimensions: 2569 x 462 pixels
-- PSRs in region: 5,655 (all north pole PSRs)
-
-**Features:**
-- Full north pole view (70-90°N)
-- Latitude gridlines: 75°, 80°, 85°, 90° (5° spacing)
-- Longitude gridlines: 0°, 30°, 60°, 90°, 120°, 150°, 180°, 210°, 240°, 270°, 300°, 330° (30° spacing)
-- Red dashed line shows COG footprint
-- Blue filled polygons show all PSRs in the north polar region
 
 ---
 
@@ -97,10 +100,10 @@ All visualizations use native polar stereographic projections:
 
 ### Coverage Area
 
-Maps show **20 degrees from each pole** (70-90° latitude range):
-- Covers the primary PSR distribution zones
-- Includes all permanently shadowed regions
-- Extent: ~600 km from pole center
+Maps show **15 degrees from each pole** (75-90° latitude range):
+- Focuses on the densest PSR concentration zones
+- Includes core permanently shadowed regions
+- Extent: ~450 km from pole center
 
 ### Grid System
 
@@ -115,19 +118,26 @@ Maps show **20 degrees from each pole** (70-90° latitude range):
 - Values: 0°, 30°, 60°, 90°, 120°, 150°, 180°, 210°, 240°, 270°, 300°, 330°
 - Rendered as dotted gray lines radiating from pole
 
-### Color Coding
+### Color Coding (Night Mode Theme)
 
-**COG Footprint Visualizations (Examples 1, 3):**
-- **Red dashed line:** COG image footprint boundary
-- **Light blue filled:** All PSR polygons in polar region
-- **Dark blue outline:** PSR polygon boundaries
-- **Gray dotted lines:** Lat/lon grid
+**COG Footprint Visualizations (Examples 1, 2):**
+- **Black background:** Night mode theme for reduced eye strain
+- **Coral red dashed line (1.5px):** COG image footprint boundary (#ff6b6b)
+- **Dark blue-gray filled (#1a3a4a):** PSR polygons in polar region
+- **Light blue thin outlines (0.3px):** PSR polygon boundaries (#4a90c0)
+- **Gray dotted lines (0.3px):** Lat/lon grid (#808080)
+- **White text:** Labels, title, axis text
 
-**PSR Overlap Visualizations (Example 2):**
-- **Light blue filled:** Target PSR polygon
-- **Light gray filled:** Other PSRs in the region (context)
-- **Colored filled (red outline):** Overlapping COG footprints
-- **Gray dotted lines:** Lat/lon grid
+**PSR Overlap Visualizations (Example 3):**
+- **Black background:** Night mode theme
+- **Dark blue-gray filled (#1a3a4a):** Target PSR polygon
+- **Light blue outline (1.0px):** Target PSR boundary (#4a90c0)
+- **Very dark gray filled (#0a0a0a):** Other PSRs in the region (context)
+- **Dark gray outlines (0.2px):** Context PSR boundaries (#303030)
+- **Set3 colormap:** Overlapping COG footprints (various colors)
+- **Coral red outlines (0.8px):** COG footprint boundaries (#ff6b6b)
+- **Gray dotted lines (0.3px):** Lat/lon grid (#808080)
+- **White text:** Labels, title, axis text
 
 ### Output Formats
 
@@ -325,6 +335,12 @@ If you use these visualizations in publications, please cite:
 
 ## Version
 
-- **Version:** 2.0
+- **Version:** 3.0
 - **Date:** 2025-11-21
-- **Features:** Polar stereographic projection, lat/lon grids, dual PNG/GeoTIFF output
+- **Features:**
+  - Polar stereographic projection (15° from pole)
+  - Lat/lon grids (5° latitude, 30° longitude)
+  - Dual PNG/GeoTIFF output
+  - **Night mode theme** with dark backgrounds
+  - **Thin outlines** for clean visualization (0.2-1.5px)
+  - Optimized for PSR-dense polar regions
