@@ -117,7 +117,7 @@ class ImpactReportGenerator:
                              crater_type: str = 'simple',
                              n_samples: int = 1000) -> Dict:
         """
-        Compute uncertainties using Monte Carlo sampling.
+        Compute uncertainties using Monte Carlo sampling with sensitivity analysis.
 
         Parameters:
         -----------
@@ -137,7 +137,7 @@ class ImpactReportGenerator:
         Returns:
         --------
         uncertainties : dict
-            Dictionary with mean, std, and percentiles for each parameter
+            Dictionary with mean, std, percentiles, and confidence intervals
         """
         target = MATERIALS[target_material]
         calc = ImpactScaling(target, impactor_density)
@@ -148,6 +148,13 @@ class ImpactReportGenerator:
             'impactor_mass': [],
             'impact_energy': [],
             'impact_velocity': []
+        }
+
+        # Storage for sensitivity analysis
+        sensitivity_samples = {
+            'D_var': {'impactor_diameter': [], 'impactor_mass': [], 'impact_energy': []},
+            'd_var': {'impactor_diameter': [], 'impactor_mass': [], 'impact_energy': []},
+            'U_var': {'impactor_diameter': [], 'impactor_mass': [], 'impact_energy': []}
         }
 
         # Monte Carlo sampling
@@ -174,7 +181,46 @@ class ImpactReportGenerator:
             except:
                 continue
 
-        # Compute statistics
+        # Sensitivity analysis - vary one parameter at a time
+        n_sens = min(100, n_samples // 10)  # Smaller sample for sensitivity
+
+        # Vary diameter only
+        for _ in range(n_sens):
+            D_sample = np.random.normal(D, D_err)
+            D_sample = max(D_sample, 0.1)
+            try:
+                results = calc.compute_impactor_params(D_sample, d, U, crater_type=crater_type)
+                sensitivity_samples['D_var']['impactor_diameter'].append(results['impactor_diameter'])
+                sensitivity_samples['D_var']['impactor_mass'].append(results['impactor_mass'])
+                sensitivity_samples['D_var']['impact_energy'].append(results['impact_energy'])
+            except:
+                continue
+
+        # Vary depth only
+        for _ in range(n_sens):
+            d_sample = np.random.normal(d, d_err)
+            d_sample = max(d_sample, 0.01)
+            try:
+                results = calc.compute_impactor_params(D, d_sample, U, crater_type=crater_type)
+                sensitivity_samples['d_var']['impactor_diameter'].append(results['impactor_diameter'])
+                sensitivity_samples['d_var']['impactor_mass'].append(results['impactor_mass'])
+                sensitivity_samples['d_var']['impact_energy'].append(results['impact_energy'])
+            except:
+                continue
+
+        # Vary velocity only
+        for _ in range(n_sens):
+            U_sample = np.random.normal(U, U_err)
+            U_sample = max(U_sample, 100)
+            try:
+                results = calc.compute_impactor_params(D, d, U_sample, crater_type=crater_type)
+                sensitivity_samples['U_var']['impactor_diameter'].append(results['impactor_diameter'])
+                sensitivity_samples['U_var']['impactor_mass'].append(results['impactor_mass'])
+                sensitivity_samples['U_var']['impact_energy'].append(results['impact_energy'])
+            except:
+                continue
+
+        # Compute statistics with confidence intervals
         uncertainties = {}
         for key, values in samples.items():
             if len(values) > 0:
@@ -183,13 +229,53 @@ class ImpactReportGenerator:
                     'mean': np.mean(arr),
                     'std': np.std(arr),
                     'median': np.median(arr),
-                    'p16': np.percentile(arr, 16),
-                    'p84': np.percentile(arr, 84),
+                    'mode': self._estimate_mode(arr),
+                    'p16': np.percentile(arr, 16),  # ~1σ lower
+                    'p84': np.percentile(arr, 84),  # ~1σ upper
+                    'p2_5': np.percentile(arr, 2.5),  # 95% CI lower
+                    'p97_5': np.percentile(arr, 97.5),  # 95% CI upper
+                    'p0_5': np.percentile(arr, 0.5),  # 99% CI lower
+                    'p99_5': np.percentile(arr, 99.5),  # 99% CI upper
                     'p5': np.percentile(arr, 5),
                     'p95': np.percentile(arr, 95),
+                    'confidence_68': (np.percentile(arr, 16), np.percentile(arr, 84)),
+                    'confidence_95': (np.percentile(arr, 2.5), np.percentile(arr, 97.5)),
+                    'confidence_99': (np.percentile(arr, 0.5), np.percentile(arr, 99.5)),
                 }
 
+        # Compute sensitivity indices (variance-based)
+        uncertainties['sensitivity'] = {}
+        for param in ['impactor_diameter', 'impactor_mass', 'impact_energy']:
+            if param in samples and len(samples[param]) > 0:
+                total_var = np.var(samples[param])
+
+                # Variance when only varying each input
+                var_D = np.var(sensitivity_samples['D_var'][param]) if len(sensitivity_samples['D_var'][param]) > 0 else 0
+                var_d = np.var(sensitivity_samples['d_var'][param]) if len(sensitivity_samples['d_var'][param]) > 0 else 0
+                var_U = np.var(sensitivity_samples['U_var'][param]) if len(sensitivity_samples['U_var'][param]) > 0 else 0
+
+                # First-order sensitivity indices (normalized)
+                total_contrib = var_D + var_d + var_U
+                if total_contrib > 0:
+                    uncertainties['sensitivity'][param] = {
+                        'diameter_contribution': var_D / total_contrib * 100,
+                        'depth_contribution': var_d / total_contrib * 100,
+                        'velocity_contribution': var_U / total_contrib * 100,
+                    }
+
         return uncertainties
+
+    def _estimate_mode(self, data: np.ndarray) -> float:
+        """Estimate mode using kernel density estimation."""
+        from scipy import stats
+        if len(data) < 10:
+            return np.median(data)
+
+        kde = stats.gaussian_kde(data)
+        x_range = np.linspace(data.min(), data.max(), 1000)
+        density = kde(x_range)
+        mode_idx = np.argmax(density)
+        return x_range[mode_idx]
 
     def compute_excavation_depth(self, D: float, crater_type: str = 'simple') -> Dict:
         """
@@ -477,50 +563,147 @@ class ImpactReportGenerator:
         m = results['impactor_mass']
         E = results['impact_energy']
 
+        # Build comprehensive uncertainty table
+        imp_data = [
+            ['<b>Parameter</b>', '<b>Best Estimate</b>', '<b>68% CI</b>', '<b>95% CI</b>']
+        ]
+
         if 'impactor_diameter' in uncertainties:
             L_unc = uncertainties['impactor_diameter']
-            L_str = f"{L:.2f} m ({L_unc['p16']:.2f} – {L_unc['p84']:.2f})"
+            imp_data.append([
+                'Impactor Diameter',
+                f"{L_unc['median']:.2f} m",
+                f"{L_unc['p16']:.2f} – {L_unc['p84']:.2f} m",
+                f"{L_unc['p2_5']:.2f} – {L_unc['p97_5']:.2f} m"
+            ])
         else:
-            L_str = f"{L:.2f} m"
+            imp_data.append(['Impactor Diameter', f'{L:.2f} m', '—', '—'])
 
         if 'impactor_mass' in uncertainties:
             m_unc = uncertainties['impactor_mass']
-            m_str = f"{m:.2e} kg ({m_unc['p16']:.2e} – {m_unc['p84']:.2e})"
+            imp_data.append([
+                'Impactor Mass',
+                f"{m_unc['median']:.2e} kg",
+                f"{m_unc['p16']:.2e} – {m_unc['p84']:.2e}",
+                f"{m_unc['p2_5']:.2e} – {m_unc['p97_5']:.2e}"
+            ])
         else:
-            m_str = f"{m:.2e} kg"
+            imp_data.append(['Impactor Mass', f'{m:.2e} kg', '—', '—'])
 
         if 'impact_energy' in uncertainties:
             E_unc = uncertainties['impact_energy']
-            E_str = f"{E:.2e} J ({E_unc['p16']:.2e} – {E_unc['p84']:.2e})"
-            E_Mt = E / 4.184e15
-            E_Mt_str = f"{E_Mt:.2f} Mt TNT"
+            E_Mt_median = E_unc['median'] / 4.184e15
+            E_Mt_16 = E_unc['p16'] / 4.184e15
+            E_Mt_84 = E_unc['p84'] / 4.184e15
+            imp_data.append([
+                'Impact Energy',
+                f"{E_unc['median']:.2e} J",
+                f"{E_unc['p16']:.2e} – {E_unc['p84']:.2e}",
+                f"{E_unc['p2_5']:.2e} – {E_unc['p97_5']:.2e}"
+            ])
+            imp_data.append([
+                '(in Megatons TNT)',
+                f"{E_Mt_median:.2f} Mt",
+                f"{E_Mt_16:.2f} – {E_Mt_84:.2f} Mt",
+                '—'
+            ])
         else:
-            E_str = f"{E:.2e} J"
-            E_Mt_str = f"{E/4.184e15:.2f} Mt TNT"
+            E_Mt = E / 4.184e15
+            imp_data.append(['Impact Energy', f'{E:.2e} J', '—', '—'])
+            imp_data.append(['(in Megatons TNT)', f'{E_Mt:.2f} Mt', '—', '—'])
 
-        imp_data = [
-            ['<b>Parameter</b>', '<b>Value</b>', '<b>Range (16th–84th percentile)</b>'],
-            ['Impactor Diameter', f'{L:.2f} m', L_str.split('(')[1].rstrip(')') if '(' in L_str else '—'],
-            ['Impactor Mass', f'{m:.2e} kg', ''],
-            ['', f'({m/1e9:.2f} million kg)', ''],
-            ['Impact Energy', f'{E:.2e} J', ''],
-            ['', E_Mt_str, ''],
-            ['Impact Momentum', f'{results["impact_momentum"]:.2e} kg⋅m/s', '—'],
-        ]
-        imp_table = Table(imp_data, colWidths=[2.2*inch, 2.2*inch, 1.8*inch])
+        imp_data.append(['Impact Momentum', f'{results["impact_momentum"]:.2e} kg⋅m/s', '—', '—'])
+
+        imp_table = Table(imp_data, colWidths=[1.8*inch, 1.6*inch, 1.5*inch, 1.3*inch])
         imp_table.setStyle(TableStyle([
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 12),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#ecf0f1')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
         ]))
         elements.append(imp_table)
+
+        # Add note about confidence intervals
+        ci_note = """
+        <i>Note: Best estimates are median values from Monte Carlo simulation.
+        68% CI ≈ ±1σ uncertainty range; 95% CI ≈ ±2σ range.</i>
+        """
+        elements.append(Paragraph(ci_note, self.styles['Caption']))
         elements.append(Spacer(1, 0.2*inch))
+
+        # === SENSITIVITY ANALYSIS ===
+        if 'sensitivity' in uncertainties and len(uncertainties['sensitivity']) > 0:
+            elements.append(Paragraph("Sensitivity Analysis", self.styles['SectionHeading']))
+
+            sens_intro = """
+            <i>Variance-based sensitivity analysis showing the percentage contribution of each
+            input parameter (crater diameter, depth, velocity) to the total uncertainty in
+            computed impactor properties:</i>
+            """
+            elements.append(Paragraph(sens_intro, self.styles['BodyText']))
+            elements.append(Spacer(1, 0.1*inch))
+
+            # Build sensitivity table
+            sens_data = [
+                ['<b>Output Parameter</b>', '<b>Diameter</b>', '<b>Depth</b>', '<b>Velocity</b>']
+            ]
+
+            # Add row for each output parameter
+            if 'impactor_diameter' in uncertainties['sensitivity']:
+                sens = uncertainties['sensitivity']['impactor_diameter']
+                sens_data.append([
+                    'Impactor Diameter',
+                    f"{sens['diameter_contribution']:.1f}%",
+                    f"{sens['depth_contribution']:.1f}%",
+                    f"{sens['velocity_contribution']:.1f}%"
+                ])
+
+            if 'impactor_mass' in uncertainties['sensitivity']:
+                sens = uncertainties['sensitivity']['impactor_mass']
+                sens_data.append([
+                    'Impactor Mass',
+                    f"{sens['diameter_contribution']:.1f}%",
+                    f"{sens['depth_contribution']:.1f}%",
+                    f"{sens['velocity_contribution']:.1f}%"
+                ])
+
+            if 'impact_energy' in uncertainties['sensitivity']:
+                sens = uncertainties['sensitivity']['impact_energy']
+                sens_data.append([
+                    'Impact Energy',
+                    f"{sens['diameter_contribution']:.1f}%",
+                    f"{sens['depth_contribution']:.1f}%",
+                    f"{sens['velocity_contribution']:.1f}%"
+                ])
+
+            sens_table = Table(sens_data, colWidths=[2.2*inch, 1.4*inch, 1.4*inch, 1.4*inch])
+            sens_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#ecf0f1')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),
+                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(sens_table)
+
+            sens_note = """
+            <i>Note: Contributions represent first-order sensitivity indices showing how much
+            each input parameter contributes to output variance. Higher percentages indicate
+            greater influence on the uncertainty of the output parameter.</i>
+            """
+            elements.append(Paragraph(sens_note, self.styles['Caption']))
+            elements.append(Spacer(1, 0.2*inch))
 
         # === MATERIAL PROPERTIES ===
         elements.append(Paragraph("Material Properties", self.styles['SectionHeading']))
