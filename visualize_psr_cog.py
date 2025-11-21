@@ -352,10 +352,10 @@ class PSRCOGVisualizer:
         )
 
         if lat_gdf is not None and len(lat_gdf) > 0:
-            lat_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+            lat_gdf.plot(ax=ax, color='#b0b0b0', linewidth=0.3, linestyle=':', alpha=0.6)
 
         if lon_gdf is not None and len(lon_gdf) > 0:
-            lon_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+            lon_gdf.plot(ax=ax, color='#b0b0b0', linewidth=0.3, linestyle=':', alpha=0.6)
 
         # Set extent to show 15 degrees from pole
         ax.set_xlim(extent[0], extent[1])
@@ -530,10 +530,8 @@ class PSRCOGVisualizer:
         # Get polar extent (15 degrees from pole)
         extent = self._get_polar_extent(is_north, psr_data.crs)
 
-        # Find all PSRs in the polar region for context
-        from shapely.geometry import box
-        extent_box = box(extent[0], extent[2], extent[1], extent[3])
-        psr_context = psr_data[psr_data.intersects(extent_box)]
+        # Use ALL PSRs for context (not filtered by extent)
+        psr_context = psr_data
 
         # Plot context PSRs (night mode with thin outlines)
         psr_context.plot(
@@ -573,10 +571,10 @@ class PSRCOGVisualizer:
         )
 
         if lat_gdf is not None and len(lat_gdf) > 0:
-            lat_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+            lat_gdf.plot(ax=ax, color='#b0b0b0', linewidth=0.3, linestyle=':', alpha=0.6)
 
         if lon_gdf is not None and len(lon_gdf) > 0:
-            lon_gdf.plot(ax=ax, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+            lon_gdf.plot(ax=ax, color='#b0b0b0', linewidth=0.3, linestyle=':', alpha=0.6)
 
         # Set extent
         ax.set_xlim(extent[0], extent[1])
@@ -716,10 +714,10 @@ class PSRCOGVisualizer:
 
         # Add lat/lon grid (same as main view)
         if lat_gdf is not None and len(lat_gdf) > 0:
-            lat_gdf.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+            lat_gdf.plot(ax=ax_zoom, color='#b0b0b0', linewidth=0.3, linestyle=':', alpha=0.6)
 
         if lon_gdf is not None and len(lon_gdf) > 0:
-            lon_gdf.plot(ax=ax_zoom, color='#808080', linewidth=0.3, linestyle=':', alpha=0.5)
+            lon_gdf.plot(ax=ax_zoom, color='#b0b0b0', linewidth=0.3, linestyle=':', alpha=0.6)
 
         # Set zoomed extent (this crops the view)
         ax_zoom.set_xlim(zoom_extent[0], zoom_extent[1])
