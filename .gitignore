@@ -1,0 +1,29 @@
+# Generated geodatabases
+*.gpkg
+
+# Generated visualizations
+*_on_psr.png
+*_cog_overlap.png
+psr_*_cog_overlap.png
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
