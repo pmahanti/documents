@@ -1,0 +1,31 @@
+{
+  "regions": {
+    "faustini": {
+      "name": "faustini",
+      "dem": "SHADOWCAM_FAUSTINI_P871S0839.tif",
+      "orthophoto": "SHADOWCAM_FAUSTINI_M017670865SE_170cm.tif"
+    },
+    "sverdrup": {
+      "name": "sverdrup",
+      "dem": "SHADOWCAM_SVERDRUP.tif",
+      "orthophoto": "SHADOWCAM_SVERDRUP_M016815246SE_210cm.tif"
+    },
+    "test": {
+      "name": "tmp.test_craters",
+      "dem": "SHADOWCAM_FAUSTINI_P871S0839.tif",
+      "orthophoto": "SHADOWCAM_FAUSTINI_M017670865SE_170cm.tif"
+    },
+    "site1": {
+      "name": "yolo_site1",
+      "dem": "LDEM_80S_20MPP_ADJ.TIF",
+      "orthophoto": "NAC_POLE_SOUTH_CM_AVG_P848S0337.TIF"
+    }
+  },
+  "default_region": "test",
+  "min_diameter": 60,
+  "paths": {
+    "images_dir": "/Users/asonke/Library/CloudStorage/OneDrive-ArizonaStateUniversity/SLC/images",
+    "shapefiles_dir": "/Users/asonke/Library/CloudStorage/OneDrive-ArizonaStateUniversity/SLC/shapefiles",
+    "output_dir": "/Users/asonke/Library/CloudStorage/OneDrive-ArizonaStateUniversity/SLC/figs"
+  }
+}
