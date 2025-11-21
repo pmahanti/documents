@@ -1,0 +1,363 @@
+KPL/IK
+
+\beginlabel
+PDS_VERSION_ID               = PDS3
+RECORD_TYPE                  = STREAM
+RECORD_BYTES                 = "N/A"
+^SPICE_KERNEL                = "kplo_shadowcam_v00.ti"
+MISSION_NAME                 = "KOREA PATHFINDER LUNAR ORBITER"
+SPACECRAFT_NAME              = "KOREA PATHFINDER LUNAR ORBITER"
+DATA_SET_ID                  = "n/a"
+KERNEL_TYPE_ID               = IK
+PRODUCT_ID                   = "kplo_shadowcam_v00.ti"
+PRODUCT_CREATION_TIME        = 2022-08-30T12:53:00
+PRODUCER_ID                  = "ShadowCam SOC/ASU"
+MISSION_PHASE_NAME           = {
+                               LAUNCH,
+                               CRUISE,
+                               "LUNAR ORBIT ACQUISITION",
+                               COMMISSIONING,
+                               "NOMINAL MISSION",
+                               "EXTENDED MISSION"
+                               }
+PRODUCT_VERSION_TYPE         = ACTUAL
+PLATFORM_OR_MOUNTING_NAME    = KPLO_SPACECRAFT
+START_TIME                   = "N/A"
+STOP_TIME                    = "N/A"
+SPACECRAFT_CLOCK_START_COUNT = "N/A"
+SPACECRAFT_CLOCK_STOP_COUNT  = "N/A"
+TARGET_NAME                  = MOON
+INSTRUMENT_NAME              = "KPLO_SHADOWCAM"
+NAIF_INSTRUMENT_ID           = -155151
+SOURCE_PRODUCT_ID            = "N/A"
+NOTE                         = "See comments in the file for details"
+OBJECT                       = SPICE_KERNEL
+  INTERCHANGE_FORMAT         = ASCII
+  KERNEL_TYPE                = INSTRUMENT
+  DESCRIPTION                = "SPICE IK file containing FOV and internal
+                               geometry parameters for ShadowCam on KPLO."
+END_OBJECT                   = SPICE_KERNEL
+\endlabel
+
+
+===========================================================================
+  $Id: kplo_shadowcam_v00.ti, v00 2022/08/30 12:53:00 espeyerer Exp espeyerer $
+===========================================================================
+
+ShadowCam (SHC) Instrument Kernel
+===========================================================================
+
+ This ShadowCam instrument kernel (I-kernel) contains the instrument 
+ geometric parameters for the ShadowCam instrument on the Korea Pathfinder
+ Lunar Orbiter (KPLO).
+
+
+Version and Date
+---------------------------------------------------------------------------
+
+   Version 1.0 -- April 25, 2023      -- Emerson Speyerer, ASU
+
+         Corrected FOV bounding vectors
+   
+   Version 0.0 -- August 30, 2022     -- Emerson Speyerer, ASU
+ 
+         Initial (Internal) release 
+
+
+ References
+---------------------------------------------------------------------------
+
+   1. Kernel Pool Required Reading, available online at
+      http://naif.jpl.nasa.gov
+   2. KPLO Frames Definition Kernel (FK), latest version
+
+
+ Contact Information
+---------------------------------------------------------------------------
+   Direct questions, comments or concerns about the contents of this kernel
+   should be sent to:
+
+   Nick Estes, ASU, lroc-dn@ser.asu.edu
+
+
+ Implementation Notes
+---------------------------------------------------------------------------
+
+   This file is used by the SPICE system as follows: programs that make use
+   of this frame kernel must "load" the kernel normally during program
+   initialization.  Loading the kernel associates the data items with
+   their names in a data structure called the "kernel pool".  The SPICELIB
+   routine FURNSH loads a kernel into the pool as shown below:
+
+      FORTRAN: (SPICELIB)
+
+         CALL FURNSH ( frame_kernel_name )
+
+      C: (CSPICE)
+
+         furnsh_c ( frame_kernel_name );
+
+      IDL: (ICY)
+
+         cspice_furnsh, frame_kernel_name
+
+      MATLAB: (MICE)
+
+         cspice_furnsh( 'frame_kernel_name' );
+         
+   In order for a program or routine to extract data from the pool, the
+   SPICELIB routines GDPOOL, GIPOOL, and GCPOOL are used.  See [1] for
+   more details.
+
+   This file was created and may be updated with a text editor or word
+   processor.
+
+
+ Naming Conventions
+---------------------------------------------------------------------------
+
+   All names referencing values in this Instrument Kernel (IK) start with 
+   the characters 'INS' followed by the NAIF KPLO spacecraft ID number 
+   (-155) and then followed by a NAIF three digit code for ShadowCam:
+   
+         Table 1: KPLO Instrument IDs
+         -----------------------------   -----------   ------------
+                  Frame Name               NAIF ID        Comments
+         -----------------------------   -----------   ------------
+           KPLO_SHC                        -155150     Apply TDI dir
+           KPLO_SHC_A                      -155151     Camera frame
+         -----------------------------   -----------   ------------
+
+   The remainder of the name is an underscore character followed by the
+   unique name of the data item.  For example, the focal length in the
+   KPLO_SHC_A frame (see [2]) is specified by:
+
+      INS-155151_FOCAL_LENGTH
+
+   The upper bound on the length of the name of any data item identifier
+   is 32 characters.
+
+   If the same item is included in more than one file, or if the same item
+   appears more than once within a single file, the latest value supersedes
+   any earlier values.
+
+
+ ShadowCam Description
+---------------------------------------------------------------------------
+
+   To be added later.
+
+ ShadowCam Geometric Calibration
+---------------------------------------------------------------------------
+
+   Prior to launch, the interior orientation parameters (i.e. principal
+   point, calibrated focal length and optical distortion) for ShadowCam 
+   were characterized at Malin Space Science Systems in San Diego, CA.
+   Due to the large minimum focusing distance, ShadowCam could not
+   directly image a calibration target inside the laboratory environment. 
+   Therefore, the ShadowCam team adopted a goniometric calibration technique 
+   [Hallert, 1960; Schuster and Braunecker, 2000] in which a collimator 
+   projects a target that is subsequently imaged by the camera that is 
+   attached to a rotary stage to enable precise measurements across the 
+   detector. Once installed on the spacecraft, the instrument integration 
+   team measured the relative pointing of each instrument with respect to 
+   the reference frame of the spacecraft bus. The ShadowCam camera model
+   incorporated these orientation parameters through variables defined 
+   inside the text based ShadowCam Instrument Kernel (this file) and 
+   KPLO Frames Kernel [2].
+
+
+ Pixel Coordinate Definition:
+---------------------------------------------------------------------------
+
+   The KPLO ShadowCam images are composed of a raster of pixels.  These
+   pixels represent finite areas and not discrete points. The center of the 
+   upper left pixel is defined as line and sample (1.0, 1.0).  The upper 
+   left corner of the upper left pixel has the coordinates (0.5, 0.5), 
+   while the lower right corner of the upper left pixel has the coordinates 
+   (1.499,1.499). The sample and line numbers increase as one progresses to 
+   the right and down in the image or detector.
+
+         Figure 1: ShadowCam Pixel Definition
+         
+         (0.5,0.5)
+              *-------------------*-------------------*---->
+              |                   |                   |
+              |                   |                   |    Sample
+              |                   |                   |  Coordinate
+              |       (1,1)       |       (2,1)       |     (+)
+              |         *         |         *         |
+              |                   |                   |
+              |                   |                   |
+              |                   |                   |
+              |      (1.499,1.499)|                   |
+              *-------------------*-------------------*---
+              |                   | (1.5,1.5)         |
+              |                   |                   |
+              |
+              v   Line Coordinate (+)
+
+
+
+ ShadowCam First Order Optical Parameters:
+---------------------------------------------------------------------------
+
+   The following section assumes that prescan and overscan pixels have been 
+   removed from each channel. The instrument is using the six center
+   channels, which each contain:
+	- 2 (virtual) prescan pixels
+	- 8 (physical) prescan pixels -> measure bias level
+	- 512 (physical) scene pixels
+  	- 2 (virtual) overscan pixels
+   Therefore, while the entire image is 3144 pixels wide, the calibrated 
+   image only contains 3072 pixels (512 pixels *6 channels).
+
+   Note: There is no physical gap between channels. 
+ 
+   ShadowCam (SHC):
+
+         Table 2: First Order ShadowCam Optical Parameters
+         -------------------------------   -----------
+                 Parameter, Unit              Value    
+         -------------------------------   -----------
+          Effective Focal Length, mm          699.275
+            Estimated Uncertainty, mm           0.010
+          F/Ratio, unitless                     3.605
+          Spectral Band, nm                   400-760
+          Boresight Sample, pixel                1572
+          Boresight Line, pixel                    64
+          IFOV, radians/pixel
+              Cross-track                   1.71606E-5
+              Along-track                   1.71606E-5
+         -------------------------------   -----------
+         
+  
+   The ShadowCam parameter values above are given in the keywords below 
+   in the same units:
+        
+         \begindata
+         INS-155151_FOCAL_LENGTH       = 699.275
+         INS-155151_F/RATIO            = 3.605
+         INS-155151_WAVELENGTH_RANGE   = ( 400, 760 )
+         INS-155151_BORESIGHT_SAMPLE   = 1558
+         INS-155151_BORESIGHT_LINE     = 1
+         INS-155151_IFOV               = ( 1.71606E-5, 1.71606E-5)
+         \begintext
+   
+
+ ShadowCam Detector Parameters:
+---------------------------------------------------------------------------
+
+   The following section contains the sensor parameters for ShadowCam.
+   
+         Table 3: LROC Detector Parameters
+         ----------------------------   ---------
+                 Parameter, Units         Value
+         ----------------------------   ---------
+          Pixel pitch, mm                12.0E-3
+          Samples, pixels                   3144 
+          Lines (TDI Stages), pixels         128 
+          CCD Center sample, pixel        1572.5
+          CCD Center line, pixel            64.5
+         ----------------------------   ---------
+
+   The following NAIF keywords define the sensor:
+        
+         \begindata
+         INS-155151_PIXEL_PITCH       = 12.0E-3
+         INS-155151_PIXEL_SAMPLES     = 3144
+         INS-155151_PIXEL_LINES       = 128
+         INS-155151_PIXEL_SIZE        = ( 12.0E-3 12.0E-3 )
+         INS-155151_CCD_CENTER        = ( 1572.5 64.5 )
+         \begintext
+
+
+ ShadowCam Field of View Parameters:
+---------------------------------------------------------------------------
+
+   This section contains definitions for the field of view (FOV) for 
+   ShadowCam. These definitions are provided in a format consistent with 
+   the format required by the SPICE (CSPICE) function GETFOV (getfov_c).
+  
+
+         \begindata
+         INS-155151_FOV_FRAME       = 'KPLO_SHC_A'
+         INS-155151_FOV_SHAPE       = 'RECTANGLE'
+         INS-155151_BORESIGHT       = ( 0.0 0.0 1.0 )
+         INS-155151_FOV_CLASS_SPEC  = 'ANGLES'
+         INS-155151_FOV_REF_VECTOR  = ( 0.0 1.0 0.0 )
+         INS-155151_FOV_REF_ANGLE   = 4.91615E-4
+         INS-155151_FOV_CROSS_ANGLE = 1.54565
+         INS-155151_FOV_ANGLE_UNITS = 'DEGREES'
+         \begintext
+
+
+  
+ ShadowCam Distortion Model Parameters
+---------------------------------------------------------------------------
+
+   The ShadowCam distortion model has the following form:
+
+      xd = (sample - BORESIGHT_SAMPLE) * PIXEL_PITCH
+      r  = abs(xd)
+
+      xc = xd * (1+k2*r^2)
+
+   where "xd" is the distorted position (the measured position), "k2" is 
+   the distortion coefficients, and "r" is the distance from the optical 
+   center, and "xc" is the corrected focal plane positions in mm.  Since 
+   the ShadowCam instrument is a TDI, we treat the detector as a single 
+   line CCD, so yd = 0 and subsequently yc = 0 is always true.
+
+   The keywords below contain the unitless optical distortion coefficients
+   for ShadowCam:
+
+         \begindata
+         INS-155151_OD_K                 = -1.741E-5
+         \begintext
+
+   The ShadowCam camera model uses the following keywords to compute focal
+   plane coordinates from CCD coordinates:
+
+         \begindata
+         INS-155151_TRANSX               = ( 0.0  0.0     0.012 )
+         INS-155151_TRANSY               = ( 0.0  0.012   0.0   )
+         \begintext
+
+   The ShadowCam camera model uses the following keywords to compute CCD 
+   coordinates from focal plane coordinates:
+
+         \begindata
+         INS-155151_ITRANSS              = ( 0.0,  0.0,    83.33333 )
+         INS-155151_ITRANSL              = ( 0.0, 83.33333, 0.0     )
+         \begintext
+
+  
+
+
+===========================================================================
+
+Platform ID
+---------------------------------------------------------------------------
+
+  \begindata
+
+  INS-155150__PLATFORM_ID         = -151000
+  INS-155151__PLATFORM_ID         = -151000
+
+  \begintext
+
+NAIF ID Code to Name Mapping
+---------------------------------------------------------------------------
+
+   \begindata
+   
+   NAIF_BODY_NAME += 'KPLO_SHC'
+   NAIF_BODY_CODE += -155150
+
+   NAIF_BODY_NAME += 'KPLO_SHC_A'
+   NAIF_BODY_CODE += -155151
+
+   \begintext
+
+===========================================================================
