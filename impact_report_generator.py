@@ -384,7 +384,7 @@ class ImpactReportGenerator:
         # ===== PAGE 1: SUMMARY =====
         story.extend(self._generate_summary_page(
             diameter, depth, velocity, latitude, longitude,
-            target, impactor, results, uncertainties,
+            target, impactor, calc, results, uncertainties,
             excavation, ejecta, crater_type, crater_name,
             diameter_uncertainty, depth_uncertainty, velocity_uncertainty
         ))
@@ -394,7 +394,7 @@ class ImpactReportGenerator:
         # ===== PAGE 2+: THEORETICAL EXPLANATION =====
         story.extend(self._generate_theory_pages(
             diameter, depth, velocity,
-            target, impactor, results,
+            target, impactor, calc, results,
             excavation, ejecta, crater_type
         ))
 
@@ -404,7 +404,7 @@ class ImpactReportGenerator:
         return output_filename
 
     def _generate_summary_page(self, D, d, U, lat, lon,
-                               target, impactor, results, uncertainties,
+                               target, impactor, calc, results, uncertainties,
                                excavation, ejecta, crater_type, crater_name,
                                D_err, d_err, U_err):
         """Generate the summary page (page 1)."""
@@ -525,14 +525,20 @@ class ImpactReportGenerator:
         # === MATERIAL PROPERTIES ===
         elements.append(Paragraph("Material Properties", self.styles['SectionHeading']))
 
+        # Compute effective strength
+        YEFF = calc.compute_effective_strength(target.cohesion)
+
         mat_data = [
             ['<b>Property</b>', '<b>Target</b>', '<b>Impactor</b>'],
             ['Material', target.name, impactor.name],
             ['Density', f'{target.density:.0f} kg/m³', f'{impactor.density:.0f} kg/m³'],
-            ['Strength', f'{target.strength:.2e} Pa', '—'],
+            ['Cohesion (Y₀)', f'{target.cohesion:.2e} Pa', '—'],
+            ['Effective Strength (Y_EFF)', f'{YEFF:.2e} Pa', '—'],
+            ['Friction Coefficient (f)', f'{target.friction:.2f}', '—'],
+            ['Porosity (Φ)', f'{target.porosity*100:.1f}%', '—'],
             ['Surface Gravity', f'{target.gravity:.2f} m/s²', '—'],
         ]
-        mat_table = Table(mat_data, colWidths=[2*inch, 2*inch, 2*inch])
+        mat_table = Table(mat_data, colWidths=[2.2*inch, 1.9*inch, 1.9*inch])
         mat_table.setStyle(TableStyle([
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
@@ -605,7 +611,7 @@ class ImpactReportGenerator:
 
         return elements
 
-    def _generate_theory_pages(self, D, d, U, target, impactor,
+    def _generate_theory_pages(self, D, d, U, target, impactor, calc,
                                results, excavation, ejecta, crater_type):
         """Generate theoretical explanation pages (page 2+)."""
         elements = []
@@ -654,13 +660,21 @@ class ImpactReportGenerator:
         elements.append(Spacer(1, 0.1*inch))
 
         elements.append(Paragraph("<b>Strength Parameter:</b>", self.styles['SubsectionHeading']))
-        eq2 = f"π₃ = Y/(ρU²)"
+        eq2 = f"π₃ = Y_EFF/(ρU²)"
         elements.append(Paragraph(eq2, self.styles['Equation']))
 
+        # Compute scaling parameters using Prieur et al. (2017)
+        mu = calc.compute_mu_prieur(target.friction, target.porosity)
+        KD = calc.compute_KD_prieur(target.friction, target.porosity)
+        YEFF = calc.compute_effective_strength(target.cohesion)
+
         pi3_text = f"""
-        Where Y = {target.strength:.2e} Pa (target strength),
+        Where Y_EFF = {YEFF:.2e} Pa (effective strength from Prieur et al. 2017),
+        Y₀ = {target.cohesion:.2e} Pa (cohesion),
         ρ = {target.density} kg/m³ (target density),
         U = {U} m/s (impact velocity).
+        <br/>
+        Note: Y_EFF ≈ 20.9 × Y₀ (Prieur et al. 2017, eq. 11)
         <br/>
         Computed value: <b>π₃ = {results['pi_3']:.2e}</b>
         """
@@ -700,11 +714,42 @@ class ImpactReportGenerator:
         elements.append(Paragraph(regime_determination, self.styles['BodyText']))
         elements.append(Spacer(1, 0.15*inch))
 
+        # === NEW SECTION: PRIEUR ET AL. SCALING PARAMETERS ===
+        elements.append(Paragraph("3.1. Target Property Effects (Prieur et al. 2017)", self.styles['SubsectionHeading']))
+
+        prieur_text = f"""
+        This analysis uses improved scaling relationships from <b>Prieur et al. (2017)</b>
+        that account for target friction coefficient and porosity. These properties significantly
+        affect crater formation efficiency:
+        <br/><br/>
+        <b>Velocity Scaling Exponent (μ):</b>
+        <br/>
+        Computed from friction coefficient f = {target.friction:.2f} and porosity Φ = {target.porosity*100:.1f}%:
+        <br/>
+        μ = {mu:.3f} (Prieur et al. 2017, equations 13-14)
+        <br/><br/>
+        The value μ controls whether crater size scales more with impact energy (μ → 2/3)
+        or momentum (μ → 1/3). Higher friction coefficients lead to lower μ values.
+        <br/><br/>
+        <b>Scaling Coefficient (K_D):</b>
+        <br/>
+        Computed from porosity Φ = {target.porosity*100:.1f}%:
+        <br/>
+        K_D = {KD:.3f} (Prieur et al. 2017, equations 15-17)
+        <br/><br/>
+        The coefficient K_D decreases linearly with porosity due to energy dissipation
+        during pore compaction. For this target:
+        <br/>
+        K_D = {2.114 if target.friction >= 0.4 else 1.867:.3f} - {1.667 if target.friction >= 0.4 else 1.596:.3f} × {target.porosity:.2f}
+        """
+        elements.append(Paragraph(prieur_text, self.styles['BodyText']))
+        elements.append(Spacer(1, 0.15*inch))
+
         # === SECTION 4: SCALING LAW APPLICATION ===
         elements.append(Paragraph("4. Crater Diameter Scaling Law", self.styles['SectionHeading']))
 
         L_imp = results['impactor_diameter']
-        mu = target.mu
+        # mu and KD already computed above from Prieur equations
         nu = target.nu
 
         if results['regime'] == 'strength':
@@ -864,8 +909,9 @@ class ImpactReportGenerator:
         <b>4. Fresh Crater:</b> Analysis assumes minimal degradation. Degraded craters require
         corrections for infilling and erosion.
         <br/><br/>
-        <b>5. Strength and Density:</b> Target strength ({target.strength:.2e} Pa) and density
-        ({target.density} kg/m³) are nominal values that can vary spatially.
+        <b>5. Material Properties:</b> Target cohesion ({target.cohesion:.2e} Pa), density
+        ({target.density} kg/m³), friction coefficient ({target.friction:.2f}), and porosity
+        ({target.porosity*100:.1f}%) are nominal values that can vary spatially and with depth.
         <br/><br/>
         <b>6. Scaling Law Validity:</b> Scaling laws are calibrated from laboratory experiments
         and numerical simulations. Extrapolation to very large or small scales introduces uncertainty.
@@ -908,6 +954,11 @@ class ImpactReportGenerator:
         elements.append(Paragraph("10. References", self.styles['SectionHeading']))
 
         references_text = """
+        <b>Prieur, N.C., Rolf, T., Luther, R., Wünnemann, K., Xiao, Z., & Werner, S.C. (2017).</b>
+        "The effect of target properties on transient crater scaling for simple craters."
+        <i>Journal of Geophysical Research: Planets</i>, 122, 1704-1726,
+        doi:10.1002/2017JE005283.
+        <br/><br/>
         <b>Holsapple, K.A. (1993).</b> "The scaling of impact processes in planetary sciences."
         <i>Annual Review of Earth and Planetary Sciences</i>, 21, 333-373.
         <br/><br/>

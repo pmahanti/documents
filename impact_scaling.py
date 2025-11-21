@@ -34,55 +34,63 @@ import warnings
 
 @dataclass
 class Material:
-    """Material properties for impact scaling calculations."""
+    """
+    Material properties for impact scaling calculations.
+
+    Based on Prieur et al. (2017) "The effect of target properties on transient
+    crater scaling for simple craters" - Journal of Geophysical Research: Planets.
+    """
     name: str
     density: float  # kg/m³
-    strength: float  # Pa (cohesion/yield strength)
+    cohesion: float  # Pa (cohesion Y0 in Drucker-Prager model)
     gravity: float  # m/s² (surface gravity of body)
-    K1: float  # Coupling parameter (strength regime)
-    mu: float  # Strength scaling exponent
-    nu: float  # Gravity scaling exponent (coupling parameter component)
+    friction: float  # Coefficient of internal friction (f)
+    porosity: float  # Initial porosity (Φ) as fraction (0-1)
+    nu: float = 0.40  # Density scaling exponent (typically 0.4)
 
     def __repr__(self):
         return (f"Material(name='{self.name}', "
                 f"ρ={self.density:.0f} kg/m³, "
-                f"Y={self.strength:.2e} Pa, "
+                f"Y0={self.cohesion:.2e} Pa, "
+                f"f={self.friction:.2f}, "
+                f"Φ={self.porosity*100:.1f}%, "
                 f"g={self.gravity:.2f} m/s²)")
 
 
 # Material Database
 # -----------------
-# Based on Holsapple (1993), Housen & Holsapple (2003), and other sources
+# Based on Prieur et al. (2017), Holsapple (1993), and other sources
+# Friction and porosity values from Prieur et al. (2017) Table 4 and text
 
 MATERIALS = {
     # Lunar materials
     'lunar_regolith': Material(
         name='Lunar Regolith',
         density=1500,  # kg/m³ (loose regolith)
-        strength=1e3,  # Pa (very weak cohesion)
+        cohesion=1e3,  # Pa (very weak cohesion)
         gravity=1.62,  # m/s² (Moon)
-        K1=0.132,  # Strength coupling parameter (sand-like)
-        mu=0.41,  # Strength exponent (sand/soil)
-        nu=0.40,  # Gravity exponent (sand/soil)
+        friction=0.7,  # Typical for granular materials
+        porosity=0.35,  # 35% porosity (loose regolith)
+        nu=0.40,
     ),
 
     'lunar_mare': Material(
         name='Lunar Mare Basalt',
         density=3100,  # kg/m³
-        strength=1e7,  # Pa (weak rock)
+        cohesion=1e6,  # Pa (fractured basalt)
         gravity=1.62,  # m/s²
-        K1=0.132,
-        mu=0.55,  # Rock-like
+        friction=0.7,  # Basalt friction
+        porosity=0.10,  # 10% porosity (fractured basalt)
         nu=0.40,
     ),
 
     'lunar_highland': Material(
         name='Lunar Highland Anorthosite',
         density=2800,  # kg/m³
-        strength=5e6,  # Pa
+        cohesion=5e5,  # Pa (fractured anorthosite)
         gravity=1.62,  # m/s²
-        K1=0.132,
-        mu=0.55,
+        friction=0.7,
+        porosity=0.12,  # 12% porosity
         nu=0.40,
     ),
 
@@ -90,60 +98,60 @@ MATERIALS = {
     'sandstone': Material(
         name='Sandstone',
         density=2200,  # kg/m³
-        strength=3e7,  # Pa
+        cohesion=1e6,  # Pa (weak rock)
         gravity=9.81,  # m/s²
-        K1=0.132,
-        mu=0.55,
+        friction=0.6,  # Sandstone friction
+        porosity=0.20,  # 20% porosity (porous sandstone)
         nu=0.40,
     ),
 
     'granite': Material(
         name='Granite',
         density=2750,  # kg/m³
-        strength=2e8,  # Pa
+        cohesion=5e6,  # Pa (competent rock)
         gravity=9.81,  # m/s²
-        K1=0.132,
-        mu=0.55,
+        friction=0.8,  # Granite friction
+        porosity=0.02,  # 2% porosity (intact granite)
         nu=0.40,
     ),
 
     'limestone': Material(
         name='Limestone',
         density=2600,  # kg/m³
-        strength=5e7,  # Pa
+        cohesion=2e6,  # Pa
         gravity=9.81,  # m/s²
-        K1=0.132,
-        mu=0.55,
+        friction=0.7,
+        porosity=0.15,  # 15% porosity (porous limestone)
         nu=0.40,
     ),
 
     'dry_soil': Material(
         name='Dry Soil',
         density=1600,  # kg/m³
-        strength=1e4,  # Pa
+        cohesion=1e4,  # Pa (cohesive soil)
         gravity=9.81,  # m/s²
-        K1=0.132,
-        mu=0.41,
+        friction=0.6,  # Soil friction
+        porosity=0.30,  # 30% porosity
         nu=0.40,
     ),
 
     'wet_soil': Material(
         name='Wet Soil',
         density=1800,  # kg/m³
-        strength=5e4,  # Pa
+        cohesion=5e4,  # Pa (higher cohesion when wet)
         gravity=9.81,  # m/s²
-        K1=0.132,
-        mu=0.41,
+        friction=0.4,  # Lower friction when wet
+        porosity=0.25,  # 25% porosity (compacted when wet)
         nu=0.40,
     ),
 
     'sand': Material(
         name='Sand',
         density=1650,  # kg/m³
-        strength=1e3,  # Pa
+        cohesion=1e3,  # Pa (nearly cohesionless)
         gravity=9.81,  # m/s²
-        K1=0.132,
-        mu=0.41,
+        friction=0.7,  # Typical sand friction (dry sand)
+        porosity=0.35,  # 35% porosity (loose sand)
         nu=0.40,
     ),
 
@@ -151,20 +159,20 @@ MATERIALS = {
     'water_ice': Material(
         name='Water Ice',
         density=920,  # kg/m³
-        strength=1e6,  # Pa (temperature dependent)
+        cohesion=1e6,  # Pa (temperature dependent)
         gravity=1.62,  # m/s² (Moon gravity as default, change as needed)
-        K1=0.132,
-        mu=0.55,
+        friction=0.5,  # Ice friction
+        porosity=0.05,  # 5% porosity (bubbly ice)
         nu=0.40,
     ),
 
     'ice_regolith_mix': Material(
         name='Ice-Regolith Mix',
         density=1200,  # kg/m³
-        strength=5e5,  # Pa
+        cohesion=5e5,  # Pa
         gravity=1.62,  # m/s²
-        K1=0.132,
-        mu=0.50,
+        friction=0.6,  # Mixed friction
+        porosity=0.20,  # 20% porosity
         nu=0.40,
     ),
 }
@@ -174,41 +182,41 @@ IMPACTORS = {
     'asteroid_rock': Material(
         name='Rocky Asteroid',
         density=2700,  # kg/m³
-        strength=0,  # Not used for impactor
+        cohesion=0,  # Not used for impactor
         gravity=0,  # Not used for impactor
-        K1=0,
-        mu=0,
-        nu=0,
+        friction=0,  # Not used for impactor
+        porosity=0,  # Not used for impactor
+        nu=0.40,
     ),
 
     'asteroid_metal': Material(
         name='Metallic Asteroid (Iron)',
         density=7800,  # kg/m³
-        strength=0,
+        cohesion=0,
         gravity=0,
-        K1=0,
-        mu=0,
-        nu=0,
+        friction=0,
+        porosity=0,
+        nu=0.40,
     ),
 
     'comet_ice': Material(
         name='Cometary Ice',
         density=500,  # kg/m³ (porous)
-        strength=0,
+        cohesion=0,
         gravity=0,
-        K1=0,
-        mu=0,
-        nu=0,
+        friction=0,
+        porosity=0,
+        nu=0.40,
     ),
 
     'comet_ice_dense': Material(
         name='Dense Cometary Ice',
         density=1000,  # kg/m³
-        strength=0,
+        cohesion=0,
         gravity=0,
-        K1=0,
-        mu=0,
-        nu=0,
+        friction=0,
+        porosity=0,
+        nu=0.40,
     ),
 }
 
@@ -217,8 +225,14 @@ class ImpactScaling:
     """
     Impact crater scaling calculator using pi-group formalism.
 
-    Implements Holsapple-Schmidt scaling to relate crater size to
-    impact parameters.
+    Implements Prieur et al. (2017) scaling relationships that account
+    for target friction coefficient and porosity, as well as traditional
+    Holsapple-Schmidt scaling.
+
+    Reference:
+    Prieur, N.C., et al. (2017). "The effect of target properties on
+    transient crater scaling for simple craters." J. Geophys. Res. Planets,
+    122, 1704-1726, doi:10.1002/2017JE005283.
     """
 
     def __init__(self, target: Material, impactor_density: float = 2700):
@@ -235,6 +249,105 @@ class ImpactScaling:
         self.target = target
         self.impactor_density = impactor_density
 
+    def compute_mu_prieur(self, friction: float, porosity: float) -> float:
+        """
+        Compute velocity scaling exponent μ using Prieur et al. (2017).
+
+        Based on equations (13) and (14) from Prieur et al. (2017).
+
+        Parameters:
+        -----------
+        friction : float
+            Coefficient of internal friction (f)
+        porosity : float
+            Porosity as fraction (0-1)
+
+        Returns:
+        --------
+        mu : float
+            Velocity scaling exponent
+        """
+        # Choose equation based on porosity range
+        if porosity <= 0.20:
+            # Equation 13: for 0 < Φ ≤ 20%
+            mu = 0.374 + 0.012 * np.exp(3.175 * (friction - 0.884))
+        else:
+            # Equation 14: for 0 < Φ ≤ 50%
+            mu = 0.383 + 0.004 * np.exp(3.031 * (friction - 1.278))
+
+        return mu
+
+    def compute_KD_prieur(self, friction: float, porosity: float) -> float:
+        """
+        Compute scaling coefficient KD using Prieur et al. (2017).
+
+        Based on equations (15), (16), and (17) from Prieur et al. (2017).
+
+        Parameters:
+        -----------
+        friction : float
+            Coefficient of internal friction (f)
+        porosity : float
+            Porosity as fraction (0-1)
+
+        Returns:
+        --------
+        KD : float
+            Scaling coefficient for gravity regime
+        """
+        # Choose equation based on friction coefficient
+        if friction >= 0.4:
+            # Equation 15: f ≥ 0.4, best fit
+            KD = 2.114 - 1.667 * porosity
+        elif friction < 0.4:
+            # Equation 16: f < 0.4
+            KD = 1.867 - 1.596 * porosity
+        else:
+            # Equation 17: general case for 0 < f < 1.0
+            KD = 2.035 - 1.669 * porosity
+
+        return max(KD, 0.5)  # Ensure positive value
+
+    def compute_effective_strength(self, cohesion: float) -> float:
+        """
+        Compute effective strength YEFF from cohesion Y0.
+
+        Based on equation (11) from Prieur et al. (2017):
+        YEFF ≈ 20.9 × Y0
+
+        Parameters:
+        -----------
+        cohesion : float
+            Cohesion in Drucker-Prager model (Pa)
+
+        Returns:
+        --------
+        YEFF : float
+            Effective strength for crater scaling (Pa)
+        """
+        return 20.9 * cohesion
+
+    def compute_DSG(self, cohesion: float) -> float:
+        """
+        Compute strength-to-gravity transition diameter.
+
+        Based on equation (12) from Prieur et al. (2017):
+        DSG (km) ≈ 5.3 × Y0 (MPa)
+
+        Parameters:
+        -----------
+        cohesion : float
+            Cohesion in Pa
+
+        Returns:
+        --------
+        DSG : float
+            Transition diameter in meters
+        """
+        cohesion_MPa = cohesion / 1e6  # Convert Pa to MPa
+        DSG_km = 5.3 * cohesion_MPa
+        return DSG_km * 1000  # Convert km to m
+
     def pi2(self, a: float, U: float) -> float:
         """
         Gravity pi-group: π₂ = ga/U²
@@ -245,11 +358,13 @@ class ImpactScaling:
 
     def pi3(self, U: float) -> float:
         """
-        Strength pi-group: π₃ = Y/(ρU²)
+        Strength pi-group: π₃ = YEFF/(ρU²)
 
-        Ratio of strength to kinetic energy (dynamic pressure).
+        Ratio of effective strength to kinetic energy (dynamic pressure).
+        Uses Prieur et al. (2017) effective strength relationship.
         """
-        return self.target.strength / (self.target.density * U**2)
+        YEFF = self.compute_effective_strength(self.target.cohesion)
+        return YEFF / (self.target.density * U**2)
 
     def pi4(self) -> float:
         """
@@ -325,10 +440,11 @@ class ImpactScaling:
 
     def scaling_law(self, a: float, U: float, m: float) -> float:
         """
-        Holsapple pi-group scaling law for crater diameter.
+        Pi-group scaling law for crater diameter using Prieur et al. (2017).
 
-        Uses comprehensive pi-scaling with proper exponent formulation
-        based on Holsapple (1993) and Collins et al. (2005).
+        Implements friction and porosity-dependent scaling relationships
+        from Prieur et al. (2017), which provide more accurate predictions
+        than traditional Holsapple-Schmidt scaling.
 
         Parameters:
         -----------
@@ -345,37 +461,36 @@ class ImpactScaling:
             Transient crater diameter (m)
         """
         L = 2 * a  # Impactor diameter
+
+        # Compute scaling parameters using Prieur et al. (2017) equations
+        mu = self.compute_mu_prieur(self.target.friction, self.target.porosity)
+        KD = self.compute_KD_prieur(self.target.friction, self.target.porosity)
         nu = self.target.nu
-        mu = self.target.mu
 
         # Dimensionless groups
         p2 = self.pi2(a, U)  # = gL/U²
-        p3 = self.pi3(U)     # = Y/(ρU²)
+        p3 = self.pi3(U)     # = YEFF/(ρU²)
         p4 = self.pi4()      # = ρ_target / ρ_impactor
 
         # Density scaling: (ρ_imp/ρ_tgt)^(1/3)
         density_factor = (1.0 / p4)**(1.0/3.0)
 
-        # Coupling parameters (empirically determined)
-        # These give D/L ratios consistent with experiments
-        K1 = 1.25  # Constant for strength regime
-        K2 = 1.61  # Constant for gravity regime
-
         # Determine regime and compute scaling
-        # Transition when gL/U² ≈ Y/(ρU²), i.e., when ρgL ≈ Y
+        # Transition when π₂ ≈ π₃
 
         if p3 > p2:
             # Strength regime dominates
-            # D/L = K1 * (ρ_imp/ρ_tgt)^(1/3) * (ρU²/Y)^(μ/(2+μ))
-            # Since π₃ = Y/(ρU²), we have (ρU²/Y) = 1/π₃
-            exponent_strength = mu / (2.0 + mu)
+            # Using Prieur et al. (2017) equation (9)
+            # D/L = KDS * (ρU²/YEFF)^ς where ς = μ/2
+            K1 = 1.25  # Strength regime coupling constant
+            exponent_strength = mu / 2.0
             D = L * K1 * density_factor * (1.0/p3)**exponent_strength
         else:
             # Gravity regime dominates
-            # D/L = K2 * (ρ_imp/ρ_tgt)^(1/3) * (U²/gL)^(ν/(2+ν))
-            # Since π₂ = gL/U², we have (U²/gL) = 1/π₂
-            exponent_gravity = nu / (2.0 + nu)
-            D = L * K2 * density_factor * (1.0/p2)**exponent_gravity
+            # Using Prieur et al. (2017) equation (10)
+            # D/L = KD * (U²/gL)^β where β = μ/(2+μ)
+            exponent_gravity = mu / (2.0 + mu)
+            D = L * KD * density_factor * (1.0/p2)**exponent_gravity
 
         return D
 
