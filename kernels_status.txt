@@ -1,0 +1,28 @@
+SPICE Kernels Status
+====================
+
+AVAILABLE (Real Binary Files):
+✓ naif0012.tls (5.2K) - Leap seconds
+✓ pck00010.tpc (124K) - Physical constants
+✓ gm_de431.tpc (6.2K) - Gravitational parameters
+✓ moon_080317.tf (21K) - Moon frames
+✓ moon_assoc_me.tf (8.3K) - Moon associations
+✓ moon_pa_de421_1900-2050.bpc (1.7M) - Moon orientation
+✓ kplo_scp_20251116_20260111_v00.bc (1.5M) - KPLO attitude
+✓ kplo_scp_20251118_20251129_v00.bc (301K) - KPLO attitude
+✓ kplo_sclkscet_v698.tsc (173K) - Spacecraft clock
+✓ kplo_shadowcam_v01.ti (14K) - ShadowCam instrument
+✓ kplo_v00_shc_a.tf (74K) - ShadowCam frames
+✓ SHC_REFERENCE.tf (1.1K) - Reference frames
+
+NEED GIT LFS (Currently LFS Pointers):
+✗ de430.bsp (134 bytes → 119 MB) - Planetary ephemeris
+✗ kplo_pm_20251113_20260108_v00.bsp (132 bytes) - KPLO position
+✗ kplo_pm_20251116_20260111_v00.bsp (132 bytes) - KPLO position
+
+IMPACT:
+- 12/15 kernels (80%) are available as real binary files
+- Missing: Spacecraft position/velocity data (ephemeris)
+- Available: Spacecraft orientation, Moon data, time systems
+- Result: Demo mode works, real-time tracking needs LFS
+

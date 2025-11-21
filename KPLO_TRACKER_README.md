@@ -57,25 +57,34 @@ Both applications generate `kplo_location.png` containing:
 
 The `kernels/` directory contains NAIF SPICE files for KPLO:
 
+### ✓ Available Kernels (Real Binary Files - 12/15)
+
 **Spacecraft Data:**
-- `kplo_pm_*.bsp` - KPLO ephemeris (position/velocity)
-- `kplo_scp_*.bc` - KPLO orientation (attitude)
-- `kplo_sclkscet_*.tsc` - Spacecraft clock
+- `kplo_scp_*.bc` (1.5 MB, 301 KB) - KPLO orientation (attitude) ✓
+- `kplo_sclkscet_*.tsc` (173 KB) - Spacecraft clock ✓
 
 **Instrument:**
-- `kplo_shadowcam_v01.ti` - ShadowCam instrument kernel
-- `kplo_v00_shc_a.tf` - ShadowCam frames
-- `SHC_REFERENCE.tf` - Reference frames
+- `kplo_shadowcam_v01.ti` (14 KB) - ShadowCam instrument kernel ✓
+- `kplo_v00_shc_a.tf` (74 KB) - ShadowCam frames ✓
+- `SHC_REFERENCE.tf` (1.1 KB) - Reference frames ✓
 
 **Lunar/Planetary:**
-- `de430.bsp` - Planetary ephemeris
-- `moon_*.tf` - Moon reference frames
-- `moon_pa_de421_1900-2050.bpc` - Moon orientation
+- `moon_*.tf` (21 KB, 8.3 KB) - Moon reference frames ✓
+- `moon_pa_de421_1900-2050.bpc` (1.7 MB) - Moon orientation ✓
 
 **Constants:**
-- `naif0012.tls` - Leap seconds
-- `pck00010.tpc` - Physical constants
-- `gm_de431.tpc` - Gravitational parameters
+- `naif0012.tls` (5.2 KB) - Leap seconds ✓
+- `pck00010.tpc` (124 KB) - Physical constants ✓
+- `gm_de431.tpc` (6.2 KB) - Gravitational parameters ✓
+
+### ✗ Require Git LFS (Currently LFS Pointers - 3/15)
+
+These files are stored as Git LFS pointers and need `git lfs pull`:
+
+- `kplo_pm_*.bsp` (2 files) - **KPLO position/velocity ephemeris** (CRITICAL)
+- `de430.bsp` (119 MB) - Planetary ephemeris
+
+**Impact:** 80% of kernels are available. Missing only the spacecraft position data needed for real-time tracking.
 
 ## Setup for Real-Time Tracking
 
