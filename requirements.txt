@@ -1,0 +1,22 @@
+# PSR-SDC1 Geodatabase and Visualization Tools
+# Requirements for Python applications
+
+# Core geospatial libraries
+geopandas>=0.14.0
+rasterio>=1.3.9
+shapely>=2.0.0
+fiona>=1.9.5
+
+# Data manipulation
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Optional: For better performance
+pyproj>=3.6.0
+rtree>=1.1.0
