@@ -1,6 +1,15 @@
 # Lunar South Pole Volatile Sublimation Calculator
 #
-# This application uses only Python standard library
-# No external dependencies required
-#
+# Core functionality uses only Python standard library
 # Tested with Python 3.7+
+
+# Optional dependencies for raster processing
+# Uncomment if you need GeoTIFF support:
+# gdal>=3.0
+# numpy>=1.18
+
+# Install with conda (recommended for GDAL):
+# conda install -c conda-forge gdal numpy
+
+# Or with pip:
+# pip install gdal numpy
