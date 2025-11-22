@@ -58,6 +58,38 @@ header .subtitle {
     font-size: 1.1rem;
 }
 
+/* View Tabs */
+.view-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.view-tab {
+    padding: 12px 24px;
+    background: var(--secondary-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-tab:hover {
+    border-color: var(--accent-color);
+    background: var(--card-bg);
+}
+
+.view-tab.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
 /* Controls */
 .controls {
     background: var(--secondary-bg);
@@ -414,6 +446,298 @@ header .subtitle {
 
 .payload-specs strong {
     color: var(--text-primary);
+}
+
+/* Outcome Badges */
+.badge-outcome {
+    font-weight: 600;
+}
+
+.badge-outcome.success {
+    background: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+}
+
+.badge-outcome.failure {
+    background: rgba(244, 67, 54, 0.2);
+    color: #e57373;
+}
+
+.badge-outcome.partial {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffb74d;
+}
+
+/* Mission Card States */
+.mission-card.failure {
+    border-left: 4px solid #e57373;
+}
+
+.mission-card.partial {
+    border-left: 4px solid #ffb74d;
+}
+
+.mission-card.success {
+    border-left: 4px solid #81c784;
+}
+
+/* Failure Information */
+.failure-reason {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(244, 67, 54, 0.1);
+    border-left: 3px solid #e57373;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.failure-detail {
+    background: rgba(244, 67, 54, 0.1);
+    border-left: 4px solid #e57373;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.failure-detail h3 {
+    color: #e57373;
+    margin-bottom: 10px;
+}
+
+/* Publications Section */
+.publications-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border-color);
+}
+
+.publications-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+.publication-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+}
+
+.pub-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.pub-authors {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-style: italic;
+}
+
+.pub-citation {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.pub-findings {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--secondary-bg);
+    border-radius: 6px;
+}
+
+.pub-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.pub-link:hover {
+    color: var(--accent-hover);
+}
+
+/* Science Tags */
+.science-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.science-tag {
+    padding: 4px 10px;
+    background: rgba(74, 144, 226, 0.15);
+    color: var(--accent-color);
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Payload Enhancements */
+.payload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.payload-core-science {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(74, 144, 226, 0.1);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.payload-findings {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(76, 175, 80, 0.1);
+    border-left: 3px solid #81c784;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.payload-innovation {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 152, 0, 0.1);
+    border-left: 3px solid #ffb74d;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Cross-Cutting Analysis Views */
+.analysis-view {
+    width: 100%;
+}
+
+.analysis-view h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.analysis-desc {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    font-size: 1.05rem;
+}
+
+.category-section {
+    margin-bottom: 40px;
+    background: var(--secondary-bg);
+    border-radius: 12px;
+    padding: 25px;
+    border: 2px solid var(--border-color);
+}
+
+.category-title {
+    font-size: 1.4rem;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.category-count {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.category-stats {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+    margin-left: auto;
+}
+
+/* Instrument Grid */
+.instrument-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.instrument-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.instrument-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.15);
+}
+
+.instrument-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.outcome-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.outcome-icon.success {
+    color: #81c784;
+}
+
+.outcome-icon.failure {
+    color: #e57373;
+}
+
+.outcome-icon.partial_success {
+    color: #ffb74d;
+}
+
+.instrument-mission {
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.instrument-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.core-science {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-color);
 }
 
 /* Footer */

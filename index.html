@@ -13,9 +13,15 @@
             <p class="subtitle">Explore past, present, and future lunar missions and their scientific payloads</p>
         </header>
 
+        <div class="view-tabs">
+            <button class="view-tab active" data-view="missions">📍 Missions View</button>
+            <button class="view-tab" data-view="instruments">🔬 By Instrument Type</button>
+            <button class="view-tab" data-view="science">🔭 By Science Objective</button>
+        </div>
+
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search missions, payloads, or instruments..." />
+                <input type="text" id="searchInput" placeholder="Search missions, payloads, vendors, instruments..." />
             </div>
 
             <div class="filters">
@@ -26,6 +32,13 @@
                         <option value="past">Past</option>
                         <option value="present">Present</option>
                         <option value="future">Future</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Outcome:</label>
+                    <select id="outcomeFilter">
+                        <option value="all">All Outcomes</option>
                     </select>
                 </div>
 
@@ -47,6 +60,20 @@
                     <label>Mission Type:</label>
                     <select id="typeFilter">
                         <option value="all">All Types</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Instrument Type:</label>
+                    <select id="instrumentFilter">
+                        <option value="all">All Instruments</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Science Objective:</label>
+                    <select id="scienceFilter">
+                        <option value="all">All Objectives</option>
                     </select>
                 </div>
             </div>

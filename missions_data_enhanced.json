@@ -1,0 +1,705 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2025-11-22",
+    "description": "Enhanced lunar missions database with instrument details, vendors, costs, and publications"
+  },
+  "instrument_categories": [
+    "Camera/Imager",
+    "Spectrometer",
+    "Seismometer",
+    "Magnetometer",
+    "Radar",
+    "Mass Spectrometer",
+    "Neutron Detector",
+    "Gamma-Ray Detector",
+    "Thermal Probe",
+    "Drilling System",
+    "Retroreflector",
+    "Particle Detector",
+    "Environmental Sensor",
+    "Communication System",
+    "Navigation Sensor",
+    "Biological Experiment"
+  ],
+  "science_objectives": [
+    "Mineralogy",
+    "Morphology",
+    "Geophysics",
+    "Seismology",
+    "Volatiles/Ice Detection",
+    "Regolith Properties",
+    "Magnetic Field",
+    "Radiation Environment",
+    "Atmospheric Studies",
+    "Heat Flow",
+    "Surface Composition",
+    "Subsurface Structure",
+    "Resource Utilization",
+    "Astrobiology",
+    "Navigation/Technology Demo"
+  ],
+  "missions": [
+    {
+      "id": "apollo11",
+      "name": "Apollo 11",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "outcome": "success",
+      "launch_date": "1969-07-16",
+      "landing_date": "1969-07-20",
+      "landing_site": "Mare Tranquillitatis",
+      "coordinates": {"lat": 0.6740, "lon": 23.4730},
+      "mission_type": "Crewed Landing",
+      "mission_cost_usd": 25000000000,
+      "description": "First crewed Moon landing mission. Neil Armstrong and Buzz Aldrin became the first humans to walk on the lunar surface.",
+      "publications": [
+        {
+          "title": "The Scientific Legacy of Apollo",
+          "authors": ["Vaniman D.", "Reedy R.", "Heiken G.", "Olhoeft G.", "Mendell W."],
+          "url": "https://arxiv.org/pdf/1211.6768",
+          "type": "Review"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Early Apollo Scientific Experiments Package (EASEP)",
+          "type": "Scientific Package",
+          "instrument_category": "Scientific Package",
+          "description": "Simplified precursor to ALSEP for rapid deployment",
+          "mass_kg": 17,
+          "vendor": "Bendix Systems Division",
+          "specifications": "Passive Seismic Experiment (PSE) and Lunar Dust Detector",
+          "science_objectives": ["Seismology", "Regolith Properties"],
+          "core_science": "First seismic measurements on the Moon, dust accumulation monitoring"
+        },
+        {
+          "name": "Passive Seismic Experiment",
+          "type": "Seismometer",
+          "instrument_category": "Seismometer",
+          "description": "Detected moonquakes and meteorite impacts",
+          "vendor": "Bendix Systems Division",
+          "pi_institution": "MIT / Columbia University",
+          "specifications": "Operated until August 1969",
+          "science_objectives": ["Seismology", "Geophysics"],
+          "core_science": "Detection of moonquakes, meteorite impacts, and internal structure"
+        }
+      ]
+    },
+    {
+      "id": "apollo12",
+      "name": "Apollo 12",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "outcome": "success",
+      "launch_date": "1969-11-14",
+      "landing_date": "1969-11-19",
+      "landing_site": "Oceanus Procellarum",
+      "coordinates": {"lat": -3.0124, "lon": -23.4216},
+      "mission_type": "Crewed Landing",
+      "description": "Second crewed Moon landing. Deployed first full ALSEP and retrieved parts from Surveyor 3.",
+      "payloads": [
+        {
+          "name": "Apollo Lunar Surface Experiments Package (ALSEP)",
+          "type": "Scientific Package",
+          "instrument_category": "Scientific Package",
+          "description": "Suite of automated scientific instruments powered by RTG",
+          "mass_kg": 124,
+          "power_watts": 70,
+          "vendor": "Bendix Systems Division",
+          "cost_usd": 17300000,
+          "specifications": "First full ALSEP deployment with plutonium-238 RTG",
+          "science_objectives": ["Seismology", "Magnetic Field", "Geophysics"],
+          "core_science": "Long-term automated surface experiments including seismology and magnetometry"
+        }
+      ]
+    },
+    {
+      "id": "apollo15",
+      "name": "Apollo 15",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "outcome": "success",
+      "launch_date": "1971-07-26",
+      "landing_date": "1971-07-30",
+      "landing_site": "Hadley-Apennine",
+      "coordinates": {"lat": 26.1322, "lon": 3.6289},
+      "mission_type": "Crewed Landing (J-Mission)",
+      "description": "First J-mission with extended stay, Lunar Roving Vehicle, and Scientific Instrument Module.",
+      "publications": [
+        {
+          "title": "Lunar Surface Radioactivity: Apollo 15 and Apollo 16 Gamma-Ray Spectrometer Experiments",
+          "journal": "Science",
+          "volume": "179",
+          "pages": "800-803",
+          "year": "1973",
+          "url": "https://www.science.org/doi/10.1126/science.179.4075.800",
+          "type": "Peer-Reviewed"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Gamma-Ray Spectrometer",
+          "type": "Spectrometer",
+          "instrument_category": "Gamma-Ray Detector",
+          "description": "Measured chemical composition of lunar surface",
+          "vendor": "JPL",
+          "specifications": "Mounted on 25-foot extendable boom",
+          "science_objectives": ["Surface Composition", "Mineralogy"],
+          "core_science": "Elemental composition mapping (Th, U, K, Fe, Mg, Al, Si)"
+        },
+        {
+          "name": "Mass Spectrometer",
+          "type": "Spectrometer",
+          "instrument_category": "Mass Spectrometer",
+          "description": "Measured composition of lunar atmosphere",
+          "vendor": "JPL",
+          "pi_name": "Dr. Conway W. Snyder",
+          "specifications": "Detected ambient atmospheric composition",
+          "science_objectives": ["Atmospheric Studies"],
+          "core_science": "Measured lunar exosphere composition and density"
+        }
+      ]
+    },
+    {
+      "id": "luna25",
+      "name": "Luna 25",
+      "agency": "Roscosmos",
+      "country": "Russia",
+      "status": "past",
+      "outcome": "failure",
+      "failure_reason": "Onboard control system failure - engine ran for 127 seconds instead of 84, creating impact trajectory",
+      "launch_date": "2023-08-10",
+      "landing_date": "2023-08-19",
+      "landing_site": "Lunar South Pole (intended)",
+      "mission_type": "Lander",
+      "description": "Russia's first lunar mission since 1976. Crashed during descent after control system malfunction.",
+      "publications": [
+        {
+          "title": "Russia Traces Luna-25 Crash to Onboard Control System Failure",
+          "url": "https://spacepolicyonline.com/news/russia-traces-luna-25-crash-to-onboard-control-system-failure/",
+          "type": "News Report"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Lunar Manipulator Complex (LMK)",
+          "type": "Robotic Arm",
+          "instrument_category": "Drilling System",
+          "description": "Capable of excavating lunar regolith",
+          "science_objectives": ["Regolith Properties", "Resource Utilization"],
+          "core_science": "Soil sampling and mechanical properties measurement"
+        },
+        {
+          "name": "ADRON-LR",
+          "type": "Neutron and Gamma Detector",
+          "instrument_category": "Neutron Detector",
+          "description": "Active neutron and gamma-ray analysis of regolith",
+          "science_objectives": ["Volatiles/Ice Detection", "Surface Composition"],
+          "core_science": "Subsurface water ice and hydrogen detection"
+        }
+      ]
+    },
+    {
+      "id": "hakuto_r1",
+      "name": "Hakuto-R Mission 1",
+      "agency": "ispace",
+      "country": "Japan",
+      "status": "past",
+      "outcome": "failure",
+      "failure_reason": "Radar altimeter misinterpretation - lander hovered at 5km until fuel depletion",
+      "launch_date": "2022-12-11",
+      "landing_date": "2023-04-25",
+      "landing_site": "Atlas Crater (intended)",
+      "mission_type": "Commercial Lander",
+      "description": "First commercial lunar landing attempt by Japanese company ispace. Crashed due to altitude sensor error.",
+      "publications": [
+        {
+          "title": "HAKUTO-R Mission 2's Crash was Caused by its Laser Range Finder",
+          "url": "https://www.universetoday.com/articles/hakuto-r-mission-2s-crash-was-caused-by-its-laser-range-finder",
+          "type": "News Analysis"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Rashid Rover",
+          "type": "Rover",
+          "instrument_category": "Camera/Imager",
+          "description": "UAE's first lunar rover with cameras and sensors",
+          "vendor": "Mohammed bin Rashid Space Centre",
+          "science_objectives": ["Morphology", "Regolith Properties"],
+          "core_science": "Surface imaging and thermal properties"
+        }
+      ]
+    },
+    {
+      "id": "peregrine",
+      "name": "Peregrine Mission One",
+      "agency": "Astrobotic / NASA CLPS",
+      "country": "USA",
+      "status": "past",
+      "outcome": "failure",
+      "failure_reason": "Propellant leak prevented lunar orbit insertion, controlled reentry after 10 days",
+      "launch_date": "2024-01-08",
+      "landing_date": null,
+      "landing_site": "Sinus Viscositatis (intended)",
+      "mission_type": "Commercial Lander",
+      "mission_cost_usd": 108000000,
+      "description": "First CLPS mission. Suffered propulsion failure shortly after launch, prevented from reaching Moon.",
+      "publications": [
+        {
+          "title": "Payload Research: The Ultra Low-Cost Economics of NASA's CLPS Lunar Program",
+          "url": "https://payloadspace.com/payload-research-the-ultra-low-cost-economics-of-nasas-clps-lunar-program/",
+          "type": "Industry Analysis"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Peregrine Ion-Trap Mass Spectrometer (PITMS)",
+          "type": "Mass Spectrometer",
+          "instrument_category": "Mass Spectrometer",
+          "description": "Lunar exosphere composition measurement",
+          "vendor": "NASA Goddard Space Flight Center / ESA",
+          "pi_name": "Dr. Barbara Cohen",
+          "pi_institution": "NASA Goddard",
+          "science_objectives": ["Atmospheric Studies", "Volatiles/Ice Detection"],
+          "core_science": "Measure volatiles released during lunar sunrise"
+        },
+        {
+          "name": "Neutron Spectrometer System (NSS)",
+          "type": "Neutron Spectrometer",
+          "instrument_category": "Neutron Detector",
+          "description": "Detects neutrons to infer hydrogen/water ice",
+          "vendor": "NASA / Arizona State University",
+          "science_objectives": ["Volatiles/Ice Detection"],
+          "core_science": "Hydrogen detection in regolith for water ice mapping"
+        }
+      ]
+    },
+    {
+      "id": "slim",
+      "name": "SLIM (Smart Lander for Investigating Moon)",
+      "agency": "JAXA",
+      "country": "Japan",
+      "status": "past",
+      "outcome": "partial_success",
+      "failure_reason": "Solar panels not functioning properly - landed upside down but survived",
+      "launch_date": "2023-09-06",
+      "landing_date": "2024-01-19",
+      "landing_site": "Shioli Crater",
+      "coordinates": {"lat": -13.3, "lon": 25.2},
+      "mission_type": "Technology Demonstrator Lander",
+      "description": "Japan's precision landing demonstrator. Landed successfully but upside down, solar panels facing wrong direction. Later revived when Sun angle changed.",
+      "payloads": [
+        {
+          "name": "Multi-Band Camera (MBC)",
+          "type": "Camera",
+          "instrument_category": "Camera/Imager",
+          "description": "Multi-band spectroscopic imaging for mineral identification",
+          "science_objectives": ["Mineralogy", "Surface Composition"],
+          "core_science": "Olivine composition analysis to study lunar mantle"
+        },
+        {
+          "name": "LEV-1 (Lunar Excursion Vehicle)",
+          "type": "Hopping Robot",
+          "instrument_category": "Camera/Imager",
+          "description": "Small hopping robot with camera",
+          "vendor": "JAXA / Tomy Company / JAXA",
+          "science_objectives": ["Morphology", "Navigation/Technology Demo"],
+          "core_science": "Lander imaging and hopping mobility demonstration"
+        }
+      ]
+    },
+    {
+      "id": "chandrayaan3",
+      "name": "Chandrayaan-3",
+      "agency": "ISRO",
+      "country": "India",
+      "status": "past",
+      "outcome": "success",
+      "launch_date": "2023-07-14",
+      "landing_date": "2023-08-23",
+      "landing_site": "Lunar South Pole",
+      "coordinates": {"lat": -69.37, "lon": 32.32},
+      "mission_type": "Lander and Rover",
+      "mission_cost_usd": 75000000,
+      "description": "First spacecraft to land near the lunar south pole. Successfully deployed Pragyan rover.",
+      "publications": [
+        {
+          "title": "Chandrayaan-1: Science goals",
+          "journal": "Journal of Earth System Science",
+          "url": "https://link.springer.com/article/10.1007/BF02715953",
+          "type": "Peer-Reviewed"
+        },
+        {
+          "title": "First analysis of Chandrayaan-3 south pole regolith samples",
+          "journal": "Nature",
+          "year": "2025",
+          "type": "Peer-Reviewed",
+          "findings": "High sulphur, low sodium/potassium vs Apollo 16 and Luna 20"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "APXS (Alpha Particle X-ray Spectrometer)",
+          "type": "Spectrometer",
+          "instrument_category": "Spectrometer",
+          "description": "Determined elemental composition of lunar soil",
+          "vendor": "Physical Research Laboratory (PRL), India",
+          "specifications": "Pragyan rover payload",
+          "science_objectives": ["Surface Composition", "Mineralogy"],
+          "core_science": "Elemental analysis: high S, low Na/K detected at south pole",
+          "key_findings": "First detection of sulphur in south polar regolith"
+        },
+        {
+          "name": "LIBS (Laser Induced Breakdown Spectroscope)",
+          "type": "Spectrometer",
+          "instrument_category": "Spectrometer",
+          "description": "Analyzed elemental composition near landing site",
+          "vendor": "Laboratory for Electro-Optics Systems (LEOS), India",
+          "specifications": "Pragyan rover payload",
+          "science_objectives": ["Surface Composition", "Mineralogy"],
+          "core_science": "In-situ elemental composition via laser ablation spectroscopy"
+        },
+        {
+          "name": "ILSA (Instrument for Lunar Seismic Activity)",
+          "type": "Seismometer",
+          "instrument_category": "Seismometer",
+          "description": "Detected moonquakes and seismic activity",
+          "vendor": "ISRO / Laboratory for Electro-Optics Systems",
+          "specifications": "Lander payload",
+          "science_objectives": ["Seismology", "Geophysics"],
+          "core_science": "First seismic measurements at south pole"
+        },
+        {
+          "name": "ChaSTE (Chandra's Surface Thermo-physical Experiment)",
+          "type": "Temperature Probe",
+          "instrument_category": "Thermal Probe",
+          "description": "Measured thermal properties of lunar surface",
+          "vendor": "Space Physics Laboratory (SPL), ISRO",
+          "specifications": "Lander payload - 10cm penetration",
+          "science_objectives": ["Regolith Properties", "Heat Flow"],
+          "core_science": "Temperature gradient measurement in south polar regolith"
+        }
+      ]
+    },
+    {
+      "id": "im1",
+      "name": "Intuitive Machines IM-1 (Odysseus)",
+      "agency": "Intuitive Machines / NASA CLPS",
+      "country": "USA",
+      "status": "past",
+      "outcome": "partial_success",
+      "failure_reason": "Tipped over on landing due to faster-than-expected descent, but transmitted data",
+      "launch_date": "2024-02-15",
+      "landing_date": "2024-02-22",
+      "landing_site": "Malapert A (near South Pole)",
+      "coordinates": {"lat": -80.0, "lon": 0.0},
+      "mission_type": "Commercial Lander",
+      "mission_cost_usd": 118000000,
+      "description": "First commercial spacecraft to land on the Moon. Part of NASA's CLPS program. Landed successfully but tipped over.",
+      "publications": [
+        {
+          "title": "Commercial Lunar Payload Services Overview",
+          "url": "https://science.nasa.gov/lunar-science/clps-deliveries/",
+          "type": "NASA Report"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Navigation Doppler Lidar (NDL)",
+          "type": "Lidar",
+          "instrument_category": "Navigation Sensor",
+          "description": "Precision landing technology demonstration",
+          "vendor": "NASA Langley Research Center",
+          "science_objectives": ["Navigation/Technology Demo"],
+          "core_science": "Demonstrates precision landing for future missions"
+        },
+        {
+          "name": "Laser Retroreflector Array (LRA)",
+          "type": "Retroreflector",
+          "instrument_category": "Retroreflector",
+          "description": "Passive ranging target for future missions",
+          "vendor": "NASA Goddard Space Flight Center",
+          "science_objectives": ["Navigation/Technology Demo"],
+          "core_science": "Permanent geodetic reference point"
+        }
+      ]
+    },
+    {
+      "id": "firefly_blueghost1",
+      "name": "Firefly Aerospace Blue Ghost 1",
+      "agency": "Firefly Aerospace / NASA CLPS",
+      "country": "USA",
+      "status": "present",
+      "outcome": "in_progress",
+      "launch_date": "2025-01-15",
+      "landing_date": "2025-03-02",
+      "landing_site": "Mare Crisium",
+      "mission_type": "Commercial Lander",
+      "mission_cost_usd": 93300000,
+      "description": "Delivering 10 NASA CLPS science payloads to Mare Crisium. Includes heat flow probe requiring 3-meter drilling.",
+      "payloads": [
+        {
+          "name": "Lunar Magnetotelluric Sounder",
+          "type": "Magnetometer",
+          "instrument_category": "Magnetometer",
+          "description": "Measures magnetic field and electrical conductivity",
+          "vendor": "Goddard Space Flight Center",
+          "specifications": "Magnetometer on extendable boom and 4 cables launched to 65 feet by springs",
+          "science_objectives": ["Magnetic Field", "Geophysics", "Subsurface Structure"],
+          "core_science": "First spring-launched cable system in space, probes subsurface electrical properties",
+          "innovation": "Novel deployment mechanism - spring-launched cables"
+        },
+        {
+          "name": "Lunar Heat Flow Probe",
+          "type": "Thermal Probe",
+          "instrument_category": "Thermal Probe",
+          "description": "Measures subsurface heat flow",
+          "specifications": "Drills 9 feet (3 meters) into regolith",
+          "science_objectives": ["Heat Flow", "Geophysics"],
+          "core_science": "First deep heat flow measurement since Apollo"
+        },
+        {
+          "name": "Regolith Adherence Characterization (RAC)",
+          "type": "Materials Science",
+          "instrument_category": "Environmental Sensor",
+          "description": "Studies dust adherence properties",
+          "vendor": "Alpha Space",
+          "science_objectives": ["Regolith Properties"],
+          "core_science": "Dust accumulation for future hardware design"
+        }
+      ]
+    },
+    {
+      "id": "im2",
+      "name": "Intuitive Machines IM-2",
+      "agency": "Intuitive Machines / NASA CLPS",
+      "country": "USA",
+      "status": "future",
+      "outcome": "planned",
+      "launch_date": "2025-02-26",
+      "landing_date": "2025-03-05",
+      "landing_site": "Mons Mouton (near South Pole)",
+      "mission_type": "Commercial Lander",
+      "mission_cost_usd": 47000000,
+      "description": "Second Intuitive Machines mission landing near the lunar South Pole. Features PRIME-1 ice mining experiment.",
+      "payloads": [
+        {
+          "name": "PRIME-1 Drill",
+          "type": "Drilling System",
+          "instrument_category": "Drilling System",
+          "description": "Subsurface drilling for ice detection",
+          "vendor": "Honeybee Robotics",
+          "specifications": "Up to 1 meter drilling depth",
+          "science_objectives": ["Volatiles/Ice Detection", "Resource Utilization"],
+          "core_science": "First in-situ resource utilization (ISRU) demonstration on Moon"
+        },
+        {
+          "name": "PRIME-1 Mass Spectrometer",
+          "type": "Mass Spectrometer",
+          "instrument_category": "Mass Spectrometer",
+          "description": "Analyzes volatile composition",
+          "vendor": "NASA Kennedy Space Center",
+          "specifications": "Part of PRIME-1 suite",
+          "science_objectives": ["Volatiles/Ice Detection", "Resource Utilization"],
+          "core_science": "Identifies water, CO2, and other volatiles in regolith"
+        }
+      ]
+    },
+    {
+      "id": "artemis3",
+      "name": "Artemis III",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "future",
+      "outcome": "planned",
+      "launch_date": "2027-06-01",
+      "landing_date": "2027-06-15",
+      "landing_site": "Lunar South Pole",
+      "mission_type": "Crewed Landing",
+      "mission_cost_usd": 4100000000,
+      "description": "First crewed lunar landing since Apollo 17. Will land near the South Pole to study water ice.",
+      "publications": [
+        {
+          "title": "NASA Selects First Lunar Instruments for Artemis Astronaut Deployment",
+          "url": "https://www.nasa.gov/news-release/nasa-selects-first-lunar-instruments-for-artemis-astronaut-deployment/",
+          "type": "NASA Press Release"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "LEMS (Lunar Environment Monitoring Station)",
+          "type": "Seismometer Suite",
+          "instrument_category": "Seismometer",
+          "description": "Compact, autonomous seismometer characterizing regional lunar structure",
+          "vendor": "JPL",
+          "specifications": "Multi-year operation planned",
+          "science_objectives": ["Seismology", "Geophysics"],
+          "core_science": "Crust and mantle structure at south pole"
+        },
+        {
+          "name": "LEAF (Lunar Effects on Agricultural Flora)",
+          "type": "Biology Experiment",
+          "instrument_category": "Biological Experiment",
+          "description": "Investigates impact of lunar environment on space crops",
+          "vendor": "Space Lab Technologies",
+          "science_objectives": ["Astrobiology"],
+          "core_science": "Plant growth in lunar gravity and radiation"
+        },
+        {
+          "name": "LDA (Lunar Dielectric Analyzer)",
+          "type": "Dielectric Analyzer",
+          "instrument_category": "Radar",
+          "description": "Measures regolith's ability to propagate electric field",
+          "vendor": "International contribution",
+          "science_objectives": ["Regolith Properties", "Volatiles/Ice Detection"],
+          "core_science": "Subsurface ice detection via dielectric properties"
+        }
+      ]
+    },
+    {
+      "id": "change4",
+      "name": "Chang'e-4",
+      "agency": "CNSA",
+      "country": "China",
+      "status": "past",
+      "outcome": "success",
+      "launch_date": "2018-12-07",
+      "landing_date": "2019-01-03",
+      "landing_site": "Von Kármán crater (far side)",
+      "coordinates": {"lat": -45.5, "lon": 177.6},
+      "mission_type": "Lander and Rover",
+      "description": "First spacecraft to land on the far side of the Moon. Deployed Yutu-2 rover.",
+      "publications": [
+        {
+          "title": "The scientific objectives and payloads of Chang'E−4 mission",
+          "url": "https://www.researchgate.net/publication/323310929_The_scientific_objectives_and_payloads_of_Chang'E-4_mission",
+          "type": "Peer-Reviewed"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "Lunar Penetrating Radar (LPR)",
+          "type": "Ground-Penetrating Radar",
+          "instrument_category": "Radar",
+          "description": "Subsurface structure investigation",
+          "vendor": "Institute of Electronics, Chinese Academy of Sciences",
+          "specifications": "Dual-frequency: 60 MHz and 500 MHz",
+          "science_objectives": ["Subsurface Structure", "Morphology"],
+          "core_science": "Penetrated 40m depth, revealed subsurface layering on far side"
+        },
+        {
+          "name": "Visible/Near-Infrared Imaging Spectrometer (VNIS)",
+          "type": "Spectrometer",
+          "instrument_category": "Spectrometer",
+          "description": "Mineralogical analysis",
+          "vendor": "Shanghai Institute of Technical Physics",
+          "specifications": "0.45-2.4 μm spectral range",
+          "science_objectives": ["Mineralogy", "Surface Composition"],
+          "core_science": "First detection of mantle material (olivine, pyroxene) on surface"
+        },
+        {
+          "name": "Low-Frequency Radio Spectrometer (LFS)",
+          "type": "Radio Spectrometer",
+          "instrument_category": "Environmental Sensor",
+          "description": "Radio astronomy observations from far side",
+          "vendor": "National Space Science Center, CAS",
+          "specifications": "0.1-40 MHz frequency range",
+          "science_objectives": ["Atmospheric Studies"],
+          "core_science": "Radio astronomy free from Earth interference"
+        }
+      ]
+    },
+    {
+      "id": "lunokhod1",
+      "name": "Luna 17 / Lunokhod 1",
+      "agency": "Soviet Space Program",
+      "country": "USSR",
+      "status": "past",
+      "outcome": "success",
+      "launch_date": "1970-11-10",
+      "landing_date": "1970-11-17",
+      "landing_site": "Mare Imbrium",
+      "coordinates": {"lat": 38.28, "lon": -35.00},
+      "mission_type": "Rover",
+      "description": "First successful rover mission. Lunokhod 1 operated for 322 Earth days and traveled 10.54 km.",
+      "payloads": [
+        {
+          "name": "RIFMA X-ray Fluorescence Spectrometer",
+          "type": "Spectrometer",
+          "instrument_category": "Spectrometer",
+          "description": "Performed elemental analysis of lunar soil",
+          "vendor": "Vernadsky Institute, USSR",
+          "specifications": "25 soil analyses conducted",
+          "science_objectives": ["Surface Composition", "Mineralogy"],
+          "core_science": "First mobile elemental composition measurements"
+        },
+        {
+          "name": "Penetrometer",
+          "type": "Mechanical Probe",
+          "instrument_category": "Environmental Sensor",
+          "description": "Measured mechanical properties of regolith",
+          "specifications": "Used at 500 different locations",
+          "science_objectives": ["Regolith Properties"],
+          "core_science": "Soil bearing strength and density measurements"
+        },
+        {
+          "name": "Cosmic Ray Detectors",
+          "type": "Radiation Detector",
+          "instrument_category": "Particle Detector",
+          "description": "Detected cosmic radiation",
+          "specifications": "Environmental monitoring",
+          "science_objectives": ["Radiation Environment"],
+          "core_science": "Surface radiation environment characterization"
+        }
+      ]
+    },
+    {
+      "id": "artemis_ltv",
+      "name": "Artemis Lunar Terrain Vehicle",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "future",
+      "outcome": "planned",
+      "launch_date": "2028-01-01",
+      "landing_date": "2028-02-01",
+      "landing_site": "Lunar South Pole region",
+      "mission_type": "Rover",
+      "description": "Pressurized rover for Artemis missions. Can operate autonomously or with crew.",
+      "publications": [
+        {
+          "title": "NASA Selects Instruments for Artemis Lunar Terrain Vehicle",
+          "url": "https://www.nasa.gov/news-release/nasa-selects-instruments-for-artemis-lunar-terrain-vehicle/",
+          "type": "NASA Press Release"
+        }
+      ],
+      "payloads": [
+        {
+          "name": "AIRES (Artemis Infrared Reflectance and Emission Spectrometer)",
+          "type": "Spectrometer",
+          "instrument_category": "Spectrometer",
+          "description": "Identifies, quantifies, and maps lunar minerals and volatiles",
+          "vendor": "JPL",
+          "pi_name": "Dr. Abigail Fraeman",
+          "pi_institution": "JPL",
+          "specifications": "Infrared spectral mapping",
+          "science_objectives": ["Mineralogy", "Volatiles/Ice Detection", "Surface Composition"],
+          "core_science": "Real-time mineral and volatile mapping during traverses"
+        },
+        {
+          "name": "L-MAPS (Lunar Microwave Active-Passive Spectrometer)",
+          "type": "Microwave Spectrometer",
+          "instrument_category": "Radar",
+          "description": "Defines subsurface structure and searches for ice",
+          "specifications": "Measures to 131+ feet (40m) depth",
+          "science_objectives": ["Subsurface Structure", "Volatiles/Ice Detection", "Regolith Properties"],
+          "core_science": "Deep subsurface temperature, density, and ice detection"
+        }
+      ]
+    }
+  ]
+}
