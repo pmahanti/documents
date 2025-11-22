@@ -11,6 +11,9 @@
         <header>
             <h1>🌙 Lunar Surface Missions Explorer</h1>
             <p class="subtitle">Explore past, present, and future lunar missions and their scientific payloads</p>
+            <button class="export-btn header-export" id="exportViewBtn">
+                📊 Export Current View
+            </button>
         </header>
 
         <div class="view-tabs">
@@ -98,6 +101,44 @@
             <div id="modalBody"></div>
         </div>
     </div>
+
+    <!-- Export Options Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content export-modal-content">
+            <span class="close export-close">&times;</span>
+            <div class="export-options">
+                <h2>📊 Export Infographic</h2>
+                <p class="export-desc">Generate a shareable infographic for social media</p>
+
+                <div class="export-templates">
+                    <button class="export-template-btn" data-template="mission-card">
+                        <span class="template-icon">🚀</span>
+                        <span class="template-name">Mission Card</span>
+                        <span class="template-size">1200x630 (Facebook/Twitter)</span>
+                    </button>
+                    <button class="export-template-btn" data-template="mission-square">
+                        <span class="template-icon">📱</span>
+                        <span class="template-name">Square Format</span>
+                        <span class="template-size">1080x1080 (Instagram)</span>
+                    </button>
+                    <button class="export-template-btn" data-template="stats-summary">
+                        <span class="template-icon">📈</span>
+                        <span class="template-name">Stats Summary</span>
+                        <span class="template-size">Current View Statistics</span>
+                    </button>
+                    <button class="export-template-btn" data-template="instrument-focus">
+                        <span class="template-icon">🔬</span>
+                        <span class="template-name">Instrument Focus</span>
+                        <span class="template-size">Detailed Instrument Card</span>
+                    </button>
+                </div>
+            </div>
+            <div id="exportPreview" class="export-preview"></div>
+        </div>
+    </div>
+
+    <!-- Hidden canvas for rendering -->
+    <canvas id="exportCanvas" style="display: none;"></canvas>
 
     <script src="app.js"></script>
 </body>

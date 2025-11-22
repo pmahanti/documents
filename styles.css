@@ -58,6 +58,36 @@ header .subtitle {
     font-size: 1.1rem;
 }
 
+/* Export Button */
+.export-btn {
+    margin-top: 15px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--accent-color), #9c27b0);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+.export-btn:active {
+    transform: translateY(0);
+}
+
+.mission-export-btn, .instrument-export-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
 /* View Tabs */
 .view-tabs {
     display: flex;
@@ -767,6 +797,110 @@ footer p {
     margin-bottom: 10px;
 }
 
+/* Export Modal */
+.export-modal-content {
+    max-width: 1000px;
+}
+
+.export-options h2 {
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.export-desc {
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+}
+
+.export-templates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.export-template-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.export-template-btn:hover {
+    border-color: var(--accent-color);
+    background: var(--secondary-bg);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.2);
+}
+
+.template-icon {
+    font-size: 2.5rem;
+}
+
+.template-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.template-size {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.export-preview {
+    border-top: 2px solid var(--border-color);
+    padding-top: 20px;
+    text-align: center;
+}
+
+.export-preview canvas {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px var(--shadow);
+    margin-bottom: 20px;
+}
+
+.export-download-btn {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.export-download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.export-back-btn {
+    padding: 12px 30px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.export-back-btn:hover {
+    border-color: var(--accent-color);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     header h1 {
@@ -787,6 +921,10 @@ footer p {
     }
 
     .modal-mission-info {
+        grid-template-columns: 1fr;
+    }
+
+    .export-templates {
         grid-template-columns: 1fr;
     }
 }
