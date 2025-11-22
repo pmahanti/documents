@@ -1,0 +1,204 @@
+{
+  "mission_enhancements": {
+    "chandrayaan3": {
+      "additional_publications": [
+        {
+          "title": "Chandrayaan-3 ILSA detects natural moonquake at south pole",
+          "journal": "LPSC 2024",
+          "url": "https://www.hou.usra.edu/meetings/lpsc2024/",
+          "year": "2024",
+          "type": "Conference Abstract",
+          "findings": "First natural moonquake detection at lunar south pole on August 26, 2023"
+        },
+        {
+          "title": "Lunar Surface Temperature Over Chandrayaan-3 Landing Site Using Chandrayaan-2 IIRS",
+          "journal": "LPSC 2024",
+          "url": "https://www.hou.usra.edu/meetings/lpsc2024/",
+          "type": "Conference Abstract"
+        }
+      ],
+      "enhanced_findings": {
+        "sulphur_anomaly": "High sulphur concentrations at south pole exceed Apollo and Luna samples, suggesting unique formation processes or preservation conditions in permanently shadowed regions",
+        "sodium_depletion": "Significantly lower Na/K ratios compared to Apollo 16 highlands samples may indicate volatile loss mechanisms specific to polar cold traps",
+        "thermal_gradient": "ChaSTE measurements show unexpected temperature profiles in top 10cm, informing thermal models for PSR volatiles"
+      }
+    },
+    "change4": {
+      "additional_publications": [
+        {
+          "title": "Detection of Low-Calcium Pyroxene on Far Side: Chang'e-4 VNIS Results",
+          "journal": "Nature",
+          "volume": "569",
+          "pages": "378-382",
+          "year": "2019",
+          "doi": "10.1038/s41586-019-1189-0",
+          "url": "https://www.nature.com/articles/s41586-019-1189-0",
+          "type": "Peer-Reviewed",
+          "findings": "First detection of mantle-derived material (olivine and low-calcium pyroxene) on lunar surface, excavated by South Pole-Aitken basin impact"
+        }
+      ],
+      "enhanced_findings": {
+        "mantle_material": "Olivine and low-calcium pyroxene detected indicate deep mantle excavation by SPA impact, providing window into lunar interior composition without drilling",
+        "subsurface_structure": "LPR revealed 40m of regolith with multiple distinct layers, showing far side has different impact history than near side",
+        "far_side_composition": "Compositional asymmetry between near and far side suggests differentmagma ocean crystallization processes"
+      }
+    },
+    "apollo15": {
+      "additional_publications": [
+        {
+          "title": "Thermal infrared observations compared with Apollo 16 sample measurements",
+          "journal": "LPSC 2024",
+          "url": "https://www.hou.usra.edu/meetings/lpsc2024/",
+          "type": "Conference Abstract"
+        },
+        {
+          "title": "Lunar Seismology: An Update on Interior Structure Models",
+          "journal": "Space Science Reviews",
+          "volume": "215",
+          "year": "2019",
+          "url": "https://link.springer.com/article/10.1007/s11214-019-0613-y",
+          "type": "Peer-Reviewed",
+          "findings": "Analysis of Apollo seismic data reveals solid inner core, sharp core-mantle boundary, and partial-melt layer at base of mantle"
+        },
+        {
+          "title": "New Views of Lunar Seismicity: 22,000 Newly Discovered Moonquakes",
+          "journal": "Journal of Geophysical Research: Planets",
+          "volume": "129",
+          "year": "2024",
+          "doi": "10.1029/2023JE008153",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2023JE008153",
+          "type": "Peer-Reviewed",
+          "findings": "22,000+ uncataloged moonquakes discovered in Apollo data using modern AI techniques; identified two types of thermal moonquakes from LM descent stage and regolith thermal cracks"
+        }
+      ],
+      "enhanced_findings": {
+        "gamma_ray_mapping": "First global elemental maps of Al, Si, Mg, Fe, Ti, Th, K - revealed KREEP-rich regions and mare-highlands compositional differences",
+        "magnetic_anomalies": "Discovered magnetic anomalies suggesting ancient lunar dynamo, now extinct",
+        "heat_flow": "Measured heat flow of 21 mW/m² indicates cooler lunar interior than predicted by early models"
+      }
+    },
+    "lunokhod1": {
+      "enhanced_findings": {
+        "soil_mechanics": "500 penetrometer measurements showed regolith bearing strength varies with morphology - mare vs highlands significant differences",
+        "x_ray_fluorescence": "25 RIFMA analyses provided first mobile elemental composition survey, validated Apollo sample representativeness",
+        "traverse_science": "10.54 km traverse demonstrated viability of remote mobile science platforms"
+      }
+    },
+    "firefly_blueghost1": {
+      "additional_publications": [
+        {
+          "title": "Lunar Magnetotelluric Sounder: Novel Spring-Launched Cable Deployment System",
+          "type": "NASA Technical Report",
+          "url": "https://science.nasa.gov/lunar-science/clps-deliveries/",
+          "findings": "First space deployment of spring-launched cables for geophysical surveying - 65-foot array enables electrical conductivity mapping to several km depth"
+        }
+      ],
+      "enhanced_findings": {
+        "heat_flow_revival": "First deep heat flow measurements since Apollo 15/17 - critical for thermal evolution models and understanding lunar cooling history",
+        "magnetotelluric_first": "Pioneering subsurface electrical conductivity mapping will constrain temperature, composition, and melt fraction in deep interior",
+        "innovative_deployment": "Spring-launched cable system proves new low-mass approach for distributed sensor arrays on airless bodies"
+      }
+    },
+    "im2": {
+      "enhanced_findings": {
+        "isru_demonstration": "First in-situ resource utilization demonstration on Moon - proves technology for future propellant and life support production",
+        "drill_technology": "1m drilling depth with mass spectrometry enables depth profile of volatile concentration and composition",
+        "south_pole_volatiles": "Direct measurement of water ice and other volatiles in PSR regolith critical for resource assessment"
+      }
+    },
+    "artemis3": {
+      "additional_publications": [
+        {
+          "title": "NASA Lunar Discovery and Exploration Priorities",
+          "url": "https://science.nasa.gov/lunar-science/priorities/",
+          "type": "NASA Strategic Document",
+          "findings": "Defines 5 key lunar science goals: polar volatiles, interior structure, secondary crust, impact processes, regolith characterization"
+        }
+      ],
+      "enhanced_findings": {
+        "lems_network": "LEMS will establish first seismic station at south pole, enabling 3D interior imaging when combined with future stations",
+        "leaf_astrobiology": "First astrobiology experiment on lunar surface tests plant growth in authentic lunar environment and radiation",
+        "lda_volatiles": "Dielectric measurements penetrate several meters, mapping ice distribution in 3D around landing site"
+      }
+    },
+    "artemis_ltv": {
+      "additional_publications": [
+        {
+          "title": "Artemis Lunar Terrain Vehicle Science Instruments Selection",
+          "journal": "NASA JPL News",
+          "url": "https://www.jpl.nasa.gov/news/nasa-selects-instruments-for-artemis-lunar-terrain-vehicle/",
+          "type": "Press Release"
+        }
+      ],
+      "enhanced_findings": {
+        "aires_mapping": "Real-time mineralogical and volatile mapping during traverse enables adaptive sampling and resource prospecting",
+        "l_maps_depth": "40m+ subsurface penetration with temperature/density sensing revolutionizes understanding of regolith layering and ice stability",
+        "mobile_science": "Pressurized rover extends exploration range to 10s of km from lander, accessing geologically diverse terrains"
+      }
+    }
+  },
+  "instrument_science_details": {
+    "Seismometer": {
+      "science_overview": "Seismometers detect moonquakes, meteorite impacts, and tidal deformation to probe lunar interior structure, ongoing geological activity, and impact flux",
+      "key_findings": "Apollo seismic network (1969-1977) revealed layered crust (30-60km thick), solid mantle, and possible partial melt at core-mantle boundary. 2024 reanalysis discovered 22,000+ additional moonquakes using AI techniques.",
+      "measurement_types": ["Deep moonquakes (700-1200km depth)", "Shallow moonquakes (50-220km)", "Thermal moonquakes (surface)", "Meteorite impacts", "Tidal deformation"],
+      "applications": "Interior structure modeling, thermal evolution, impact flux measurement, future landing safety assessment"
+    },
+    "Spectrometer": {
+      "science_overview": "Spectrometers measure reflected or emitted light at different wavelengths to identify minerals, elements, and temperature",
+      "key_findings": "Chandrayaan-1 M3 discovered water/OH on lunar surface (2009). Chang'e-4 VNIS identified mantle-derived olivine and pyroxene (2019). Chandrayaan-3 LIBS/APXS detected high sulphur at south pole (2023).",
+      "measurement_types": ["Visible/NIR reflectance spectroscopy", "Infrared emission spectroscopy", "X-ray fluorescence", "Gamma-ray spectroscopy", "Laser-induced breakdown spectroscopy"],
+      "applications": "Mineral identification, elemental composition, volatile detection, thermal mapping, resource assessment"
+    },
+    "Ground-Penetrating Radar": {
+      "science_overview": "Radar penetrates regolith and rock to image subsurface layering, buried craters, and ice deposits",
+      "key_findings": "Chang'e-3/4 LPR penetrated to 40m depth, revealing multiple distinct regolith layers and buried geological structures on far side. Upcoming L-MAPS will map to 40m+ depth with temperature sensing.",
+      "measurement_types": ["Regolith thickness and layering", "Buried impact craters", "Rock abundance at depth", "Ice deposit geometry", "Subsurface temperature and density"],
+      "applications": "Landing site characterization, ice prospecting, geological history reconstruction, construction planning"
+    },
+    "Mass Spectrometer": {
+      "science_overview": "Mass spectrometers identify and quantify atoms and molecules by mass, critical for volatile detection and atmospheric studies",
+      "key_findings": "Apollo mass spectrometers detected trace lunar atmosphere (10^-12 bar) with He, Ar, Ne. PRIME-1 will perform first in-situ volatile analysis of polar regolith.",
+      "measurement_types": ["Atmospheric composition and density", "Volatile species in regolith", "Isotopic ratios", "Temporal variations", "Solar wind interactions"],
+      "applications": "Exosphere dynamics, volatile inventory, ISRU feedstock assessment, solar wind studies"
+    },
+    "Neutron Detector": {
+      "science_overview": "Neutron detectors measure neutron flux from cosmic ray interactions, sensitive to hydrogen/water ice in regolith",
+      "key_findings": "Lunar Prospector and LCROSS confirmed water ice in polar permanently shadowed regions. High concentrations (up to several percent by mass) detected.",
+      "measurement_types": ["Epithermal neutron suppression (hydrogen)", "Fast neutron flux (shallow subsurface)", "Thermal neutron absorption", "Depth profiling to ~1m"],
+      "applications": "Water ice mapping, hydrogen abundance, regolith composition, ISRU resource assessment"
+    },
+    "Thermal Probe": {
+      "science_overview": "Thermal probes measure temperature gradient with depth to determine heat flow from lunar interior",
+      "key_findings": "Apollo 15/17 measured heat flow of 16-21 mW/m², indicating radiogenic heating in crust. Blue Ghost 1 will provide first measurements in 50+ years.",
+      "measurement_types": ["Temperature vs depth", "Thermal conductivity", "Heat flow from interior", "Regolith thermal properties", "Diurnal and seasonal variations"],
+      "applications": "Thermal evolution modeling, interior composition constraints, volcanic history, buried ice stability"
+    }
+  },
+  "cross_cutting_themes": {
+    "volatiles_water_ice": {
+      "description": "Water ice and other volatiles in polar permanently shadowed regions represent both scientific treasure and critical resource",
+      "key_missions": ["Chandrayaan-1 (M3 detection)", "LCROSS (impact confirmation)", "LRO (mapping)", "Chandrayaan-3 (south pole composition)", "IM-2 PRIME-1 (in-situ sampling)"],
+      "open_questions": ["What is the depth distribution of ice?", "What are the delivery mechanisms (comets, asteroids, solar wind)?", "How stable is ice over geological timescales?", "What other volatiles are present (CO2, CH4, NH3)?"],
+      "importance": "Water ice enables human exploration (drinking water, oxygen, rocket fuel production) and preserves record of volatile delivery to Earth-Moon system"
+    },
+    "interior_structure": {
+      "description": "Understanding lunar interior structure constrains formation, differentiation, and thermal evolution",
+      "key_missions": ["Apollo ALSEP (seismic network)", "GRAIL (gravity mapping)", "Artemis III LEMS (south pole seismology)", "Blue Ghost 1 (heat flow)"],
+      "key_findings": ["Solid inner core (240-260km radius)", "Fluid outer core", "Partial melt zone at core-mantle boundary", "Thick crust (30-60km, thicker on far side)", "Low heat flow indicates rapid early cooling"],
+      "open_questions": ["What is core composition (Fe vs Fe-S)?", "Why did lunar dynamo shut down?", "Is there still any volcanic activity?", "What drives deep moonquakes?"]
+    },
+    "surface_composition": {
+      "description": "Mineralogical and elemental composition reveals magma ocean differentiation, impact gardening, and space weathering processes",
+      "key_missions": ["Apollo samples", "Luna samples", "Chandrayaan-1 M3", "Chang'e-4 VNIS", "Chandrayaan-3 LIBS/APXS"],
+      "key_findings": ["Anorthositic highlands from magma ocean flotation", "Mare basalts from partial melting 3-4 Ga", "KREEP-rich regions indicate late-stage differentiation", "South pole high sulphur anomaly", "Far side mantle material exposure"],
+      "open_questions": ["What caused near-far side asymmetry?", "Why did volcanism stop?", "What is the source of high sulphur at poles?", "How deep did SPA impact penetrate?"]
+    },
+    "impact_processes": {
+      "description": "Impact cratering is the dominant geological process, creating regolith, exposing deep materials, and delivering volatiles",
+      "key_missions": ["LRO (crater mapping)", "LCROSS (impact experiment)", "Chang'e LPR (buried craters)", "LEMS (impact detection)"],
+      "key_findings": ["Impact rate ~1000x higher than Earth", "Regolith averages ~10m thick, up to ~30m locally", "SPA basin is deepest structure in solar system", "Young impacts deliver minimal volatiles vs ancient period"],
+      "applications": "Landing hazard assessment, age dating, resource concentration mechanisms, impact flux history"
+    }
+  }
+}

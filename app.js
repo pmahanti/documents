@@ -473,6 +473,19 @@ function showMissionModal(mission) {
             ${mission.publications.map(pub => createPublicationCard(pub)).join('')}
         </div>` : '';
 
+    const enhancedFindingsSection = mission.enhanced_findings ?
+        `<div class="enhanced-findings-section">
+            <h3>🔬 Enhanced Scientific Findings</h3>
+            <div class="findings-grid">
+                ${Object.entries(mission.enhanced_findings).map(([key, value]) => `
+                    <div class="finding-card">
+                        <div class="finding-title">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                        <div class="finding-text">${value}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>` : '';
+
     modalBody.innerHTML = `
         <div class="modal-mission-header">
             <h2 class="modal-mission-name">${mission.name}</h2>
@@ -519,6 +532,8 @@ function showMissionModal(mission) {
         </div>
 
         ${publicationsSection}
+
+        ${enhancedFindingsSection}
 
         <div class="payloads-section">
             <h3>Scientific Payloads & Instruments (${mission.payloads.length})</h3>
