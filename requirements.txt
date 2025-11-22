@@ -1,0 +1,6 @@
+# Lunar South Pole Volatile Sublimation Calculator
+#
+# This application uses only Python standard library
+# No external dependencies required
+#
+# Tested with Python 3.7+
