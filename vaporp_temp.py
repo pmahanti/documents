@@ -388,6 +388,372 @@ def process_temperature_raster(input_raster, output_raster, species_name, alpha=
     return stats
 
 
+def estimate_cold_trap_fraction(roughness_rms_slope=None, roughness_rms_height=None,
+                                  pixel_size=1.0, model='cosine'):
+    """
+    Estimate the fractional area of micro cold traps based on surface roughness.
+
+    Micro cold traps are small permanently shadowed regions created by surface
+    roughness (boulders, crater walls, etc.) that can be much colder than the
+    pixel-averaged temperature.
+
+    Parameters:
+    -----------
+    roughness_rms_slope : float
+        RMS slope in degrees (typical range: 5-45° for lunar surface)
+    roughness_rms_height : float
+        RMS height deviation in meters (if available)
+    pixel_size : float
+        Pixel size in meters (for relating height to shadows)
+    model : str
+        Model to use: 'cosine', 'linear', 'exponential'
+
+    Returns:
+    --------
+    float
+        Fraction of pixel in permanent shadow (0 to 1)
+
+    References:
+    -----------
+    - Rubanenko et al. (2019): "Stability of ice on the Moon with rough topography"
+    - Schorghofer & Taylor (2007): "Subsurface migration of H2O at lunar cold traps"
+    """
+    if roughness_rms_slope is None and roughness_rms_height is None:
+        raise ValueError("Either roughness_rms_slope or roughness_rms_height must be provided")
+
+    # Convert RMS height to equivalent slope if needed
+    if roughness_rms_slope is None and roughness_rms_height is not None:
+        # Approximate: slope ~ arctan(height / baseline)
+        # Use pixel_size as baseline
+        roughness_rms_slope = math.degrees(math.atan(roughness_rms_height / pixel_size))
+
+    # Ensure slope is in valid range
+    roughness_rms_slope = max(0, min(90, roughness_rms_slope))
+
+    if model == 'cosine':
+        # Cosine model: f_cold = (1 - cos(slope)) / 2
+        # At high latitudes, this approximates shadowed fraction
+        slope_rad = math.radians(roughness_rms_slope)
+        fraction = (1 - math.cos(slope_rad)) / 2
+
+    elif model == 'linear':
+        # Linear model: f_cold = slope / 90
+        # Simple linear relationship
+        fraction = roughness_rms_slope / 90.0
+
+    elif model == 'exponential':
+        # Exponential model: more realistic for rough terrain
+        # f_cold = 1 - exp(-slope/slope_0) where slope_0 ~ 15°
+        slope_0 = 15.0
+        fraction = 1 - math.exp(-roughness_rms_slope / slope_0)
+
+    else:
+        raise ValueError(f"Unknown model: {model}. Use 'cosine', 'linear', or 'exponential'")
+
+    # Clamp to valid range
+    fraction = max(0.0, min(1.0, fraction))
+
+    return fraction
+
+
+def calculate_micro_cold_trap_temperature(illuminated_temp, cold_trap_depression=None,
+                                            latitude=None, solar_elevation=None):
+    """
+    Estimate temperature in micro cold traps relative to illuminated areas.
+
+    Parameters:
+    -----------
+    illuminated_temp : float
+        Temperature of illuminated portion (K)
+    cold_trap_depression : float
+        Temperature depression in cold trap (K). If None, estimated from geometry
+    latitude : float
+        Latitude in degrees (for automatic estimation)
+    solar_elevation : float
+        Solar elevation angle in degrees (for automatic estimation)
+
+    Returns:
+    --------
+    float
+        Temperature in micro cold trap (K)
+    """
+    if cold_trap_depression is not None:
+        return max(illuminated_temp - cold_trap_depression, 30.0)  # Minimum ~30K
+
+    # Estimate temperature depression based on latitude/solar geometry
+    # At high latitudes, micro-PSRs can be significantly colder
+    if latitude is not None:
+        abs_lat = abs(latitude)
+        if abs_lat > 85:
+            # Very high latitude: large temperature contrasts
+            depression = illuminated_temp * 0.7  # Can be 70% cooler
+        elif abs_lat > 80:
+            depression = illuminated_temp * 0.5
+        elif abs_lat > 70:
+            depression = illuminated_temp * 0.3
+        else:
+            depression = illuminated_temp * 0.2
+    elif solar_elevation is not None:
+        # Low solar elevation = larger shadows = colder temperatures
+        if solar_elevation < 5:
+            depression = illuminated_temp * 0.6
+        elif solar_elevation < 10:
+            depression = illuminated_temp * 0.4
+        else:
+            depression = illuminated_temp * 0.3
+    else:
+        # Default: assume 40% temperature depression
+        depression = illuminated_temp * 0.4
+
+    cold_trap_temp = illuminated_temp - depression
+    return max(cold_trap_temp, 30.0)  # Minimum temperature
+
+
+def calculate_mixed_pixel_sublimation(species, illuminated_temp, cold_trap_fraction,
+                                        cold_trap_temp=None, cold_trap_depression=None,
+                                        alpha=1.0):
+    """
+    Calculate effective sublimation rate for a mixed pixel with micro cold traps.
+
+    This accounts for the fact that volatiles are preserved in cold traps but
+    sublimate from warmer illuminated areas.
+
+    Parameters:
+    -----------
+    species : VolatileSpecies
+        The volatile species object
+    illuminated_temp : float
+        Temperature of illuminated portion (K)
+    cold_trap_fraction : float
+        Fraction of pixel in permanent shadow/cold traps (0 to 1)
+    cold_trap_temp : float
+        Temperature in cold traps (K). If None, estimated from cold_trap_depression
+    cold_trap_depression : float
+        Temperature depression in cold traps (K). Used if cold_trap_temp is None
+    alpha : float
+        Sticking coefficient (default 1.0)
+
+    Returns:
+    --------
+    dict
+        Dictionary with mixed-pixel sublimation rates and separate components
+    """
+    # Get temperatures for each component
+    if cold_trap_temp is None:
+        if cold_trap_depression is None:
+            cold_trap_depression = illuminated_temp * 0.4
+        cold_trap_temp = max(illuminated_temp - cold_trap_depression, 30.0)
+
+    illuminated_fraction = 1.0 - cold_trap_fraction
+
+    # Calculate sublimation for each component
+    illum_result = species.sublimation_rate(illuminated_temp, alpha=alpha)
+    cold_result = species.sublimation_rate(cold_trap_temp, alpha=alpha)
+
+    # Area-weighted average sublimation rate
+    mixed_rate_kg_m2_s = (illuminated_fraction * illum_result['sublimation_rate_kg_m2_s'] +
+                           cold_trap_fraction * cold_result['sublimation_rate_kg_m2_s'])
+
+    # If volatiles only exist in cold traps, effective rate from those areas only
+    # This is the "retention" scenario
+    retention_rate_kg_m2_s = cold_result['sublimation_rate_kg_m2_s']
+
+    results = {
+        'illuminated_temp_K': illuminated_temp,
+        'cold_trap_temp_K': cold_trap_temp,
+        'cold_trap_fraction': cold_trap_fraction,
+        'illuminated_fraction': illuminated_fraction,
+
+        # Mixed pixel average (if ice is distributed everywhere)
+        'mixed_sublimation_rate_kg_m2_s': mixed_rate_kg_m2_s,
+        'mixed_sublimation_rate_kg_m2_yr': mixed_rate_kg_m2_s * 365.25 * 24 * 3600,
+        'mixed_sublimation_rate_mm_yr': species._to_mm_per_year(mixed_rate_kg_m2_s),
+
+        # Cold trap only (retention scenario - ice only in cold traps)
+        'cold_trap_only_rate_kg_m2_s': retention_rate_kg_m2_s,
+        'cold_trap_only_rate_kg_m2_yr': retention_rate_kg_m2_s * 365.25 * 24 * 3600,
+        'cold_trap_only_rate_mm_yr': species._to_mm_per_year(retention_rate_kg_m2_s),
+
+        # Illuminated area only
+        'illuminated_rate_kg_m2_s': illum_result['sublimation_rate_kg_m2_s'],
+        'illuminated_rate_kg_m2_yr': illum_result['sublimation_rate_kg_m2_yr'],
+
+        # Reduction factor due to cold traps
+        'sublimation_reduction_factor': (mixed_rate_kg_m2_s / illum_result['sublimation_rate_kg_m2_s']
+                                          if illum_result['sublimation_rate_kg_m2_s'] > 0 else 0)
+    }
+
+    return results
+
+
+def process_roughness_raster(input_temp_raster, input_roughness_raster, output_raster,
+                               species_name, alpha=1.0, roughness_type='slope',
+                               roughness_model='cosine', cold_trap_depression_K=None):
+    """
+    Process temperature and roughness rasters to calculate sublimation with micro cold traps.
+
+    Parameters:
+    -----------
+    input_temp_raster : str
+        Path to input temperature raster (GeoTIFF, in Kelvin)
+    input_roughness_raster : str
+        Path to roughness raster (RMS slope in degrees or RMS height in meters)
+    output_raster : str
+        Path to output mixed-pixel sublimation rate raster (GeoTIFF)
+    species_name : str
+        Name of volatile species
+    alpha : float
+        Sticking coefficient
+    roughness_type : str
+        'slope' for RMS slope (degrees) or 'height' for RMS height (meters)
+    roughness_model : str
+        Model for cold trap fraction: 'cosine', 'linear', or 'exponential'
+    cold_trap_depression_K : float
+        Fixed temperature depression (K), or None for auto-estimation
+
+    Returns:
+    --------
+    dict
+        Statistics about the processing
+    """
+    try:
+        from osgeo import gdal
+        import numpy as np
+        gdal.UseExceptions()
+    except ImportError:
+        raise ImportError("GDAL and numpy required for raster processing")
+
+    if species_name not in VOLATILE_SPECIES:
+        raise ValueError(f"Unknown species: {species_name}")
+
+    species = VOLATILE_SPECIES[species_name]
+
+    # Open rasters
+    temp_ds = gdal.Open(input_temp_raster, gdal.GA_ReadOnly)
+    rough_ds = gdal.Open(input_roughness_raster, gdal.GA_ReadOnly)
+
+    if temp_ds is None or rough_ds is None:
+        raise ValueError("Could not open input rasters")
+
+    # Check dimensions match
+    if (temp_ds.RasterXSize != rough_ds.RasterXSize or
+        temp_ds.RasterYSize != rough_ds.RasterYSize):
+        raise ValueError("Temperature and roughness rasters must have same dimensions")
+
+    # Read data
+    temp_array = temp_ds.GetRasterBand(1).ReadAsArray()
+    rough_array = rough_ds.GetRasterBand(1).ReadAsArray()
+    temp_nodata = temp_ds.GetRasterBand(1).GetNoDataValue()
+    rough_nodata = rough_ds.GetRasterBand(1).GetNoDataValue()
+
+    # Get pixel size for height-to-slope conversion
+    geotransform = temp_ds.GetGeoTransform()
+    pixel_size = abs(geotransform[1])  # Pixel width in map units
+
+    # Create output array
+    sublimation_array = np.zeros_like(temp_array, dtype=np.float32)
+
+    # Valid data mask
+    valid_mask = np.ones_like(temp_array, dtype=bool)
+    if temp_nodata is not None:
+        valid_mask &= (temp_array != temp_nodata)
+    if rough_nodata is not None:
+        valid_mask &= (rough_array != rough_nodata)
+    valid_mask &= (temp_array > 0)
+
+    valid_temps = temp_array[valid_mask]
+    valid_rough = rough_array[valid_mask]
+
+    if len(valid_temps) > 0:
+        # Calculate cold trap fraction for each pixel
+        cold_trap_fractions = np.zeros_like(valid_rough)
+
+        for i, roughness in enumerate(valid_rough):
+            if roughness_type == 'slope':
+                frac = estimate_cold_trap_fraction(roughness_rms_slope=roughness,
+                                                     model=roughness_model)
+            else:  # height
+                frac = estimate_cold_trap_fraction(roughness_rms_height=roughness,
+                                                     pixel_size=pixel_size,
+                                                     model=roughness_model)
+            cold_trap_fractions[i] = frac
+
+        # Calculate cold trap temperatures
+        if cold_trap_depression_K is not None:
+            cold_trap_temps = np.maximum(valid_temps - cold_trap_depression_K, 30.0)
+        else:
+            # Estimate based on illuminated temperature
+            cold_trap_temps = np.maximum(valid_temps * 0.6, 30.0)  # 40% depression
+
+        # Calculate sublimation rates
+        R = 8.314
+        sublimation_rates = np.zeros_like(valid_temps)
+
+        for i in range(len(valid_temps)):
+            # Mixed pixel calculation
+            illum_frac = 1.0 - cold_trap_fractions[i]
+            cold_frac = cold_trap_fractions[i]
+
+            # Illuminated area sublimation
+            if species.use_clausius_clapeyron:
+                ln_p_illum = np.log(species.P0) - (species.latent_heat / R) * (1/valid_temps[i] - 1/species.T0)
+                P_illum = np.exp(ln_p_illum)
+            else:
+                log_p_illum = species.A - species.B / (valid_temps[i] + species.C)
+                P_illum = 10 ** log_p_illum
+
+            flux_illum = alpha * P_illum * np.sqrt(species.molecular_mass / (2 * np.pi * R * valid_temps[i]))
+
+            # Cold trap sublimation
+            if species.use_clausius_clapeyron:
+                ln_p_cold = np.log(species.P0) - (species.latent_heat / R) * (1/cold_trap_temps[i] - 1/species.T0)
+                P_cold = np.exp(ln_p_cold)
+            else:
+                log_p_cold = species.A - species.B / (cold_trap_temps[i] + species.C)
+                P_cold = 10 ** log_p_cold
+
+            flux_cold = alpha * P_cold * np.sqrt(species.molecular_mass / (2 * np.pi * R * cold_trap_temps[i]))
+
+            # Mixed rate (area-weighted)
+            mixed_flux = illum_frac * flux_illum + cold_frac * flux_cold
+            sublimation_rates[i] = mixed_flux * 365.25 * 24 * 3600  # Convert to kg/(m²·yr)
+
+        sublimation_array[valid_mask] = sublimation_rates
+
+    # Create output
+    driver = gdal.GetDriverByName('GTiff')
+    out_ds = driver.Create(output_raster, temp_ds.RasterXSize, temp_ds.RasterYSize,
+                            1, gdal.GDT_Float32, ['COMPRESS=LZW'])
+    out_ds.SetGeoTransform(temp_ds.GetGeoTransform())
+    out_ds.SetProjection(temp_ds.GetProjection())
+
+    out_band = out_ds.GetRasterBand(1)
+    if temp_nodata is not None:
+        out_band.SetNoDataValue(0.0)
+        sublimation_array[~valid_mask] = 0.0
+
+    out_band.WriteArray(sublimation_array)
+    out_band.SetDescription(f"{species_name} mixed-pixel sublimation rate with micro cold traps (kg/m²/yr)")
+
+    # Statistics
+    stats = {
+        'species': species_name,
+        'roughness_type': roughness_type,
+        'roughness_model': roughness_model,
+        'valid_pixels': int(np.sum(valid_mask)),
+        'mean_cold_trap_fraction': float(np.mean(cold_trap_fractions)) if len(cold_trap_fractions) > 0 else None,
+        'mean_sublimation_rate': float(np.mean(sublimation_rates)) if len(sublimation_rates) > 0 else None,
+    }
+
+    # Cleanup
+    out_band.FlushCache()
+    out_ds = None
+    temp_ds = None
+    rough_ds = None
+
+    return stats
+
+
 def format_results(species_name, results):
     """Format sublimation rate results for display."""
     output = []
@@ -416,6 +782,20 @@ def format_results(species_name, results):
         output.append(f"  {results['time_averaged_rate_g_m2_hr']:.2e} g/(m²·hr)")
         output.append(f"  {results['time_averaged_rate_kg_m2_yr']:.2e} kg/(m²·yr)")
         output.append(f"  {results['time_averaged_rate_mm_yr']:.2e} mm/yr (depth loss)")
+    elif 'cold_trap_fraction' in results:
+        # Mixed-pixel result with micro cold traps
+        output.append(f"Illuminated Temperature: {results['illuminated_temp_K']:.2f} K")
+        output.append(f"Cold Trap Temperature:   {results['cold_trap_temp_K']:.2f} K")
+        output.append(f"Cold Trap Fraction:      {results['cold_trap_fraction']:.3f} ({results['cold_trap_fraction']*100:.1f}%)")
+        output.append(f"\nMixed-Pixel Sublimation Rates (area-weighted average):")
+        output.append(f"  {results['mixed_sublimation_rate_kg_m2_s']:.2e} kg/(m²·s)")
+        output.append(f"  {results['mixed_sublimation_rate_kg_m2_yr']:.2e} kg/(m²·yr)")
+        output.append(f"  {results['mixed_sublimation_rate_mm_yr']:.2e} mm/yr (depth loss)")
+        output.append(f"\nCold Trap Only Rates (ice retained in cold traps):")
+        output.append(f"  {results['cold_trap_only_rate_kg_m2_s']:.2e} kg/(m²·s)")
+        output.append(f"  {results['cold_trap_only_rate_kg_m2_yr']:.2e} kg/(m²·yr)")
+        output.append(f"  {results['cold_trap_only_rate_mm_yr']:.2e} mm/yr (depth loss)")
+        output.append(f"\nSublimation Reduction:   {results['sublimation_reduction_factor']:.3f}x")
 
     output.append(f"{'='*70}\n")
 

@@ -10,7 +10,9 @@ This tool calculates sublimation rates using the **Hertz-Knudsen equation**, whi
 
 - **Accurate vapor pressure calculations** using Clausius-Clapeyron equation (Andreas et al. 2007 for H₂O)
 - **Time-averaged sublimation rates** for diurnal/seasonal temperature variations
+- **Micro cold trap analysis** accounting for surface roughness effects on volatile retention
 - **GeoTIFF raster processing** to convert temperature maps to sublimation rate maps
+- **Roughness-based processing** to model mixed-pixel sublimation in rough terrain
 - **Multiple volatile species** support (H₂O, CO₂, CO, CH₄, NH₃, SO₂)
 - **Flexible output units** (kg/m²/s, mm/yr depth loss, etc.)
 - **Command-line and programmatic** interfaces
@@ -46,6 +48,23 @@ Where:
 - `P₀`, `T₀` = reference pressure and temperature
 
 This method is more accurate than Antoine equation for the extreme low temperatures found in permanently shadowed regions (PSRs).
+
+### Micro Cold Traps
+
+Surface roughness creates micro-scale permanently shadowed regions (micro cold traps) within pixels. These micro-PSRs can be significantly colder than the pixel-averaged temperature, enabling ice retention even in nominally "warm" locations.
+
+**Key concepts:**
+- Surface roughness from boulders, small craters, and terrain undulations creates shadows
+- Rough terrain characterized by RMS slope (degrees) or RMS height (meters)
+- Cold trap fraction: f_cold = (1 - cos(θ_RMS)) / 2 (cosine model)
+- Temperature depression: T_cold ≈ 0.3 to 0.7 × T_illuminated (latitude-dependent)
+- Mixed-pixel sublimation: J_mixed = f_illum × J_illum + f_cold × J_cold
+
+**Impact:**
+- 20-30° RMS slope can reduce sublimation by 100-1000×
+- Extends ice stability boundary poleward by several degrees latitude
+- Explains ice detection in "unexpected" warm locations
+- Critical for accurate total ice inventory estimates
 
 ## Supported Volatile Species
 
@@ -159,6 +178,54 @@ python raster_sublimation.py -i temp.tif -o sublim.tif -s H2O -v
 - LZW compression
 - NoData values preserved
 
+### 4. Micro Cold Trap Analysis
+
+Analyze sublimation accounting for surface roughness and micro-scale permanently shadowed regions:
+
+```bash
+# Run comprehensive micro cold trap analysis
+python micro_cold_trap_analysis.py
+
+# Process rasters with temperature and roughness data
+python raster_micro_coldtrap.py -t temp.tif -r slope_rms.tif -o sublim_mixed.tif -s H2O
+
+# Use different roughness models
+python raster_micro_coldtrap.py -t temp.tif -r slope.tif -o sublim.tif -s H2O --model exponential
+
+# RMS height instead of slope
+python raster_micro_coldtrap.py -t temp.tif -r height_rms.tif -o sublim.tif -s H2O --rtype height
+
+# Fixed temperature depression
+python raster_micro_coldtrap.py -t temp.tif -r slope.tif -o sublim.tif -s H2O --depression 50
+```
+
+**Programmatic usage:**
+```python
+from vaporp_temp import (VOLATILE_SPECIES, estimate_cold_trap_fraction,
+                          calculate_mixed_pixel_sublimation)
+
+# Estimate cold trap fraction from roughness
+roughness_rms_slope = 25  # degrees
+cold_trap_frac = estimate_cold_trap_fraction(roughness_rms_slope=roughness_rms_slope)
+
+# Calculate mixed-pixel sublimation
+species = VOLATILE_SPECIES['H2O']
+illuminated_temp = 130  # K
+cold_trap_temp = 70     # K
+
+result = calculate_mixed_pixel_sublimation(
+    species, illuminated_temp, cold_trap_frac, cold_trap_temp=cold_trap_temp
+)
+
+print(f"Mixed rate: {result['mixed_sublimation_rate_kg_m2_yr']:.2e} kg/(m²·yr)")
+print(f"Cold trap only: {result['cold_trap_only_rate_kg_m2_yr']:.2e} kg/(m²·yr)")
+```
+
+**Roughness models:**
+- `cosine`: f_cold = (1 - cos(slope)) / 2 (conservative, geometric)
+- `linear`: f_cold = slope / 90° (simple linear)
+- `exponential`: f_cold = 1 - exp(-slope/15°) (realistic for very rough terrain)
+
 ### Command Line Arguments
 
 - `-t, --temperature` : Temperature value(s) in Kelvin (required)
@@ -204,11 +271,13 @@ Sublimation Rates:
 
 ## Scientific Applications
 
-- Modeling volatile loss from lunar cold traps
+- Modeling volatile loss from lunar cold traps (including micro-PSRs)
 - Estimating ice stability in permanently shadowed regions
-- Planning resource utilization missions
+- Analyzing effect of surface roughness on ice retention
+- Planning resource utilization missions (ice prospecting)
 - Understanding volatile migration and distribution
 - Analyzing LCROSS and other lunar mission data
+- Calculating total ice inventory accounting for rough terrain
 
 ## Scientific References
 
@@ -226,6 +295,16 @@ Sublimation Rates:
 - **Hertz-Knudsen equation** for molecular flux from surfaces in vacuum
 - **Clausius-Clapeyron equation** for vapor pressure as function of temperature
 - **Zhang, J. A., & Paige, D. A. (2009).** "Cold-trapped organic compounds at the poles of the Moon and Mercury: Implications for origins." *Geophysical Research Letters*, 36(16).
+
+### Micro Cold Traps and Surface Roughness
+- **Rubanenko, L., et al. (2019).** "Stability of ice on the Moon with rough topography." *Icarus*, 296, 99-109.
+  - Demonstrates how surface roughness extends ice stability boundaries
+- **Schorghofer, N., & Taylor, G. J. (2007).** "Subsurface migration of H₂O at lunar cold traps." *Journal of Geophysical Research*, 112(E2).
+  - Early work on cold trap physics
+- **Hayne, P. O., et al. (2021).** "Micro cold traps on the Moon." *Nature Astronomy*, 5(5), 462-467.
+  - Micro-scale PSRs from surface roughness
+- **Deutsch, A. N., et al. (2020).** "Analyzing the ages of south polar craters on the Moon: Implications for the sources and evolution of surface water ice." *Icarus*, 336, 113455.
+  - Ice stability in rough polar terrain
 
 ## License
 
