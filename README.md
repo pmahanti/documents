@@ -66,6 +66,64 @@ Surface roughness creates micro-scale permanently shadowed regions (micro cold t
 - Explains ice detection in "unexpected" warm locations
 - Critical for accurate total ice inventory estimates
 
+### Integrated Thermal Modeling
+
+The `thermal_model.py` module integrates accurate 1-D thermal modeling with micro cold trap theory and sublimation physics. This provides a comprehensive framework for understanding lunar ice retention from kilometer to centimeter scales.
+
+**Key components:**
+- **heat1d thermal model** (Hayne et al. 2017) - 1-D heat conduction with temperature-dependent thermophysical properties
+- **Hayne et al. (2021) micro cold trap theory** - Analytical crater shadows, rough surface models, lateral conduction limits
+- **Multi-scale analysis** - Cold traps from 1 km down to 1 cm (10⁶ range in scale!)
+- **Lateral heat conduction** - Eliminates cold traps < 1 cm due to thermal diffusion
+- **Thermal skin depth** - δ = √(κP/π) where κ is thermal diffusivity, P is period
+
+**Physical parameters:**
+- Thermal conductivity: k = kc(1 + R350×T³) (temperature-dependent)
+- Heat capacity: cp(T) from Ledlow et al. (1992)
+- Diurnal skin depth: ~4.4 cm for lunar regolith
+- Optimal RMS slope for cold trapping: σs ≈ 10-20°
+
+**Total lunar cold trap area (Hayne et al. 2021):**
+- ~40,000 km² total (~0.10% of lunar surface)
+- South pole: ~23,000 km² (60%)
+- North pole: ~17,000 km² (40%)
+- Micro cold traps (<100m): ~2,500 km² (~10-20% of total)
+- Most numerous cold traps: ~1 cm scale
+
+**Usage:**
+```python
+from thermal_model import (integrated_sublimation_with_thermal,
+                            LunarThermalProperties)
+from vaporp_temp import VOLATILE_SPECIES
+
+# Calculate sublimation accounting for thermal model + roughness
+species = VOLATILE_SPECIES['H2O']
+latitude = 85  # degrees
+rms_slope = 20  # degrees
+length_scale = 0.1  # meters
+
+result = integrated_sublimation_with_thermal(
+    species, latitude, rms_slope, length_scale
+)
+
+print(f"Cold trap fraction: {result['cold_trap_fraction']:.2%}")
+print(f"Cold trap temp: {result['cold_trap_temp_K']:.1f} K")
+print(f"Ice lifetime (1m deposit): {1000/result['cold_trap_only_rate_mm_yr']:.2e} years")
+```
+
+Run comprehensive thermal integration examples:
+```bash
+python example_thermal_integration.py
+```
+
+This demonstrates:
+1. Crater shadow fractions at different d/D ratios
+2. Lateral conduction limits on cold trap size
+3. Rough surface cold trap fractions vs RMS slope
+4. Scale-dependent cold trap areas
+5. Integrated thermal + sublimation calculations
+6. Validation against Hayne et al. (2021) published results
+
 ## Supported Volatile Species
 
 - **H₂O** (Water ice) - Primary volatile of interest
@@ -296,13 +354,21 @@ Sublimation Rates:
 - **Clausius-Clapeyron equation** for vapor pressure as function of temperature
 - **Zhang, J. A., & Paige, D. A. (2009).** "Cold-trapped organic compounds at the poles of the Moon and Mercury: Implications for origins." *Geophysical Research Letters*, 36(16).
 
+### Thermal Modeling
+- **Hayne, P. O., et al. (2017).** "Evidence for exposed water ice in the Moon's south polar regions from Lunar Reconnaissance Orbiter ultraviolet albedo and temperature measurements." *Icarus*, 255, 58-69.
+  - Source for heat1d 1-D thermal model and lunar thermophysical properties
+- **Mitchell, D. L., & de Pater, I. (1994).** "Microwave imaging of Mercury's thermal emission at wavelengths from 0.3 to 20.5 cm." *Icarus*, 110(1), 2-32.
+  - Temperature-dependent thermal conductivity model
+- **Ledlow, M. J., et al. (1992).** "Subsurface emissions from Mercury: VLA radio observations at 2 and 6 cm." *Astrophysical Journal*, 384, 640-655.
+  - Heat capacity measurements for regolith
+
 ### Micro Cold Traps and Surface Roughness
+- **Hayne, P. O., et al. (2021).** "Micro cold traps on the Moon." *Nature Astronomy*, 5(5), 462-467.
+  - Micro-scale PSRs from surface roughness, multi-scale cold trap theory
 - **Rubanenko, L., et al. (2019).** "Stability of ice on the Moon with rough topography." *Icarus*, 296, 99-109.
   - Demonstrates how surface roughness extends ice stability boundaries
 - **Schorghofer, N., & Taylor, G. J. (2007).** "Subsurface migration of H₂O at lunar cold traps." *Journal of Geophysical Research*, 112(E2).
   - Early work on cold trap physics
-- **Hayne, P. O., et al. (2021).** "Micro cold traps on the Moon." *Nature Astronomy*, 5(5), 462-467.
-  - Micro-scale PSRs from surface roughness
 - **Deutsch, A. N., et al. (2020).** "Analyzing the ages of south polar craters on the Moon: Implications for the sources and evolution of surface water ice." *Icarus*, 336, 113455.
   - Ice stability in rough polar terrain
 
