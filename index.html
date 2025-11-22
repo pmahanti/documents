@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar Surface Missions Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌙 Lunar Surface Missions Explorer</h1>
+            <p class="subtitle">Explore past, present, and future lunar missions and their scientific payloads</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search missions, payloads, or instruments..." />
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="statusFilter">
+                        <option value="all">All Missions</option>
+                        <option value="past">Past</option>
+                        <option value="present">Present</option>
+                        <option value="future">Future</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Agency:</label>
+                    <select id="agencyFilter">
+                        <option value="all">All Agencies</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Country:</label>
+                    <select id="countryFilter">
+                        <option value="all">All Countries</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Mission Type:</label>
+                    <select id="typeFilter">
+                        <option value="all">All Types</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats" id="stats"></div>
+        </div>
+
+        <div class="missions-container" id="missionsContainer">
+            <!-- Missions will be dynamically loaded here -->
+        </div>
+
+        <footer>
+            <p>Data compiled from NASA, ISRO, CNSA, ESA, and various space agencies</p>
+            <p>Last updated: November 2025 | Works completely offline</p>
+        </footer>
+    </div>
+
+    <!-- Mission Detail Modal -->
+    <div id="missionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

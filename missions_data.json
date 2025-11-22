@@ -1,0 +1,799 @@
+{
+  "missions": [
+    {
+      "id": "apollo11",
+      "name": "Apollo 11",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "1969-07-16",
+      "landing_date": "1969-07-20",
+      "landing_site": "Mare Tranquillitatis",
+      "mission_type": "Crewed Landing",
+      "description": "First crewed Moon landing mission. Neil Armstrong and Buzz Aldrin became the first humans to walk on the lunar surface.",
+      "payloads": [
+        {
+          "name": "Early Apollo Scientific Experiments Package (EASEP)",
+          "type": "Scientific Package",
+          "description": "Simplified precursor to ALSEP for rapid deployment",
+          "mass_kg": 17,
+          "specifications": "Passive Seismic Experiment (PSE) and Lunar Dust Detector"
+        },
+        {
+          "name": "Passive Seismic Experiment",
+          "type": "Seismometer",
+          "description": "Detected moonquakes and meteorite impacts",
+          "specifications": "Operated until August 1969"
+        },
+        {
+          "name": "Lunar Dust Detector",
+          "type": "Environmental Sensor",
+          "description": "Measured accumulation of lunar dust",
+          "specifications": "Part of EASEP package"
+        }
+      ]
+    },
+    {
+      "id": "apollo12",
+      "name": "Apollo 12",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "1969-11-14",
+      "landing_date": "1969-11-19",
+      "landing_site": "Oceanus Procellarum",
+      "mission_type": "Crewed Landing",
+      "description": "Second crewed Moon landing. Deployed first full ALSEP and retrieved parts from Surveyor 3.",
+      "payloads": [
+        {
+          "name": "Apollo Lunar Surface Experiments Package (ALSEP)",
+          "type": "Scientific Package",
+          "description": "Suite of automated scientific instruments powered by RTG",
+          "mass_kg": 124,
+          "power_watts": 70,
+          "specifications": "First full ALSEP deployment with plutonium-238 RTG"
+        },
+        {
+          "name": "Passive Seismic Experiment",
+          "type": "Seismometer",
+          "description": "Long-term seismic monitoring station",
+          "specifications": "Operated until 1977"
+        },
+        {
+          "name": "Lunar Surface Magnetometer",
+          "type": "Magnetometer",
+          "description": "Measured lunar magnetic field",
+          "specifications": "Part of ALSEP suite"
+        }
+      ]
+    },
+    {
+      "id": "apollo15",
+      "name": "Apollo 15",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "1971-07-26",
+      "landing_date": "1971-07-30",
+      "landing_site": "Hadley-Apennine",
+      "mission_type": "Crewed Landing (J-Mission)",
+      "description": "First J-mission with extended stay, Lunar Roving Vehicle, and Scientific Instrument Module.",
+      "payloads": [
+        {
+          "name": "Panoramic Camera",
+          "type": "Camera",
+          "description": "24-inch camera for high-resolution stereo photography from orbit",
+          "specifications": "Part of SIM bay, stereo and high-resolution photos"
+        },
+        {
+          "name": "Mapping Camera",
+          "type": "Camera",
+          "description": "3-inch camera for terrain mapping",
+          "specifications": "20-meter resolution on 5-inch film"
+        },
+        {
+          "name": "Laser Altimeter",
+          "type": "Altimeter",
+          "description": "Measured spacecraft altitude above lunar surface",
+          "specifications": "±1 meter precision"
+        },
+        {
+          "name": "Gamma-Ray Spectrometer",
+          "type": "Spectrometer",
+          "description": "Measured chemical composition of lunar surface",
+          "specifications": "Mounted on 25-foot extendable boom"
+        },
+        {
+          "name": "Mass Spectrometer",
+          "type": "Spectrometer",
+          "description": "Measured composition of lunar atmosphere",
+          "specifications": "Detected ambient atmospheric composition"
+        },
+        {
+          "name": "Lunar Roving Vehicle (LRV)",
+          "type": "Rover",
+          "description": "First crewed lunar vehicle",
+          "specifications": "Electric battery-powered, 460 kg on Earth"
+        }
+      ]
+    },
+    {
+      "id": "luna9",
+      "name": "Luna 9",
+      "agency": "Soviet Space Program",
+      "country": "USSR",
+      "status": "past",
+      "launch_date": "1966-01-31",
+      "landing_date": "1966-02-03",
+      "landing_site": "Oceanus Procellarum",
+      "mission_type": "Lander",
+      "description": "First spacecraft to achieve a soft landing on the Moon and transmit photographic data to Earth.",
+      "payloads": [
+        {
+          "name": "Television Camera",
+          "type": "Camera",
+          "description": "Transmitted first images from lunar surface",
+          "specifications": "Panoramic camera system"
+        },
+        {
+          "name": "Radiation Detector",
+          "type": "Sensor",
+          "description": "Measured radiation on lunar surface",
+          "specifications": "Environmental monitoring"
+        }
+      ]
+    },
+    {
+      "id": "luna16",
+      "name": "Luna 16",
+      "agency": "Soviet Space Program",
+      "country": "USSR",
+      "status": "past",
+      "launch_date": "1970-09-12",
+      "landing_date": "1970-09-20",
+      "landing_site": "Mare Fecunditatis",
+      "mission_type": "Sample Return",
+      "description": "First robotic sample return mission. Successfully returned 101 grams of lunar soil.",
+      "payloads": [
+        {
+          "name": "Drilling System",
+          "type": "Sample Collection",
+          "description": "Automated drill for soil sample collection",
+          "mass_kg": 1880,
+          "specifications": "Drilled to 35 cm depth, collected 101g samples"
+        },
+        {
+          "name": "Ascent Stage",
+          "type": "Return Vehicle",
+          "description": "Returned samples to Earth",
+          "specifications": "Part of Ye-8-5 spacecraft"
+        }
+      ]
+    },
+    {
+      "id": "luna17",
+      "name": "Luna 17 / Lunokhod 1",
+      "agency": "Soviet Space Program",
+      "country": "USSR",
+      "status": "past",
+      "launch_date": "1970-11-10",
+      "landing_date": "1970-11-17",
+      "landing_site": "Mare Imbrium",
+      "mission_type": "Rover",
+      "description": "First successful rover mission. Lunokhod 1 operated for 322 Earth days and traveled 10.54 km.",
+      "payloads": [
+        {
+          "name": "Lunokhod 1 Rover",
+          "type": "Rover",
+          "description": "Eight-wheeled lunar rover with solar panels",
+          "mass_kg": 756,
+          "specifications": "1.35m high, 2.15m across, 8 wheels, solar-powered"
+        },
+        {
+          "name": "Television Cameras",
+          "type": "Camera",
+          "description": "Returned over 20,000 TV images and 206 panoramas",
+          "specifications": "Multiple cameras for navigation and science"
+        },
+        {
+          "name": "RIFMA X-ray Fluorescence Spectrometer",
+          "type": "Spectrometer",
+          "description": "Performed elemental analysis of lunar soil",
+          "specifications": "25 soil analyses conducted"
+        },
+        {
+          "name": "Penetrometer",
+          "type": "Mechanical Probe",
+          "description": "Measured mechanical properties of regolith",
+          "specifications": "Used at 500 different locations"
+        },
+        {
+          "name": "Cosmic Ray Detectors",
+          "type": "Radiation Detector",
+          "description": "Detected cosmic radiation",
+          "specifications": "Environmental monitoring"
+        },
+        {
+          "name": "Polonium-210 Heaters",
+          "type": "Thermal System",
+          "description": "Radioisotope heaters for thermal control",
+          "specifications": "Maintained temperature during 14-day lunar nights"
+        }
+      ]
+    },
+    {
+      "id": "surveyor1",
+      "name": "Surveyor 1",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "1966-05-30",
+      "landing_date": "1966-06-02",
+      "landing_site": "Oceanus Procellarum",
+      "mission_type": "Lander",
+      "description": "First U.S. spacecraft to soft-land on the Moon. Transmitted 11,150 photographs.",
+      "payloads": [
+        {
+          "name": "Television Camera",
+          "type": "Camera",
+          "description": "Scanning television camera",
+          "specifications": "Transmitted 11,150 photographs"
+        },
+        {
+          "name": "Temperature Sensors",
+          "type": "Environmental Sensor",
+          "description": "Measured surface temperature",
+          "specifications": "Environmental monitoring"
+        },
+        {
+          "name": "Radar Reflectivity Instrument",
+          "type": "Radar",
+          "description": "Measured radar reflectivity of lunar surface",
+          "specifications": "Surface characterization"
+        }
+      ]
+    },
+    {
+      "id": "surveyor3",
+      "name": "Surveyor 3",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "1967-04-17",
+      "landing_date": "1967-04-20",
+      "landing_site": "Oceanus Procellarum",
+      "mission_type": "Lander",
+      "description": "Carried soil mechanics surface sampler. Parts later retrieved by Apollo 12 crew.",
+      "payloads": [
+        {
+          "name": "Soil Mechanics Surface Sampler",
+          "type": "Scoop/Excavator",
+          "description": "Robotic arm with scoop for soil analysis",
+          "specifications": "12 cm x 5 cm scoop on 1.5m pantograph arm"
+        },
+        {
+          "name": "Television Camera",
+          "type": "Camera",
+          "description": "Surface imaging system",
+          "specifications": "Standard Surveyor camera"
+        }
+      ]
+    },
+    {
+      "id": "surveyor5",
+      "name": "Surveyor 5",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "1967-09-08",
+      "landing_date": "1967-09-11",
+      "landing_site": "Mare Tranquillitatis",
+      "mission_type": "Lander",
+      "description": "First spacecraft to perform chemical analysis of lunar soil.",
+      "payloads": [
+        {
+          "name": "Alpha-Scattering Chemical Analysis Instrument",
+          "type": "Chemical Analyzer",
+          "description": "First chemical analysis of lunar surface material",
+          "specifications": "Alpha-scattering technique for elemental composition"
+        },
+        {
+          "name": "Magnets",
+          "type": "Magnetic Sensor",
+          "description": "Attached to footpads to collect magnetic particles",
+          "specifications": "Detected magnetic properties of regolith"
+        },
+        {
+          "name": "Television Camera",
+          "type": "Camera",
+          "description": "Surface imaging",
+          "specifications": "Standard Surveyor camera"
+        }
+      ]
+    },
+    {
+      "id": "chandrayaan3",
+      "name": "Chandrayaan-3",
+      "agency": "ISRO",
+      "country": "India",
+      "status": "past",
+      "launch_date": "2023-07-14",
+      "landing_date": "2023-08-23",
+      "landing_site": "Lunar South Pole",
+      "mission_type": "Lander and Rover",
+      "description": "First spacecraft to land near the lunar south pole. Successfully deployed Pragyan rover.",
+      "payloads": [
+        {
+          "name": "SHAPE (Spectro-Polarimetry of Habitable Planet Earth)",
+          "type": "Spectrometer",
+          "description": "Measured spectral and polarimetric properties of Earth from lunar orbit",
+          "specifications": "Mounted on Propulsion Module"
+        },
+        {
+          "name": "RAMBHA-LP (Radio Anatomy of Moon Bound Hypersensitive ionosphere and Atmosphere - Langmuir Probe)",
+          "type": "Plasma Probe",
+          "description": "Studied lunar surface plasma environment",
+          "specifications": "Lander payload"
+        },
+        {
+          "name": "ChaSTE (Chandra's Surface Thermo-physical Experiment)",
+          "type": "Temperature Probe",
+          "description": "Measured thermal properties of lunar surface",
+          "specifications": "Lander payload"
+        },
+        {
+          "name": "ILSA (Instrument for Lunar Seismic Activity)",
+          "type": "Seismometer",
+          "description": "Detected moonquakes and seismic activity",
+          "specifications": "Lander payload"
+        },
+        {
+          "name": "Laser Retroreflector Array (LRA)",
+          "type": "Retroreflector",
+          "description": "Passive laser ranging target provided by NASA",
+          "specifications": "For precise distance measurements"
+        },
+        {
+          "name": "APXS (Alpha Particle X-ray Spectrometer)",
+          "type": "Spectrometer",
+          "description": "Determined elemental composition of lunar soil",
+          "specifications": "Pragyan rover payload"
+        },
+        {
+          "name": "LIBS (Laser Induced Breakdown Spectroscope)",
+          "type": "Spectrometer",
+          "description": "Analyzed elemental composition near landing site",
+          "specifications": "Pragyan rover payload"
+        }
+      ]
+    },
+    {
+      "id": "change3",
+      "name": "Chang'e-3",
+      "agency": "CNSA",
+      "country": "China",
+      "status": "past",
+      "launch_date": "2013-12-01",
+      "landing_date": "2013-12-14",
+      "landing_site": "Mare Imbrium",
+      "mission_type": "Lander and Rover",
+      "description": "First Chinese lunar landing mission with Yutu rover.",
+      "payloads": [
+        {
+          "name": "Landing Camera (LCAM)",
+          "type": "Camera",
+          "description": "Documented descent and landing",
+          "specifications": "Lander camera"
+        },
+        {
+          "name": "Terrain Camera (TCAM)",
+          "type": "Camera",
+          "description": "Imaged surrounding terrain",
+          "specifications": "Lander camera"
+        },
+        {
+          "name": "Lunar Lander Neutrons and Dosimetry Experiment (LND)",
+          "type": "Radiation Detector",
+          "description": "Measured radiation environment",
+          "specifications": "Lander payload"
+        },
+        {
+          "name": "Panoramic Camera (PCAM)",
+          "type": "Camera",
+          "description": "360-degree panoramic imaging",
+          "specifications": "Yutu rover payload"
+        },
+        {
+          "name": "Visible/Near-Infrared Imaging Spectrometer (VNIS)",
+          "type": "Spectrometer",
+          "description": "Analyzed surface composition",
+          "specifications": "Yutu rover payload"
+        },
+        {
+          "name": "Lunar Penetrating Radar (LPR)",
+          "type": "Ground-Penetrating Radar",
+          "description": "Studied subsurface structure",
+          "specifications": "Yutu rover payload, penetrated up to 400m depth"
+        },
+        {
+          "name": "Advanced Small Analyzer for Neutrals (ASAN)",
+          "type": "Particle Analyzer",
+          "description": "Analyzed lunar exosphere",
+          "specifications": "Yutu rover payload"
+        }
+      ]
+    },
+    {
+      "id": "change4",
+      "name": "Chang'e-4",
+      "agency": "CNSA",
+      "country": "China",
+      "status": "past",
+      "launch_date": "2018-12-07",
+      "landing_date": "2019-01-03",
+      "landing_site": "Von Kármán crater (far side)",
+      "mission_type": "Lander and Rover",
+      "description": "First spacecraft to land on the far side of the Moon. Deployed Yutu-2 rover.",
+      "payloads": [
+        {
+          "name": "Low-Frequency Radio Spectrometer (LFS)",
+          "type": "Radio Spectrometer",
+          "description": "Radio astronomy observations from far side",
+          "specifications": "0.1-40 MHz frequency range"
+        },
+        {
+          "name": "Landing Camera",
+          "type": "Camera",
+          "description": "Documented landing sequence",
+          "specifications": "Lander camera"
+        },
+        {
+          "name": "Terrain Camera",
+          "type": "Camera",
+          "description": "Surface imaging",
+          "specifications": "Lander camera"
+        },
+        {
+          "name": "Lunar Lander Neutrons and Dosimetry",
+          "type": "Radiation Detector",
+          "description": "Radiation environment monitoring",
+          "specifications": "Lander payload"
+        },
+        {
+          "name": "Panoramic Camera",
+          "type": "Camera",
+          "description": "High-resolution panoramic imaging",
+          "specifications": "Yutu-2 rover payload"
+        },
+        {
+          "name": "Visible/Near-Infrared Imaging Spectrometer",
+          "type": "Spectrometer",
+          "description": "Mineralogical analysis",
+          "specifications": "Yutu-2 rover payload"
+        },
+        {
+          "name": "Lunar Penetrating Radar",
+          "type": "Ground-Penetrating Radar",
+          "description": "Subsurface structure investigation",
+          "specifications": "Yutu-2 rover payload"
+        }
+      ]
+    },
+    {
+      "id": "im1",
+      "name": "Intuitive Machines IM-1 (Odysseus)",
+      "agency": "Intuitive Machines / NASA CLPS",
+      "country": "USA",
+      "status": "past",
+      "launch_date": "2024-02-15",
+      "landing_date": "2024-02-22",
+      "landing_site": "Malapert A (near South Pole)",
+      "mission_type": "Commercial Lander",
+      "description": "First commercial spacecraft to land on the Moon. Part of NASA's CLPS program.",
+      "payloads": [
+        {
+          "name": "Laser Retroreflector Array",
+          "type": "Retroreflector",
+          "description": "Passive ranging target for future missions",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Navigation Doppler Lidar",
+          "type": "Navigation Sensor",
+          "description": "Precision landing technology demonstration",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Radio Frequency Mass Gauge",
+          "type": "Propellant Gauge",
+          "description": "Measured cryogenic propellant levels",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Lunar Node 1",
+          "type": "Communication System",
+          "description": "Autonomous navigation beacon",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Stereo Cameras for Lunar Plume-Surface Studies",
+          "type": "Camera",
+          "description": "Studied plume-surface interactions during landing",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Radio-wave Observations at the Lunar Surface",
+          "type": "Radio Instrument",
+          "description": "Studied photoelectron sheath and radio astronomy",
+          "specifications": "NASA payload"
+        }
+      ]
+    },
+    {
+      "id": "firefly_blueghost1",
+      "name": "Firefly Aerospace Blue Ghost 1",
+      "agency": "Firefly Aerospace / NASA CLPS",
+      "country": "USA",
+      "status": "present",
+      "launch_date": "2025-01-15",
+      "landing_date": "2025-03-02",
+      "landing_site": "Mare Crisium",
+      "mission_type": "Commercial Lander",
+      "description": "Delivering 10 NASA CLPS science payloads to Mare Crisium. Includes heat flow probe requiring 3-meter drilling.",
+      "payloads": [
+        {
+          "name": "Heat Flow Probe",
+          "type": "Thermal Probe",
+          "description": "Measures subsurface heat flow",
+          "specifications": "Drills 9 feet (3 meters) into regolith"
+        },
+        {
+          "name": "Magnetotelluric Sounder",
+          "type": "Magnetometer",
+          "description": "Measures magnetic field and electrical conductivity",
+          "specifications": "Features magnetometer on extendable boom and 4 cables launched to 65 feet by springs"
+        },
+        {
+          "name": "Lunar Magnetotelluric Sounder Cables",
+          "type": "Sensor Array",
+          "description": "First spring-launched cable system in space",
+          "specifications": "Four 65-foot cables with powerful spring deployment"
+        },
+        {
+          "name": "Regolith Adherence Characterization",
+          "type": "Materials Science",
+          "description": "Studies dust adherence properties",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Lunar PlanetVac",
+          "type": "Sample Collection",
+          "description": "Pneumatic sample acquisition system",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Lunar Surface Electromagnetics Experiment - Night",
+          "type": "Electromagnetic Sensor",
+          "description": "Studies surface electrical properties",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Stereo Cameras for Lunar Plume-Surface Studies",
+          "type": "Camera",
+          "description": "Documents landing plume interactions",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "User Terminal Position Sensor",
+          "type": "Navigation Sensor",
+          "description": "Demonstrates lunar surface positioning",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Sample Acquisition, Morphology Filtering, and Probing of Lunar Regolith",
+          "type": "Sampling System",
+          "description": "Collects and analyzes regolith samples",
+          "specifications": "NASA payload"
+        },
+        {
+          "name": "Lunar GNSS Receiver Experiment",
+          "type": "Navigation Receiver",
+          "description": "Tests GPS reception from lunar surface",
+          "specifications": "NASA payload"
+        }
+      ]
+    },
+    {
+      "id": "im2",
+      "name": "Intuitive Machines IM-2",
+      "agency": "Intuitive Machines / NASA CLPS",
+      "country": "USA",
+      "status": "future",
+      "launch_date": "2025-02-26",
+      "landing_date": "2025-03-05",
+      "landing_site": "Mons Mouton (near South Pole)",
+      "mission_type": "Commercial Lander",
+      "description": "Second Intuitive Machines mission landing near the lunar South Pole. Features PRIME-1 ice mining experiment.",
+      "payloads": [
+        {
+          "name": "PRIME-1 (Polar Resources Ice Mining Experiment-1)",
+          "type": "ISRU Demonstration",
+          "description": "First on-site resource utilization demonstration on Moon",
+          "specifications": "Drill and mass spectrometer to measure volatile content of subsurface materials"
+        },
+        {
+          "name": "PRIME-1 Drill",
+          "type": "Drilling System",
+          "description": "Subsurface drilling for ice detection",
+          "specifications": "Part of PRIME-1 suite"
+        },
+        {
+          "name": "PRIME-1 Mass Spectrometer",
+          "type": "Mass Spectrometer",
+          "description": "Analyzes volatile composition",
+          "specifications": "Part of PRIME-1 suite"
+        },
+        {
+          "name": "Laser Retroreflector Array (LRA)",
+          "type": "Retroreflector",
+          "description": "Passive ranging target",
+          "specifications": "NASA payload"
+        }
+      ]
+    },
+    {
+      "id": "im3",
+      "name": "Intuitive Machines IM-3",
+      "agency": "Intuitive Machines / NASA CLPS",
+      "country": "USA",
+      "status": "future",
+      "launch_date": "2026-01-15",
+      "landing_date": "2026-02-01",
+      "landing_site": "Reiner Gamma",
+      "mission_type": "Commercial Lander",
+      "description": "Third Intuitive Machines mission to study the enigmatic Reiner Gamma lunar swirl.",
+      "payloads": [
+        {
+          "name": "Lunar Vertex",
+          "type": "Science Package",
+          "description": "Studies magnetic anomalies and swirl formation",
+          "specifications": "Multi-instrument package for Reiner Gamma investigation"
+        }
+      ]
+    },
+    {
+      "id": "draper1",
+      "name": "Team Draper Mission",
+      "agency": "Draper / NASA CLPS",
+      "country": "USA",
+      "status": "future",
+      "launch_date": "2026-06-01",
+      "landing_date": "2026-06-15",
+      "landing_site": "Schrödinger Basin (far side)",
+      "mission_type": "Commercial Lander",
+      "description": "Far side landing in Schrödinger Basin with seismometers and heat flow experiments.",
+      "payloads": [
+        {
+          "name": "Long-Lived Seismometers",
+          "type": "Seismometer",
+          "description": "Studies tectonic activity and deep lunar interior",
+          "specifications": "Measures moonquakes and micrometeorite impacts"
+        },
+        {
+          "name": "Heat Flow Probe",
+          "type": "Thermal Probe",
+          "description": "Measures subsurface heat flow",
+          "specifications": "Includes drill for deep penetration"
+        },
+        {
+          "name": "Electrical Conductivity Probes",
+          "type": "Conductivity Sensor",
+          "description": "Measures regolith electrical properties",
+          "specifications": "Subsurface characterization"
+        }
+      ]
+    },
+    {
+      "id": "artemis3",
+      "name": "Artemis III",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "future",
+      "launch_date": "2027-06-01",
+      "landing_date": "2027-06-15",
+      "landing_site": "Lunar South Pole",
+      "mission_type": "Crewed Landing",
+      "description": "First crewed lunar landing since Apollo 17. Will land near the South Pole to study water ice.",
+      "payloads": [
+        {
+          "name": "LEMS (Lunar Environment Monitoring Station)",
+          "type": "Seismometer Suite",
+          "description": "Compact, autonomous seismometer characterizing regional lunar structure",
+          "specifications": "Studies crust and mantle structure"
+        },
+        {
+          "name": "LEAF (Lunar Effects on Agricultural Flora)",
+          "type": "Biology Experiment",
+          "description": "Investigates impact of lunar environment on space crops",
+          "specifications": "Plant growth experiment"
+        },
+        {
+          "name": "LDA (Lunar Dielectric Analyzer)",
+          "type": "Dielectric Analyzer",
+          "description": "Measures regolith's ability to propagate electric field",
+          "specifications": "International payload contribution"
+        }
+      ]
+    },
+    {
+      "id": "artemis_ltv",
+      "name": "Artemis Lunar Terrain Vehicle",
+      "agency": "NASA",
+      "country": "USA",
+      "status": "future",
+      "launch_date": "2028-01-01",
+      "landing_date": "2028-02-01",
+      "landing_site": "Lunar South Pole region",
+      "mission_type": "Rover",
+      "description": "Pressurized rover for Artemis missions. Can operate autonomously or with crew.",
+      "payloads": [
+        {
+          "name": "AIRES (Artemis Infrared Reflectance and Emission Spectrometer)",
+          "type": "Spectrometer",
+          "description": "Identifies, quantifies, and maps lunar minerals and volatiles",
+          "specifications": "Captures spectral data to discover mineral and volatile distribution in south polar region"
+        },
+        {
+          "name": "L-MAPS (Lunar Microwave Active-Passive Spectrometer)",
+          "type": "Microwave Spectrometer",
+          "description": "Defines subsurface structure and searches for ice",
+          "specifications": "Measures temperature, density, and subsurface structures to 131+ feet (40m) depth"
+        }
+      ]
+    },
+    {
+      "id": "change7",
+      "name": "Chang'e-7",
+      "agency": "CNSA",
+      "country": "China",
+      "status": "future",
+      "launch_date": "2026-01-01",
+      "landing_date": "2026-02-01",
+      "landing_site": "Lunar South Pole",
+      "mission_type": "Multi-Component Mission",
+      "description": "Comprehensive south polar exploration with orbiter, lander, rover, and hopping probe.",
+      "payloads": [
+        {
+          "name": "International Payloads",
+          "type": "Multiple",
+          "description": "6 international payloads among 21 total instruments",
+          "specifications": "Detailed south polar environment and resource exploration"
+        },
+        {
+          "name": "Orbiter Instruments",
+          "type": "Multiple",
+          "description": "Remote sensing from orbit",
+          "specifications": "Part of 21-payload suite"
+        },
+        {
+          "name": "Lander Instruments",
+          "type": "Multiple",
+          "description": "Surface measurements",
+          "specifications": "Part of 21-payload suite"
+        },
+        {
+          "name": "Rover Instruments",
+          "type": "Multiple",
+          "description": "Mobile surface exploration",
+          "specifications": "Part of 21-payload suite"
+        },
+        {
+          "name": "Hopping Probe",
+          "type": "Mobile Probe",
+          "description": "Can hop to explore permanently shadowed regions",
+          "specifications": "Novel mobility system for PSR exploration"
+        }
+      ]
+    }
+  ]
+}
