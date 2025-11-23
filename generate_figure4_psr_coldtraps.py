@@ -53,12 +53,21 @@ def generate_crater_size_distribution(L_min: float = 0.01, L_max: float = 100000
     L_bins = np.logspace(np.log10(L_min), np.log10(L_max), n_bins)
 
     # Power-law exponent for crater size-frequency distribution
-    # N(>D) ∝ D^(-b) where b ≈ 2 for lunar craters
-    b = 2.0
+    # For Hayne model: area dominated by large features, not small ones
+    # b ≈ 1.06 calibrated to match Hayne constraints:
+    #   - Cumulative area scales as L^(2-b) = L^0.94
+    #   - Gives 0.01 km² at 1cm and 40,000 km² at 100km
+    # Original lunar craters: b ≈ 2 (self-similar, equal area per log bin)
+    # Hayne model: b ≈ 1.06 (area dominated by large features)
+    b = 1.06
 
     # Differential number density: dN/dD ∝ D^(-b-1)
-    # Scale by total lunar surface area
-    scale_factor = 1e10  # Total number of small features
+    # Scale factor calibrated to match Hayne et al. (2021) constraints:
+    #   - At L = 1 cm: cumulative area = 0.01 km² (PRIMARY CONSTRAINT)
+    #   - Total area ~ 40,000 km²
+    # Note: Exact power-law doesn't capture full physics, so we prioritize
+    # matching the 1cm constraint which was specified by user
+    scale_factor = 1.42e7  # Calibrated for A_cum(1cm) = 0.01 km²
 
     N_differential = scale_factor * L_bins**(-b - 1)
 
