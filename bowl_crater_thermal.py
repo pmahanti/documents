@@ -149,17 +149,29 @@ def crater_view_factors(gamma: float) -> Dict[str, float]:
         - 'f_walls': View factor to crater walls from floor
         - 'f_floor_walls': Effective view factor accounting for geometry
     """
-    # For a point at the bottom of a spherical bowl,
-    # the view factor depends on the opening angle
+    # Exact view factor calculation from Ingersoll et al. (1992)
+    # Based on solid angle subtended by the sky as seen from crater floor
 
-    # Simplified model: view factor to walls increases with gamma
-    # Shallow craters (small gamma) see more sky, are colder
-    f_walls = min(gamma / 0.2, 0.7)  # Saturates at ~70%
-    f_sky = 1.0 - f_walls
+    # For a spherical bowl:
+    # - Sphere radius: R_s = (R² + d²) / (2d)
+    # - For d/D = γ, R = D/2:
+    # - R_s/D = (1/4 + γ²) / (2γ) = (1 + 4γ²) / (8γ)
+    # - Opening half-angle: θ = arctan(R / (R_s - d))
 
-    # For more accurate calculations, use spherical cap geometry
-    # Opening half-angle: theta = arctan(R / (R_sphere - d))
-    # where R_sphere = (R² + d²) / (2d)
+    R_s_over_D = (0.25 + gamma**2) / (2.0 * gamma)  # R_s / D
+    d_over_D = gamma                                  # d / D
+    R_over_D = 0.5                                    # R / D
+
+    # Height from floor to sphere center
+    height = R_s_over_D - d_over_D
+
+    # Opening half-angle from geometry
+    cos_theta = height / np.sqrt(height**2 + R_over_D**2)
+
+    # View factor from solid angle (Ingersoll 1992)
+    # F_sky = (solid angle of sky) / (2π steradians)
+    f_sky = (1.0 - cos_theta) / 2.0
+    f_walls = 1.0 - f_sky
 
     return {
         'f_sky': f_sky,
