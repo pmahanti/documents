@@ -329,7 +329,7 @@ def plot_figure4_top_panel(L_bins, A_north, A_south,
     """
     Create Figure 4 top panel: Cumulative cold trap area vs length scale.
     """
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
     # Calculate cumulative areas
     A_north_cum = np.cumsum(A_north)
@@ -360,6 +360,7 @@ def plot_figure4_top_panel(L_bins, A_north, A_south,
     ax.legend(fontsize=11, loc='upper left', framealpha=0.95)
     ax.grid(True, alpha=0.3, which='both', linestyle=':')
     ax.set_xlim([L_bins[0], L_bins[-1]])
+    ax.set_ylim([1e-2, 1e5])
     ax.tick_params(labelsize=12)
 
     # Add annotations
