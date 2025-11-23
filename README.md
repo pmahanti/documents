@@ -337,6 +337,97 @@ Sublimation Rates:
 - Analyzing LCROSS and other lunar mission data
 - Calculating total ice inventory accounting for rough terrain
 
+## Bowl-Shaped Crater Temperature Analysis
+
+New modules for analyzing temperatures in bowl-shaped craters using analytical theory:
+
+### Core Modules
+
+- **`bowl_crater_thermal.py`**: Ingersoll et al. (1992) analytical crater model
+  - Shadow area calculations (permanent vs instantaneous)
+  - View factor calculations for radiation exchange
+  - Temperature calculations accounting for crater geometry
+  - Cold trap area estimates
+
+- **`crater_topography_deviation.py`**: Topographic deviation analysis
+  - Quantifies departure from ideal spherical bowl
+  - Shape factor calculations
+  - Temperature corrections for irregular craters
+  - Uncertainty estimates
+
+### Usage Examples
+
+**Basic bowl-shaped crater analysis:**
+```python
+from bowl_crater_thermal import CraterGeometry, ingersoll_crater_temperature
+
+# Define crater
+crater = CraterGeometry(diameter=5000, depth=400, latitude_deg=-85)
+
+# Calculate temperatures
+temps = ingersoll_crater_temperature(
+    crater, T_sunlit=200, solar_elevation_deg=5.0
+)
+
+print(f"Shadow temperature: {temps['T_shadow']:.1f} K")
+print(f"Shadow fraction: {temps['shadow_fraction']:.2%}")
+```
+
+**Topographic deviation analysis:**
+```python
+from crater_topography_deviation import (
+    generate_synthetic_irregular_crater,
+    analyze_topographic_deviation,
+    temperature_correction_factor
+)
+
+# Generate irregular crater profile
+radii, depths = generate_synthetic_irregular_crater(
+    diameter=5000, depth=400, irregularity=0.2
+)
+
+# Analyze deviations from ideal bowl
+deviation = analyze_topographic_deviation(radii, depths, diameter=5000)
+
+# Calculate temperature corrections
+corrections = temperature_correction_factor(deviation, crater)
+
+print(f"Shape factor: {deviation.shape_factor:.3f}")
+print(f"Temperature correction: {corrections['temperature_offset']:+.1f} K")
+```
+
+**Complete examples:**
+- `example_bowl_crater_thermal.py` - Integration with volatile retention analysis
+- `example_topography_corrected_temperatures.py` - Corrected Ingersoll temperatures
+
+### Key Features
+
+1. **Analytical Ingersoll Model** (perfect spherical bowl):
+   - Fast calculation of shadow areas and temperatures
+   - Latitude and solar declination dependencies
+   - View factors for sky vs crater walls
+   - Scattered and thermal radiation
+
+2. **Topographic Deviation Analysis**:
+   - Fit actual topography to ideal bowl
+   - Compute shape factor (0=perfect, 1=highly irregular)
+   - Estimate temperature corrections
+   - Assess Ingersoll model applicability
+
+3. **Applications**:
+   - Determine when analytical model is sufficient
+   - Quantify uncertainty from topographic irregularities
+   - Bridge gap between analytical and 3D modeling
+   - Optimize computational resources
+
+### When to Use Each Approach
+
+| Shape Factor | Approach | Temperature Uncertainty |
+|--------------|----------|------------------------|
+| < 0.15 | Nominal Ingersoll | < 5 K |
+| 0.15 - 0.30 | Corrected Ingersoll | 5-10 K |
+| > 0.30 | 3D topographic modeling | > 10 K |
+
 ## Scientific References
 
 ### Vapor Pressure Data
@@ -361,6 +452,19 @@ Sublimation Rates:
   - Temperature-dependent thermal conductivity model
 - **Ledlow, M. J., et al. (1992).** "Subsurface emissions from Mercury: VLA radio observations at 2 and 6 cm." *Astrophysical Journal*, 384, 640-655.
   - Heat capacity measurements for regolith
+
+### Crater Geometry and Temperature Modeling
+- **Ingersoll, A. P., Svitek, T., & Murray, B. C. (1992).** "Stability of polar frosts in spherical bowl-shaped craters on the Moon, Mercury, and Mars." *Icarus*, 100(1), 40-47.
+  - Analytical theory for temperatures in bowl-shaped craters
+  - Shadow area calculations and view factor formulations
+  - Foundation for simple crater cold trap analysis
+- **Hayne, P. O., et al. (2021).** "Micro cold traps on the Moon." *Nature Astronomy*, 5(2), 169-175.
+  - Implements Ingersoll theory at multiple spatial scales
+  - Equations for shadow fractions in craters (Eqs. 2-9, 22-26)
+  - Lateral conduction effects limiting micro cold traps
+- **Schorghofer, N., & Williams, J.-P. (2020).** "Mapping of ice storage processes on the Moon with time-dependent temperatures." *The Planetary Science Journal*, 1(3), 54.
+  - Time-dependent temperature mapping from Diviner data
+  - Subsurface ice stability and vapor pumping analysis
 
 ### Micro Cold Traps and Surface Roughness
 - **Hayne, P. O., et al. (2021).** "Micro cold traps on the Moon." *Nature Astronomy*, 5(5), 462-467.
