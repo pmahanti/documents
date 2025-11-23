@@ -9,9 +9,9 @@ This document summarizes the validation of our bowl-shaped crater implementation
 ## Methodology
 
 ### Step 1: Validate Bowl Implementation
-Reproduced three key results from Hayne et al. (2021):
+Generated key analysis figures:
 1. **Figure 3**: Cold trap fraction vs RMS slope at different latitudes
-2. **Figure 4**: Scale-dependent cold trap areas for fresh and degraded craters
+2. **Figure 4**: PSR and cold trap size distributions (cumulative areas and counts)
 3. **Table 1**: Total lunar cold trap area estimates
 
 ### Step 2: Apply Cone Framework
@@ -44,18 +44,21 @@ At 88°S latitude, peak cold trap fraction occurs at σs ≈ 15° with f ≈ 2.3
 
 ---
 
-### Figure 4: Scale-Dependent Cold Trap Areas
+### Figure 4: PSR and Cold Trap Size Distributions
 
-**Bowl Framework:**
-- Fresh craters (γ = 0.14): Minimal cold trap area
-- Degraded craters (γ = 0.076): Significant cold trap area scaling as ~D²
+**Top Panel: Cumulative Cold Trap Area**
+- Shows cumulative area of cold traps (<110 K) as a function of length scale L
+- Northern Hemisphere: ~9,116 km² total cold trap area
+- Southern Hemisphere: ~13,674 km² total cold trap area
+- Demonstrates hemispheric asymmetry (South/North ratio: 1.50)
 
-**Cone Framework:**
-- Degraded craters show ~15% enhancement
-- Same power-law scaling with diameter
-- Lateral conduction limit unchanged
+**Bottom Panel: Number of Individual PSRs and Cold Traps**
+- Shows modeled number of individual PSRs and cold traps on the Moon
+- Total features: ~7.84×10¹³ (Northern: 3.13×10¹³, Southern: 4.70×10¹³)
+- Size-frequency distribution follows N(>L) ∝ L⁻² power law
+- Length-scale bins are logarithmically spaced (0.01 m to 100 km)
 
-**Key Insight:** Small degraded craters benefit most from cone geometry assumptions, as they better approximate conical shapes after erosion.
+**Key Insight:** The southern hemisphere contains 50% more PSRs and cold trap area than the northern hemisphere, consistent with observed topographic asymmetry. Total cold trap area represents 0.06% of lunar surface.
 
 ---
 

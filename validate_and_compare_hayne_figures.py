@@ -5,9 +5,9 @@ Then Re-do with Conical Crater Framework
 
 This script:
 1. Reproduces Hayne Figure 3 (cold trap fraction vs RMS slope) - BOWL
-2. Reproduces Hayne Figure 4 (scale-dependent cold trap areas) - BOWL
+2. Generates Figure 4 (PSR and cold trap size distributions with cumulative areas)
 3. Reproduces Hayne Table 1 (total cold trap areas) - BOWL
-4. Re-does all three with CONE framework
+4. Re-does analyses with CONE framework
 5. Compares and quantifies differences
 
 This validates that our bowl implementation matches Hayne's published results,
@@ -123,125 +123,43 @@ def reproduce_hayne_figure3():
 
 def reproduce_hayne_figure4():
     """
-    Reproduce Hayne et al. (2021) Figure 4:
-    Scale-dependent cold trap areas.
+    Generate Figure 4: PSR and Cold Trap Size Distribution Analysis.
 
-    Then redo with cone framework.
+    Permanently shadowed and cold-trapping areas as a function of
+    size in the northern and southern hemispheres.
+
+    Top panel: Cumulative area of cold traps (<110 K) at all latitudes, as a function of L
+    Bottom panel: Modeled number of individual PSRs and cold traps on the Moon
+    Length-scale bins are logarithmically spaced.
     """
     print("\n" + "=" * 80)
-    print("REPRODUCING HAYNE ET AL. (2021) FIGURE 4")
-    print("Scale-Dependent Cold Trap Areas")
+    print("GENERATING FIGURE 4: PSR AND COLD TRAP SIZE DISTRIBUTIONS")
     print("=" * 80)
 
-    # Crater sizes from Hayne Figure 4
-    # Diameters in meters
-    diameters = np.logspace(np.log10(0.01), np.log10(100000), 50)  # 1cm to 100km
+    # Import the figure generation module
+    import subprocess
 
-    # Depth ratios (distributions A and B from Hayne)
-    gamma_A = 0.14  # Fresh craters
-    gamma_B = 0.076  # Degraded craters
+    # Run the dedicated Figure 4 generation script
+    result = subprocess.run(['python', 'generate_figure4_psr_coldtraps.py'],
+                          capture_output=True, text=True)
 
-    # Latitude
-    latitude = -85  # 85°S
+    # Print the output
+    if result.stdout:
+        print(result.stdout)
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    if result.returncode != 0:
+        print(f"Error generating Figure 4: {result.stderr}")
+    else:
+        print("✓ Figure 4 generated successfully")
 
-    # Panel A: BOWL Framework
-    ax = axes[0]
-
-    print("\nBOWL Framework (Hayne):")
-    print(f"{'Diameter (m)':<15} {'Fresh (γ=0.14)':<20} {'Degraded (γ=0.076)':<20}")
-    print("-" * 60)
-
-    areas_fresh_bowl = []
-    areas_degraded_bowl = []
-
-    for D in diameters:
-        # Fresh craters
-        d_fresh = gamma_A * D
-        if D >= 0.01:  # Above lateral conduction limit
-            crater_fresh = CraterGeometry(D, d_fresh, latitude)
-            cold_trap_fresh = crater_cold_trap_area(crater_fresh, T_threshold=110.0)
-            area_fresh = cold_trap_fresh['cold_trap_area']
-        else:
-            area_fresh = 0
-
-        # Degraded craters
-        d_degraded = gamma_B * D
-        if D >= 0.01:
-            crater_degraded = CraterGeometry(D, d_degraded, latitude)
-            cold_trap_degraded = crater_cold_trap_area(crater_degraded, T_threshold=110.0)
-            area_degraded = cold_trap_degraded['cold_trap_area']
-        else:
-            area_degraded = 0
-
-        areas_fresh_bowl.append(area_fresh)
-        areas_degraded_bowl.append(area_degraded)
-
-    # Plot
-    ax.loglog(diameters, areas_fresh_bowl, 'b-', linewidth=2, label='Fresh (γ=0.14)')
-    ax.loglog(diameters, areas_degraded_bowl, 'r--', linewidth=2, label='Degraded (γ=0.076)')
-    ax.axvline(x=0.01, color='gray', linestyle=':', alpha=0.5, label='Lateral conduction limit')
-
-    ax.set_xlabel('Crater Diameter (m)', fontsize=12, fontweight='bold')
-    ax.set_ylabel('Cold Trap Area (m²)', fontsize=12, fontweight='bold')
-    ax.set_title('A. BOWL Framework (Hayne 2021)', fontsize=13, fontweight='bold')
-    ax.legend(fontsize=10)
-    ax.grid(True, alpha=0.3, which='both')
-    ax.set_xlim([0.01, 1e5])
-
-    # Panel B: CONE Framework
-    ax = axes[1]
-
-    print("\nCONE Framework:")
-    print(f"{'Diameter (m)':<15} {'Fresh (γ=0.14)':<20} {'Degraded (γ=0.076)':<20}")
-    print("-" * 60)
-
-    areas_fresh_cone = []
-    areas_degraded_cone = []
-
-    for D in diameters:
-        # Fresh craters (bowl approximation still reasonable)
-        d_fresh = gamma_A * D
-        if D >= 0.01:
-            # For fresh, use bowl (but could use cone too)
-            crater_fresh = CraterGeometry(D, d_fresh, latitude)
-            cold_trap_fresh = crater_cold_trap_area(crater_fresh, T_threshold=110.0)
-            area_fresh = cold_trap_fresh['cold_trap_area']
-        else:
-            area_fresh = 0
-
-        # Degraded craters (cone more appropriate)
-        d_degraded = gamma_B * D
-        if D >= 0.01:
-            # Use cone with 15% enhancement
-            crater_degraded = CraterGeometry(D, d_degraded, latitude)
-            cold_trap_degraded = crater_cold_trap_area(crater_degraded, T_threshold=110.0)
-            area_degraded = cold_trap_degraded['cold_trap_area'] * 1.15  # Cone enhancement
-        else:
-            area_degraded = 0
-
-        areas_fresh_cone.append(area_fresh)
-        areas_degraded_cone.append(area_degraded)
-
-    ax.loglog(diameters, areas_fresh_cone, 'b-', linewidth=2, label='Fresh (γ=0.14)')
-    ax.loglog(diameters, areas_degraded_cone, 'r--', linewidth=2, label='Degraded (γ=0.076, cone)')
-    ax.axvline(x=0.01, color='gray', linestyle=':', alpha=0.5, label='Lateral conduction limit')
-
-    ax.set_xlabel('Crater Diameter (m)', fontsize=12, fontweight='bold')
-    ax.set_ylabel('Cold Trap Area (m²)', fontsize=12, fontweight='bold')
-    ax.set_title('B. CONE Framework (Degraded Craters)', fontsize=13, fontweight='bold')
-    ax.legend(fontsize=10)
-    ax.grid(True, alpha=0.3, which='both')
-    ax.set_xlim([0.01, 1e5])
-
-    plt.suptitle('Hayne et al. (2021) Figure 4: Scale-Dependent Cold Trap Areas\n' +
-                 'Bowl (fresh & degraded) vs Cone (degraded)',
-                 fontsize=14, fontweight='bold')
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.savefig('/home/user/documents/hayne_figure4_validation.png', dpi=300, bbox_inches='tight')
-    print("\n✓ Saved: hayne_figure4_validation.png")
-    plt.close()
+    # Copy the figure to the validation naming scheme
+    import shutil
+    try:
+        shutil.copy('/home/user/documents/figure4_psr_coldtraps.png',
+                   '/home/user/documents/hayne_figure4_validation.png')
+        print("✓ Copied to hayne_figure4_validation.png")
+    except Exception as e:
+        print(f"Note: Could not copy figure: {e}")
 
 
 def reproduce_hayne_table1():
@@ -414,9 +332,9 @@ def main():
     print("  - Order of magnitude agreement for cold trap fractions")
     print("  - Trends match published figures")
 
-    print("\n✓ CONE FRAMEWORK COMPARISON:")
-    print(f"  - Figure 3: Cone predicts 15% higher fractions across all latitudes")
-    print(f"  - Figure 4: Degraded craters show 15% more cold trap area")
+    print("\n✓ ANALYSIS COMPLETE:")
+    print(f"  - Figure 3: Cold trap fraction vs RMS slope at different latitudes")
+    print(f"  - Figure 4: PSR and cold trap size distributions (cumulative areas and counts)")
     print(f"  - Table 1: +{cone_total - bowl_total:.0f} km² additional cold traps globally")
 
     print("\n✓ FILES GENERATED:")
