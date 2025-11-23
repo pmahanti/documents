@@ -329,7 +329,7 @@ def plot_figure4_top_panel(L_bins, A_north, A_south,
     """
     Create Figure 4 top panel: Cumulative cold trap area vs length scale.
     """
-    fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+    fig, ax = plt.subplots(1, 1, figsize=(8, 6))
 
     # Calculate cumulative areas
     A_north_cum = np.cumsum(A_north)
@@ -346,6 +346,11 @@ def plot_figure4_top_panel(L_bins, A_north, A_south,
                alpha=0.7, linewidth=2, label='Lateral conduction limit (1 cm)')
     ax.axvline(x=TRANSITION_SCALE, color='purple', linestyle=':',
                alpha=0.6, linewidth=2, label=f'Transition to observed PSRs ({TRANSITION_SCALE/1000:.0f} km)')
+
+    # Mark smallest PSR from geodata (diameter = 270.81 m)
+    SMALLEST_PSR_DIAMETER = 270.81  # m
+    ax.axvline(x=SMALLEST_PSR_DIAMETER, color='green', linestyle=':',
+               alpha=0.8, linewidth=1.5, label=f'Smallest PSR ({SMALLEST_PSR_DIAMETER:.1f} m)')
 
     ax.set_xlabel('Length Scale L [m]', fontsize=14, fontweight='bold')
     ax.set_ylabel('Cumulative Cold Trap Area < L [km²]', fontsize=14, fontweight='bold')
