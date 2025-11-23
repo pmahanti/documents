@@ -155,9 +155,10 @@ def plot_figure4(L_bins: np.ndarray, N_north: np.ndarray, N_south: np.ndarray,
     # TOP PANEL: Cumulative cold trap area
     # ========================================================================
 
-    # Calculate cumulative areas (from large to small features)
-    A_north_cumulative = np.cumsum(A_north[::-1])[::-1]
-    A_south_cumulative = np.cumsum(A_south[::-1])[::-1]
+    # Calculate cumulative areas (from small to large features)
+    # For each L, show total area of all cold traps with size <= L
+    A_north_cumulative = np.cumsum(A_north)
+    A_south_cumulative = np.cumsum(A_south)
 
     ax_top.loglog(L_bins, A_north_cumulative, 'b-', linewidth=2.5,
                   label='Northern Hemisphere', marker='o', markersize=4, markevery=5)
