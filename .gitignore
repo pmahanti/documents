@@ -33,3 +33,10 @@ wheels/
 # OS
 .DS_Store
 Thumbs.db
+
+# Large data files (restored from git history for processing)
+hayne_model_corrected.py
+polar_north_80_summer_max-float.tif
+polar_south_80_summer_max-float.tif
+psr_database.gpkg
+psr_with_temperatures.csv
