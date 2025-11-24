@@ -229,6 +229,87 @@ def calculate_cumulative_by_size(coldtraps, L_values):
     return cum_area_north, cum_area_south
 
 
+def calculate_psr_counts(L_min=1e-4, L_max=100000, n_bins=100):
+    """
+    Calculate number of PSRs at each length scale.
+
+    Returns:
+        L_values: Array of length scales [m]
+        N_psr_north: Number of PSRs in northern hemisphere
+        N_psr_south: Number of PSRs in southern hemisphere
+    """
+    print("\n[Calculating PSR counts]")
+
+    # Create logarithmic bins for PSR diameters
+    L_bins = np.logspace(np.log10(L_min), np.log10(L_max), n_bins)
+    dL = np.diff(np.logspace(np.log10(L_min), np.log10(L_max), n_bins + 1))
+
+    # Power-law exponent
+    b = 1.8
+
+    # Scale factor
+    K = 2e11
+
+    # Differential number density
+    N_diff = K * L_bins**(-b - 1)
+    N_per_bin = N_diff * dL
+
+    # Hemisphere asymmetry
+    N_psr_north = N_per_bin * 0.40
+    N_psr_south = N_per_bin * 0.60
+
+    print(f"  Total PSRs (North): {N_psr_north.sum():.2e}")
+    print(f"  Total PSRs (South): {N_psr_south.sum():.2e}")
+
+    return L_bins, N_psr_north, N_psr_south
+
+
+def calculate_coldtrap_counts(coldtraps, L_values):
+    """
+    Calculate number of cold traps at each length scale.
+
+    Args:
+        coldtraps: List of dicts with 'diameter_m', 'area_km2', 'hemisphere', 'count'
+        L_values: Array of diameter values [m]
+
+    Returns:
+        N_ct_north, N_ct_south: Number of cold traps at each L
+    """
+    print("\n[Calculating cold trap counts by size]")
+
+    # Create bin edges (geometric mean between adjacent bins)
+    L_edges = np.zeros(len(L_values) + 1)
+    L_edges[0] = L_values[0] / (L_values[1]/L_values[0])**0.5
+    L_edges[-1] = L_values[-1] * (L_values[-1]/L_values[-2])**0.5
+    for i in range(1, len(L_values)):
+        L_edges[i] = np.sqrt(L_values[i-1] * L_values[i])
+
+    # Initialize count arrays
+    N_ct_north = np.zeros(len(L_values))
+    N_ct_south = np.zeros(len(L_values))
+
+    # Bin the cold traps by their diameter
+    for ct in coldtraps:
+        diameter = ct['diameter_m']
+        count = ct['count']
+        hemisphere = ct['hemisphere']
+
+        # Find which bin this cold trap belongs to
+        bin_idx = np.searchsorted(L_edges, diameter) - 1
+
+        # Check if within bin range
+        if 0 <= bin_idx < len(L_values):
+            if hemisphere == 'North':
+                N_ct_north[bin_idx] += count
+            else:  # South
+                N_ct_south[bin_idx] += count
+
+    print(f"  Total cold traps (North): {N_ct_north.sum():.2e}")
+    print(f"  Total cold traps (South): {N_ct_south.sum():.2e}")
+
+    return N_ct_north, N_ct_south
+
+
 def plot_cumulative_coldtrap_area(L_values, cum_area_north, cum_area_south,
                                    output_path='/home/user/documents/figure4_top_panel.png'):
     """
@@ -280,11 +361,109 @@ def plot_cumulative_coldtrap_area(L_values, cum_area_north, cum_area_south,
     plt.close()
 
 
+def plot_figure4_complete(L_values, cum_area_north, cum_area_south,
+                          N_psr_north, N_psr_south, N_ct_north, N_ct_south,
+                          output_path='/home/user/documents/figure4_complete.png'):
+    """
+    Create complete Figure 4 with both top and bottom panels.
+
+    Top panel: Cumulative cold trap area vs cold trap diameter
+    Bottom panel: Number of PSRs and cold traps vs length scale
+    """
+    fig, (ax_top, ax_bottom) = plt.subplots(2, 1, figsize=(10, 14))
+
+    # ========================================================================
+    # TOP PANEL: Cumulative Cold Trap Area
+    # ========================================================================
+
+    # Plot cumulative areas
+    ax_top.loglog(L_values, cum_area_north, 'b-', linewidth=2.5,
+                  label='Northern Hemisphere', marker='o', markersize=5, markevery=10)
+    ax_top.loglog(L_values, cum_area_south, 'r-', linewidth=2.5,
+                  label='Southern Hemisphere', marker='s', markersize=5, markevery=10)
+
+    # Add reference lines
+    ax_top.axvline(x=LATERAL_CONDUCTION_LIMIT, color='gray', linestyle='--',
+                   alpha=0.7, linewidth=2, label='Lateral conduction limit (1 mm)')
+    ax_top.axvline(x=TRANSITION_SCALE, color='purple', linestyle=':',
+                   alpha=0.6, linewidth=2, label=f'Transition to observed data ({TRANSITION_SCALE/1000:.0f} km)')
+
+    ax_top.set_xlabel('Cold Trap Diameter L [m]', fontsize=14, fontweight='bold')
+    ax_top.set_ylabel('Cumulative Cold Trap Area < L [km²]', fontsize=14, fontweight='bold')
+    ax_top.set_title('Top Panel: Cumulative Area of Cold Traps < L',
+                     fontsize=13, fontweight='bold', pad=10)
+    ax_top.legend(fontsize=11, loc='upper left', framealpha=0.95)
+    ax_top.grid(True, alpha=0.3, which='both', linestyle=':')
+    ax_top.set_xlim([L_values[0], L_values[-1]])
+    ax_top.set_ylim([1e-2, 1e5])
+    ax_top.tick_params(labelsize=12)
+
+    # Add annotations
+    total_north = cum_area_north[-1]
+    total_south = cum_area_south[-1]
+    total_both = total_north + total_south
+
+    ax_top.text(0.95, 0.35, f'Total North: {total_north:,.0f} km²',
+                transform=ax_top.transAxes, fontsize=11, ha='right',
+                bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+    ax_top.text(0.95, 0.25, f'Total South: {total_south:,.0f} km²',
+                transform=ax_top.transAxes, fontsize=11, ha='right',
+                bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.8))
+    ax_top.text(0.95, 0.15, f'TOTAL: {total_both:,.0f} km²',
+                transform=ax_top.transAxes, fontsize=12, fontweight='bold', ha='right',
+                bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
+
+    # ========================================================================
+    # BOTTOM PANEL: Number of PSRs and Cold Traps
+    # ========================================================================
+
+    # Plot PSR counts
+    ax_bottom.loglog(L_values, N_psr_north + N_psr_south, 'k-', linewidth=2.5,
+                     label='PSRs (Total)', marker='o', markersize=4, markevery=10, alpha=0.7)
+
+    # Plot cold trap counts
+    ax_bottom.loglog(L_values, N_ct_north + N_ct_south, 'g-', linewidth=2.5,
+                     label='Cold Traps (Total)', marker='s', markersize=4, markevery=10, alpha=0.7)
+
+    # Add reference lines
+    ax_bottom.axvline(x=LATERAL_CONDUCTION_LIMIT, color='gray', linestyle='--',
+                      alpha=0.7, linewidth=2, label='Lateral conduction limit (1 mm)')
+    ax_bottom.axvline(x=TRANSITION_SCALE, color='purple', linestyle=':',
+                      alpha=0.6, linewidth=2, label=f'Transition to observed data ({TRANSITION_SCALE/1000:.0f} km)')
+
+    ax_bottom.set_xlabel('Length Scale L [m]', fontsize=14, fontweight='bold')
+    ax_bottom.set_ylabel('Number', fontsize=14, fontweight='bold')
+    ax_bottom.set_title('Bottom Panel: Modelled Number of Individual PSRs and Cold Traps on the Moon',
+                        fontsize=13, fontweight='bold', pad=10)
+    ax_bottom.legend(fontsize=11, loc='upper right', framealpha=0.95)
+    ax_bottom.grid(True, alpha=0.3, which='both', linestyle=':')
+    ax_bottom.set_xlim([L_values[0], L_values[-1]])
+    ax_bottom.tick_params(labelsize=12)
+
+    # Add note about logarithmic spacing
+    ax_bottom.text(0.05, 0.05, 'Length-scale bins are logarithmically spaced',
+                   transform=ax_bottom.transAxes, fontsize=10, style='italic',
+                   bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+    # ========================================================================
+    # Overall Figure
+    # ========================================================================
+
+    plt.suptitle('Figure 4: PSR and Cold Trap Size Distribution',
+                 fontsize=15, fontweight='bold', y=0.998)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.995])
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"\n✓ Saved complete figure: {output_path}")
+    plt.close()
+
+
 def main():
     """Main execution."""
     print("\n" + "=" * 80)
-    print("FIGURE 4 TOP PANEL: CUMULATIVE COLD TRAP AREA BY COLD TRAP SIZE")
-    print("Plots cumulative area of cold traps with diameter < L")
+    print("FIGURE 4: COMPLETE (TOP AND BOTTOM PANELS)")
+    print("Top: Cumulative cold trap area by cold trap size")
+    print("Bottom: Number of PSRs and cold traps")
     print("=" * 80)
 
     # Load PSR data with Diviner temperatures
@@ -307,11 +486,21 @@ def main():
     # Define L values for cumulative calculation
     L_values = np.logspace(np.log10(1e-4), np.log10(100000), 200)
 
-    # Calculate cumulative areas
+    # Calculate cumulative areas for top panel
     cum_area_north, cum_area_south = calculate_cumulative_by_size(all_coldtraps, L_values)
 
-    # Plot
+    # Calculate PSR counts for bottom panel
+    L_psr, N_psr_north, N_psr_south = calculate_psr_counts(L_min=1e-4, L_max=100000, n_bins=200)
+
+    # Calculate cold trap counts for bottom panel
+    N_ct_north, N_ct_south = calculate_coldtrap_counts(all_coldtraps, L_values)
+
+    # Plot top panel only (original)
     plot_cumulative_coldtrap_area(L_values, cum_area_north, cum_area_south)
+
+    # Plot complete figure with both panels
+    plot_figure4_complete(L_values, cum_area_north, cum_area_south,
+                          N_psr_north, N_psr_south, N_ct_north, N_ct_south)
 
     # Summary
     total_area = cum_area_north[-1] + cum_area_south[-1]
@@ -321,7 +510,9 @@ def main():
     print(f"Total cumulative cold trap area: {total_area:,.2f} km²")
     print(f"Fraction of lunar surface: {total_area/LUNAR_SURFACE_AREA*100:.4f}%")
     print(f"South/North ratio: {cum_area_south[-1]/cum_area_north[-1]:.2f}")
-    print("\n✓ COMPLETE: Figure 4 top panel by cold trap size")
+    print(f"\nTotal PSRs: {(N_psr_north.sum() + N_psr_south.sum()):.2e}")
+    print(f"Total cold traps: {(N_ct_north.sum() + N_ct_south.sum()):.2e}")
+    print("\n✓ COMPLETE: Figure 4 with top and bottom panels")
     print("=" * 80 + "\n")
 
 
