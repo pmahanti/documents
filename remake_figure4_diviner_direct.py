@@ -22,9 +22,18 @@ from hayne_model_corrected import hayne_cold_trap_fraction_corrected
 COLD_TRAP_THRESHOLD = 110.0  # K
 DIVINER_PIXEL_SIZE = 0.24  # km (240m)
 DIVINER_PIXEL_AREA = DIVINER_PIXEL_SIZE ** 2  # km² = 0.0576 km²/pixel
-LATERAL_CONDUCTION_LIMIT = 0.01  # 1 cm in meters
+LATERAL_CONDUCTION_LIMIT = 0.01  # 1 cm in meters - theoretical minimum for cold trap formation
 TRANSITION_SCALE = 1000.0  # 1 km - transition from synthetic to observed
 LUNAR_SURFACE_AREA = 3.793e7  # km²
+
+# NOTE ON OBSERVED MINIMUM COLD TRAP SIZE:
+# The smallest observed cold trap in the Diviner dataset is 61.7m diameter.
+# This is NOT a code bug or artificial limit - it reflects the actual data:
+#   1. Diviner pixel resolution: 240m × 240m (smallest PSR is 270.8m diameter)
+#   2. Most small PSRs are at lower latitudes (70-85°) where few are cold enough (<110K)
+#   3. The 61.7m is the diameter of the COLD TRAP area within a larger PSR
+# The model generates synthetic cold traps down to LATERAL_CONDUCTION_LIMIT (1cm) for
+# features < TRANSITION_SCALE (1km), but observed data only starts at 61.7m.
 
 # File path
 PSR_CSV = '/home/user/documents/psr_with_temperatures.csv'
@@ -286,7 +295,8 @@ def create_hybrid_distribution(large_psrs_data, L_min=1e-4, L_max=100000, n_bins
         print("\n  [Small scales: Synthetic power-law + Hayne model]")
 
         # Generate synthetic distribution only for small bins
-        synth = generate_synthetic_distribution(L_min=L_bins[0], L_max=L_bins[transition_idx-1],
+        # FIXED: Use exact TRANSITION_SCALE (1000m) instead of L_bins[transition_idx-1] (~811m)
+        synth = generate_synthetic_distribution(L_min=L_bins[0], L_max=TRANSITION_SCALE,
                                                 n_bins=transition_idx)
 
         # Calculate cold trap areas using Hayne model
