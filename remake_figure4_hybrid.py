@@ -21,7 +21,7 @@ from hayne_model_corrected import hayne_cold_trap_fraction_corrected
 SIGMA_SB = 5.67051e-8  # Stefan-Boltzmann constant [W m⁻² K⁻⁴]
 LUNAR_SURFACE_AREA = 3.793e7  # Total lunar surface area [km²]
 LUNAR_RADIUS = 1737.4  # Lunar radius [km]
-LATERAL_CONDUCTION_LIMIT = 0.001  # 1 mm in meters (extended from 1 cm to enable sub-cm cold traps)
+LATERAL_CONDUCTION_LIMIT = 0.01  # 1 cm in meters
 COLD_TRAP_THRESHOLD = 110.0  # Temperature threshold for cold traps [K]
 
 # Transition scale between synthetic and observed data

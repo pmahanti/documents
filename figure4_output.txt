@@ -1,0 +1,58 @@
+
+================================================================================
+FIGURE 4: COMPLETE (TOP AND BOTTOM PANELS)
+Top: Cumulative cold trap area by cold trap size
+Bottom: Number of PSRs and cold traps
+================================================================================
+
+[Loading PSR data with Diviner temperatures]
+✓ Loaded 8039 PSRs with Diviner temperature data
+  Total PSR area: 2726.99 km²
+  Total cold trap area (< 110K): 573.85 km²
+  PSRs with cold traps: 738
+  Cold trap diameter range: 61.7 - 8879.4 m
+
+[Generating synthetic cold traps]
+  Generated 142 synthetic cold trap size bins
+  Total synthetic cold trap area: 18187.95 km²
+
+[Extracting observed cold traps from large PSRs]
+  Large PSRs (D >= 1000.0m): 521
+  Large PSRs with cold traps: 140
+  Total observed cold trap area: 513.06 km²
+
+[Combined cold trap inventory]
+  Synthetic cold trap bins: 142
+  Observed cold traps: 140
+  Total entries: 282
+
+[Calculating cumulative areas by cold trap size]
+  Total cold trap area (North): 7275.18 km²
+  Total cold trap area (South): 11425.83 km²
+  Total: 18701.01 km²
+
+[Calculating PSR counts]
+  Total PSRs (North): 8.08e+17
+  Total PSRs (South): 1.21e+18
+
+[Calculating cold trap counts by size]
+  Total cold traps (North): 1.69e+14
+  Total cold traps (South): 2.53e+14
+
+✓ Saved: /home/user/documents/figure4_top_panel.png
+
+✓ Saved complete figure: /home/user/documents/figure4_complete.png
+
+================================================================================
+SUMMARY
+================================================================================
+Total cumulative cold trap area: 18,701.01 km²
+Fraction of lunar surface: 0.0493%
+South/North ratio: 1.57
+
+Total PSRs: 2.02e+18
+Total cold traps: 4.22e+14
+
+✓ COMPLETE: Figure 4 with top and bottom panels
+================================================================================
+
