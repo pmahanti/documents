@@ -22,7 +22,7 @@ from hayne_model_corrected import hayne_cold_trap_fraction_corrected
 COLD_TRAP_THRESHOLD = 110.0  # K
 DIVINER_PIXEL_SIZE = 0.24  # km (240m)
 DIVINER_PIXEL_AREA = DIVINER_PIXEL_SIZE ** 2  # km² = 0.0576 km²/pixel
-LATERAL_CONDUCTION_LIMIT = 0.01  # 1 cm in meters
+LATERAL_CONDUCTION_LIMIT = 0.001  # 1 mm in meters (extended from 1 cm to enable sub-cm cold traps)
 TRANSITION_SCALE = 1000.0  # 1 km - transition from synthetic to observed
 LUNAR_SURFACE_AREA = 3.793e7  # km²
 
@@ -343,7 +343,7 @@ def plot_figure4_top_panel(L_bins, A_north, A_south,
 
     # Add reference lines
     ax.axvline(x=LATERAL_CONDUCTION_LIMIT, color='gray', linestyle='--',
-               alpha=0.7, linewidth=2, label='Lateral conduction limit (1 cm)')
+               alpha=0.7, linewidth=2, label=f'Lateral conduction limit ({LATERAL_CONDUCTION_LIMIT*1000:.0f} mm)')
     ax.axvline(x=TRANSITION_SCALE, color='purple', linestyle=':',
                alpha=0.6, linewidth=2, label=f'Transition to observed PSRs ({TRANSITION_SCALE/1000:.0f} km)')
 

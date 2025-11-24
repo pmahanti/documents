@@ -20,7 +20,7 @@ from hayne_model_corrected import hayne_cold_trap_fraction_corrected
 COLD_TRAP_THRESHOLD = 110.0  # K
 DIVINER_PIXEL_SIZE = 0.24  # km (240m)
 DIVINER_PIXEL_AREA = DIVINER_PIXEL_SIZE ** 2  # km² = 0.0576 km²/pixel
-LATERAL_CONDUCTION_LIMIT = 0.01  # 1 cm in meters
+LATERAL_CONDUCTION_LIMIT = 0.001  # 1 mm in meters (extended from 1 cm to enable sub-cm cold traps)
 TRANSITION_SCALE = 1000.0  # 1 km - transition from synthetic to observed
 LUNAR_SURFACE_AREA = 3.793e7  # km²
 
