@@ -1,58 +1,99 @@
 
 ================================================================================
-FIGURE 4: COMPLETE (TOP AND BOTTOM PANELS)
-Top: Cumulative cold trap area by cold trap size
-Bottom: Number of PSRs and cold traps
+VERIFYING PAPER CLAIMS WITH CURRENT MODEL
+Lateral conduction limit: 1.0 cm
 ================================================================================
 
-[Loading PSR data with Diviner temperatures]
-✓ Loaded 8039 PSRs with Diviner temperature data
-  Total PSR area: 2726.99 km²
-  Total cold trap area (< 110K): 573.85 km²
-  PSRs with cold traps: 738
-  Cold trap diameter range: 61.7 - 8879.4 m
+[Loading PSR data...]
 
-[Generating synthetic cold traps]
-  Generated 142 synthetic cold trap size bins
-  Total synthetic cold trap area: 18187.95 km²
+[Generating synthetic cold traps...]
 
-[Extracting observed cold traps from large PSRs]
-  Large PSRs (D >= 1000.0m): 521
-  Large PSRs with cold traps: 140
-  Total observed cold trap area: 513.06 km²
-
-[Combined cold trap inventory]
-  Synthetic cold trap bins: 142
-  Observed cold traps: 140
-  Total entries: 282
-
-[Calculating cumulative areas by cold trap size]
-  Total cold trap area (North): 7275.18 km²
-  Total cold trap area (South): 11425.83 km²
-  Total: 18701.01 km²
-
-[Calculating PSR counts]
-  Total PSRs (North): 8.08e+17
-  Total PSRs (South): 1.21e+18
-
-[Calculating cold trap counts by size]
-  Total cold traps (North): 1.69e+14
-  Total cold traps (South): 2.53e+14
-
-✓ Saved: /home/user/documents/figure4_top_panel.png
-
-✓ Saved complete figure: /home/user/documents/figure4_complete.png
+[Extracting observed cold traps...]
 
 ================================================================================
-SUMMARY
+COLD TRAP AREA BY SIZE RANGE
 ================================================================================
-Total cumulative cold trap area: 18,701.01 km²
-Fraction of lunar surface: 0.0493%
-South/North ratio: 1.57
 
-Total PSRs: 2.02e+18
-Total cold traps: 4.22e+14
+< 1 m:
+  North: 2,532.24 km² (1.69e+14 cold traps)
+  South: 3,798.36 km² (2.53e+14 cold traps)
+  TOTAL: 6,330.60 km²
+  N/S ratio: 0.667
 
-✓ COMPLETE: Figure 4 with top and bottom panels
+1 m - 10 m:
+  North: 2,032.62 km² (5.24e+08 cold traps)
+  South: 3,048.92 km² (7.86e+08 cold traps)
+  TOTAL: 5,081.54 km²
+  N/S ratio: 0.667
+
+10 m - 100 m:
+  North: 2,710.33 km² (6.24e+06 cold traps)
+  South: 4,065.51 km² (9.36e+06 cold traps)
+  TOTAL: 6,775.83 km²
+  N/S ratio: 0.667
+
+100 m - 1 km:
+  North: 0.00 km² (0.00e+00 cold traps)
+  South: 19.41 km² (5.70e+01 cold traps)
+  TOTAL: 19.41 km²
+  N/S ratio: 0.000
+
+1 km - 10 km:
+  North: 0.00 km² (0.00e+00 cold traps)
+  South: 493.63 km² (8.00e+01 cold traps)
+  TOTAL: 493.63 km²
+  N/S ratio: 0.000
+
+> 10 km:
+  North: 0.00 km² (0.00e+00 cold traps)
+  South: 0.00 km² (0.00e+00 cold traps)
+  TOTAL: 0.00 km²
+
+--------------------------------------------------------------------------------
+OVERALL TOTALS:
+  North: 7,275.18 km²
+  South: 11,425.83 km²
+  TOTAL: 18,701.01 km²
+  S/N ratio: 1.571
+================================================================================
+
+================================================================================
+VERIFICATION OF PAPER CLAIMS
+================================================================================
+
+1. OVERALL COLD TRAP AREAS:
+   Paper claim: South ~23,000 km², North ~17,000 km²
+   Model result: South 11,426 km², North 7,275 km²
+   ✗ MISMATCH
+
+2. COLD TRAPS IN 1m-10km RANGE:
+   Paper claim: North has more cold traps of size ~1m-10km
+   Model result: North 5.30e+08, South 7.95e+08
+   ✗ MISMATCH
+
+3. COLD TRAPS > 10km:
+   Paper claim: South has more cold traps > 10km
+   Model result: North 0.00e+00, South 0.00e+00
+   ✗ MISMATCH
+
+4. AREA IN SHADOWS < 100m:
+   Paper claim: About 2,500 km²
+   Model result: 18,188 km²
+   ✗ MISMATCH
+
+5. AREA IN SHADOWS < 1m:
+   Paper claim: ~700 km²
+   Model result: 6,331 km²
+   ✗ MISMATCH
+
+6. MINIMUM COLD TRAP SIZE:
+   Lateral conduction limit: 1.0 cm
+   Smallest cold trap found: 0.0 m
+   Note: Cannot validate claims about <1m shadows with 1cm limit
+
+================================================================================
+
+================================================================================
+ANALYSIS COMPLETE
 ================================================================================
 
